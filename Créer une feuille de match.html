@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feuille de Match — Éditable</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@300;400;500;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --blue:      #0B1829;
+  --blue-mid:  #122038;
+  --blue-soft: #1C3256;
+  --accent:    #E02D37;
+  --gold:      #F5A623;
+  --green:     #00C17A;
+  --cyan:      #4A9FFF;
+  --white:     #FFFFFF;
+  --off:       #F2F5FA;
+  --border:    #D4DCE8;
+  --muted:     #8A9BBE;
+  --font-h:    'Barlow Condensed', sans-serif;
+  --font-b:    'Barlow', sans-serif;
+  --edit-bg:   rgba(74,159,255,0.06);
+  --edit-border: rgba(74,159,255,0.35);
+}
+
+body {
+  background: #CBD5E4;
+  font-family: var(--font-b);
+  color: var(--blue);
+  padding: 16px;
+}
+
+/* ── TOOLBAR ── */
+.toolbar {
+  width: 297mm;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--blue);
+  border-radius: 8px;
+  padding: 8px 14px;
+  flex-wrap: wrap;
+}
+.toolbar-title {
+  font-family: var(--font-h);
+  font-size: 13px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--white); flex: 1;
+}
+.toolbar-hint {
+  font-size: 10px; color: var(--muted);
+}
+.btn {
+  padding: 6px 14px;
+  border: none; border-radius: 5px;
+  font-family: var(--font-h); font-size: 12px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-print {
+  background: var(--accent); color: var(--white);
+}
+.btn-print:hover { background: #c0222c; }
+.btn-reset {
+  background: rgba(255,255,255,0.1); color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.btn-reset:hover { background: rgba(255,255,255,0.18); }
+
+/* ── PAGE ── */
+.page {
+  width: 297mm;
+  margin: 0 auto;
+  background: var(--white);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ── EDITABLE FIELDS ── */
+[contenteditable="true"] {
+  outline: none;
+  border-radius: 2px;
+  transition: background 0.12s, box-shadow 0.12s;
+  cursor: text;
+  -webkit-user-modify: read-write;
+}
+[contenteditable="true"]:hover {
+  background: var(--edit-bg) !important;
+  box-shadow: 0 0 0 1px var(--edit-border);
+}
+[contenteditable="true"]:focus {
+  background: rgba(74,159,255,0.12) !important;
+  box-shadow: 0 0 0 1.5px var(--cyan);
+}
+
+/* ════════════════════════════════
+   HEADER
+════════════════════════════════ */
+.header { background: var(--blue); }
+
+.header-top {
+  display: flex;
+  align-items: stretch;
+}
+
+.brand {
+  background: var(--accent);
+  padding: 10px 18px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-width: 100px; flex-shrink: 0;
+}
+.brand-logo {
+  font-family: var(--font-h);
+  font-size: 26px; font-weight: 900;
+  letter-spacing: 2px; color: var(--white); line-height: 1;
+}
+.brand-sub {
+  font-family: var(--font-h);
+  font-size: 7px; font-weight: 700;
+  letter-spacing: 2px; color: rgba(255,255,255,0.65);
+  text-transform: uppercase; margin-top: 2px;
+}
+
+.header-titles {
+  flex: 1; padding: 10px 20px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.doc-eyebrow {
+  font-family: var(--font-h); font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
+}
+.doc-title {
+  font-family: var(--font-h); font-size: 26px; font-weight: 900;
+  text-transform: uppercase; color: var(--white); line-height: 1; letter-spacing: 0.5px;
+}
+.doc-comp {
+  font-size: 10px; color: var(--muted); margin-top: 2px; line-height: 1.3;
+}
+
+.header-ids {
+  padding: 10px 16px; border-left: 1px solid rgba(255,255,255,0.08);
+  display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 180px;
+}
+.id-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 9px; color: var(--muted);
+}
+.id-row strong { color: var(--white); font-size: 10px; font-weight: 600; }
+.id-pip { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+/* MATCH HERO */
+.match-hero {
+  display: flex; align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  background: var(--blue-mid);
+  gap: 12px;
+}
+
+.team-side {
+  flex: 1; display: flex; align-items: center; gap: 10px;
+}
+.team-side.away { flex-direction: row-reverse; }
+
+.team-badge {
+  width: 44px; height: 44px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-h); font-size: 16px; font-weight: 900; color: var(--white);
+  flex-shrink: 0;
+}
+.badge-home { background: var(--accent); }
+.badge-away { background: var(--blue-soft); border: 1.5px solid rgba(255,255,255,0.12); }
+
+.team-info { flex: 1; }
+.team-side.away .team-info { text-align: right; }
+.team-tag {
+  font-family: var(--font-h); font-size: 8px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+}
+.team-name {
+  font-family: var(--font-h); font-size: 18px; font-weight: 900;
+  text-transform: uppercase; color: var(--white); line-height: 1.1;
+}
+.team-code { font-size: 9px; color: var(--muted); margin-top: 1px; }
+
+.score-block {
+  text-align: center; flex-shrink: 0; padding: 0 16px;
+}
+.scores {
+  display: flex; align-items: center; gap: 6px;
+}
+.score-box {
+  width: 48px; height: 46px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.14);
+  border-radius: 6px;
+  font-family: var(--font-h); font-size: 32px; font-weight: 900;
+  color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+}
+.score-box.away-win { border-color: var(--cyan); color: var(--cyan); }
+.score-box.home-win { border-color: var(--accent); color: var(--accent); }
+.score-sep {
+  font-family: var(--font-h); font-size: 24px;
+  font-weight: 300; color: var(--muted);
+}
+.score-label {
+  font-family: var(--font-h); font-size: 7.5px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+  margin-top: 4px;
+}
+.ht-score {
+  font-size: 9.5px; color: rgba(255,255,255,0.4); margin-top: 2px;
+}
+
+/* ════════════════════════════════
+   INFO BAND
+════════════════════════════════ */
+.info-band {
+  background: var(--off);
+  border-bottom: 2px solid var(--border);
+  display: flex;
+}
+.info-cell {
+  flex: 1; padding: 7px 12px;
+  border-right: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.info-cell:last-child { border-right: none; }
+.info-icon {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: var(--blue); display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
+}
+.info-key {
+  font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); line-height: 1;
+}
+.info-val {
+  font-size: 10.5px; font-weight: 600; color: var(--blue);
+  line-height: 1.3; margin-top: 1px;
+}
+.info-val small { font-size: 9px; font-weight: 400; color: var(--muted); display: block; }
+
+/* ════════════════════════════════
+   BODY — TWO COLUMNS
+════════════════════════════════ */
+.body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+}
+.col-divider { background: var(--border); }
+
+/* Section header */
+.sec-head {
+  display: flex; align-items: stretch;
+}
+.sec-bar { width: 4px; flex-shrink: 0; }
+.sec-bar-red { background: var(--accent); }
+.sec-bar-blue { background: var(--cyan); }
+
+.sec-label {
+  flex: 1; background: var(--blue);
+  font-family: var(--font-h); font-size: 10px; font-weight: 800;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); padding: 5px 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-label span { color: var(--white); }
+.sec-tag {
+  padding: 5px 10px;
+  font-family: var(--font-h); font-size: 10px; font-weight: 800;
+  letter-spacing: 1px;
+}
+.sec-tag-home { background: rgba(224,45,55,0.15); color: var(--accent); }
+.sec-tag-away { background: rgba(74,159,255,0.15); color: var(--cyan); }
+
+/* Player table */
+.ptable {
+  width: 100%; border-collapse: collapse;
+}
+.ptable thead tr { background: var(--blue); }
+.ptable thead th {
+  font-family: var(--font-h); font-size: 7.5px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--muted); padding: 4px 4px;
+  text-align: center; white-space: nowrap;
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+.ptable thead th.th-name { text-align: left; padding-left: 8px; }
+
+.ptable tbody tr { border-bottom: 1px solid var(--border); }
+.ptable tbody tr:nth-child(even) { background: #F7F9FD; }
+.ptable tbody tr.capt-row-home { background: #FFFBF2; }
+.ptable tbody tr.capt-row-away { background: #F0F6FF; }
+
+.ptable td {
+  padding: 3px 4px;
+  text-align: center; vertical-align: middle;
+  font-size: 9px;
+}
+
+.td-num {
+  font-family: var(--font-h); font-size: 14px; font-weight: 800;
+  color: var(--blue); width: 24px;
+  background: var(--off);
+  border-right: 1px solid var(--border);
+}
+.td-num.gk-num { color: var(--gold); }
+.td-num.capt-home { color: var(--gold); }
+.td-num.capt-away { color: var(--cyan); font-weight: 900; }
+
+.td-name {
+  text-align: left !important; padding-left: 8px !important;
+  font-weight: 600; color: var(--blue); font-size: 9.5px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 0; min-width: 100px;
+}
+.td-name .lic { display: block; font-size: 7px; font-weight: 400; color: var(--muted); }
+
+.pos-badge {
+  display: inline-block; padding: 1px 4px;
+  border-radius: 8px; font-size: 7px; font-weight: 800;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  cursor: pointer; user-select: none;
+  transition: opacity 0.1s;
+}
+.pos-badge:hover { opacity: 0.75; }
+.pos-gk { background: #FFF3CD; color: #9A6E00; }
+.pos-j  { background: #E3ECFF; color: #2255CC; }
+
+.td-goals {
+  font-family: var(--font-h); font-size: 14px; font-weight: 800;
+  color: var(--green); width: 22px;
+}
+.td-goals.zero, .td-7m.zero, .td-ars.zero { color: var(--border); font-size: 11px; }
+.td-7m { font-family: var(--font-h); font-size: 12px; font-weight: 700; color: #00A068; width: 18px; }
+.td-tirs { font-size: 9px; color: var(--muted); width: 22px; }
+.td-ars { font-family: var(--font-h); font-size: 12px; font-weight: 700; color: #2255CC; width: 22px; }
+
+/* ── PENALTY CELLS ── */
+.pen-row {
+  display: flex; align-items: center; justify-content: center;
+}
+.pen-box {
+  width: 16px; height: 16px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7px; font-weight: 700;
+  cursor: pointer; user-select: none;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.pen-box:hover { transform: scale(1.15); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.c-yellow { background: #FFF3CD; border-color: #E0A800; color: #8A6200; }
+.c-2min   { background: #FFF0E5; border-color: #F5A623; color: #C07000; }
+.c-2min-used { background: #FFD580; border-color: #D08000; color: #6A4000; }
+.c-red    { background: #FFE0E2; border-color: var(--accent); color: var(--accent); }
+.c-blue   { background: #E0EDFF; border-color: #4A9FFF; color: #0055CC; }
+.c-empty  { background: var(--off); border-color: var(--border); color: var(--muted); }
+
+/* ── OFFICIALS ── */
+.off-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+}
+.off-cell {
+  padding: 5px 10px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.off-cell:nth-child(2n) { border-right: none; }
+.off-role {
+  font-size: 7px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
+}
+.off-name { font-size: 10px; font-weight: 600; color: var(--blue); }
+
+/* ════════════════════════════════
+   BOTTOM
+════════════════════════════════ */
+.bottom-row {
+  display: flex;
+  border-top: 2px solid var(--border);
+}
+.arb-block { flex: 1; border-right: 1px solid var(--border); }
+.stats-block {
+  width: 170px; flex-shrink: 0; border-right: 1px solid var(--border);
+  padding: 8px 12px;
+}
+.stats-title {
+  font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+}
+.stat-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 2px 0; border-bottom: 1px solid var(--border);
+  font-size: 9px;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: var(--muted); }
+.stat-val { font-weight: 700; color: var(--blue); font-family: var(--font-h); font-size: 12px; }
+.stat-val.red { color: var(--accent); }
+.stat-val.blue-val { color: var(--cyan); }
+
+.period-block { padding: 6px 12px; }
+.period-title {
+  font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
+}
+.period-grid {
+  display: grid;
+  grid-template-columns: auto repeat(5, 1fr);
+  border: 1px solid var(--border);
+  border-radius: 4px; overflow: hidden;
+  font-size: 9px;
+}
+.pg-header {
+  background: var(--blue); color: var(--muted);
+  font-family: var(--font-h); font-size: 7px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 6px; text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+.pg-cell {
+  padding: 3px 6px; text-align: center;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.pg-cell:last-child { border-right: none; }
+.pg-row-label {
+  background: var(--off); font-weight: 700; font-size: 8px;
+  padding: 3px 6px; color: var(--blue);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.pg-row-label.last { border-bottom: none; }
+.pg-cell.score-val {
+  font-family: var(--font-h); font-size: 13px; font-weight: 800;
+}
+.pg-cell.home-score { color: var(--accent); }
+.pg-cell.away-score { color: var(--cyan); }
+.pg-cell.empty-p { color: var(--border); font-size: 10px; }
+
+.sig-row {
+  display: flex; border-top: 2px solid var(--border);
+}
+.sig-block {
+  flex: 1; padding: 6px 10px;
+  border-right: 1px solid var(--border);
+}
+.sig-block:last-child { border-right: none; }
+.sig-label {
+  font-size: 7px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+}
+.sig-name { font-size: 8.5px; font-weight: 600; color: var(--blue); margin-bottom: 4px; }
+.sig-line {
+  height: 20px; border-bottom: 1.5px solid var(--border);
+}
+
+.obs-block { flex: 2; padding: 6px 10px; border-right: 1px solid var(--border); }
+.obs-label {
+  font-size: 7px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+}
+.obs-content {
+  font-size: 9px; color: var(--blue);
+  border: 1px solid var(--border); border-radius: 3px;
+  padding: 4px 6px; min-height: 30px;
+  line-height: 1.4;
+}
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 10px;
+  font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  background: rgba(0,193,122,0.12); color: var(--green);
+  border: 1px solid rgba(0,193,122,0.3);
+}
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+
+.footer {
+  background: var(--blue); padding: 5px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-left { font-size: 8px; color: var(--muted); }
+.footer-center {
+  font-family: var(--font-h); font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.2);
+}
+.footer-right { font-size: 8px; color: var(--muted); }
+
+/* ── LEGEND ── */
+.legend-bar {
+  background: var(--off); border-top: 1px solid var(--border);
+  padding: 5px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.leg-key {
+  font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted);
+}
+.leg-item {
+  display: flex; align-items: center; gap: 4px; font-size: 8.5px; color: var(--blue);
+}
+
+/* ── PRINT STYLES ── */
+@media print {
+  body { background: white; padding: 0; }
+  .toolbar { display: none !important; }
+  .page { box-shadow: none; width: 100%; border-radius: 0; }
+  [contenteditable="true"]:hover,
+  [contenteditable="true"]:focus {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .pen-box:hover { transform: none !important; }
+}
+
+/* Cycle tooltip */
+.pen-cycle-hint {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--blue); color: var(--white);
+  font-size: 10px; padding: 6px 12px; border-radius: 6px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 999;
+  font-family: var(--font-b);
+}
+.pen-cycle-hint.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="toolbar-title">✏️ Feuille de Match — Mode Édition</div>
+  <span class="toolbar-hint">Cliquez sur n'importe quel champ pour le modifier · Cliquez sur les cases de sanction pour les cycler</span>
+  <button class="btn btn-reset" onclick="resetToOriginal()">↺ Réinitialiser</button>
+  <button class="btn btn-print" onclick="window.print()">🖨️ Imprimer / PDF</button>
+</div>
+
+<div class="pen-cycle-hint" id="cycleHint"></div>
+
+<div class="page">
+
+<!-- ════ HEADER ════ -->
+<div class="header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-logo">FFHB</div>
+      <div class="brand-sub">Officiel</div>
+    </div>
+    <div class="header-titles">
+      <div class="doc-eyebrow" contenteditable="true">Document officiel — Feuille de Match</div>
+      <div class="doc-title" contenteditable="true">AS Fontaine Handball &nbsp;/&nbsp; Meylan Handball 2</div>
+      <div class="doc-comp" contenteditable="true">M18 ANS MASCULIN — DIV 2 AURA 2ème Phase · Poule 10 Div 2 · Groupe M510035252</div>
+    </div>
+    <div class="header-ids">
+      <div class="id-row"><div class="id-pip"></div> Code Renc : <strong contenteditable="true">VAGLLOF</strong></div>
+      <div class="id-row"><div class="id-pip"></div> Ligue : <strong contenteditable="true">AUVERGNE-RHÔNE-ALPES (5100000)</strong></div>
+      <div class="id-row"><div class="id-pip"></div> Statut : <strong><span class="status-pill"><span class="status-dot"></span><span contenteditable="true">JOUÉ</span></span></strong></div>
+    </div>
+  </div>
+
+  <!-- MATCH HERO -->
+  <div class="match-hero">
+    <div class="team-side">
+      <div class="team-badge badge-home" contenteditable="true">AFH</div>
+      <div class="team-info">
+        <div class="team-tag">Club Recevant</div>
+        <div class="team-name" contenteditable="true">AS Fontaine Handball</div>
+        <div class="team-code" contenteditable="true">5138016</div>
+      </div>
+    </div>
+
+    <div class="score-block">
+      <div class="scores">
+        <div class="score-box" id="score-home" contenteditable="true">19</div>
+        <div class="score-sep">:</div>
+        <div class="score-box away-win" id="score-away" contenteditable="true">29</div>
+      </div>
+      <div class="score-label">Score final</div>
+      <div class="ht-score" contenteditable="true">Mi-temps : 10 – 16</div>
+    </div>
+
+    <div class="team-side away">
+      <div class="team-badge badge-away" contenteditable="true">MHB</div>
+      <div class="team-info">
+        <div class="team-tag">Club Visiteur</div>
+        <div class="team-name" contenteditable="true">Meylan Handball 2</div>
+        <div class="team-code" contenteditable="true">5138021</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ INFO BAND ════ -->
+<div class="info-band">
+  <div class="info-cell">
+    <div class="info-icon">📅</div>
+    <div>
+      <div class="info-key">Date &amp; Heure</div>
+      <div class="info-val" contenteditable="true">Samedi 25/04/2026 <small>18h30 — J8 (25→26/04/26)</small></div>
+    </div>
+  </div>
+  <div class="info-cell">
+    <div class="info-icon">🏟️</div>
+    <div>
+      <div class="info-key">Salle</div>
+      <div class="info-val" contenteditable="true">Gymnase Gérard Philipe <small>Allée des Plans, 38600 Fontaine · N°5138</small></div>
+    </div>
+  </div>
+  <div class="info-cell">
+    <div class="info-icon">⏱️</div>
+    <div>
+      <div class="info-key">Chronométreur / Secrétaire</div>
+      <div class="info-val" contenteditable="true">KLEBER Chrystel · CEPEDA <small>Secrétaire : LAFASCIANO Flavia</small></div>
+    </div>
+  </div>
+  <div class="info-cell">
+    <div class="info-icon">⚖️</div>
+    <div>
+      <div class="info-key">Arbitres</div>
+      <div class="info-val" contenteditable="true">DOS SANTOS Colin <small>N°5138016101778 — Juge Arbitre 1</small></div>
+    </div>
+  </div>
+  <div class="info-cell" style="border-right:none;">
+    <div class="info-icon">🔒</div>
+    <div>
+      <div class="info-key">Resp. Salle</div>
+      <div class="info-val" contenteditable="true">FERREIRA GONCALVES Carlos <small>N°5138016102315</small></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ BODY ════ -->
+<div class="body-grid">
+
+  <!-- ══ COLONNE DOMICILE ══ -->
+  <div>
+    <div class="sec-head">
+      <div class="sec-bar sec-bar-red"></div>
+      <div class="sec-label"><span contenteditable="true">AS Fontaine Handball</span> — Joueurs</div>
+      <div class="sec-tag sec-tag-home">DOM</div>
+    </div>
+    <table class="ptable" id="table-home">
+      <thead>
+        <tr>
+          <th style="width:24px">N°</th>
+          <th class="th-name">Nom · Prénom</th>
+          <th style="width:26px">Pos</th>
+          <th style="width:22px">Buts</th>
+          <th style="width:18px">7m</th>
+          <th style="width:22px">Tirs</th>
+          <th style="width:22px">Arrêts</th>
+          <th style="width:16px" title="Avertissement">Av.</th>
+          <th style="width:16px" title="2 minutes #1">2'</th>
+          <th style="width:16px" title="2 minutes #2">2'</th>
+          <th style="width:22px" title="Disqualification">Dis</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-home">
+      </tbody>
+    </table>
+    <div style="padding:4px 8px; border-top:1px solid var(--border);">
+      <button onclick="addRow('tbody-home','home')" style="font-size:8px;padding:2px 8px;background:var(--off);border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);font-family:var(--font-b);">+ Ajouter un joueur</button>
+    </div>
+
+    <!-- Officiels domicile -->
+    <div class="sec-head">
+      <div class="sec-bar sec-bar-red"></div>
+      <div class="sec-label"><span>Officiels</span> — Domicile</div>
+    </div>
+    <div class="off-grid">
+      <div class="off-cell">
+        <div class="off-role">Responsable A</div>
+        <div class="off-name" contenteditable="true">CHAPAYS Bastien <span style="font-size:8px;color:var(--muted);">5138016101834</span></div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Officiel B</div>
+        <div class="off-name" contenteditable="true" style="color:var(--muted);">—</div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Officiel C</div>
+        <div class="off-name" contenteditable="true" style="color:var(--muted);">—</div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Kiné / Médecin</div>
+        <div class="off-name" contenteditable="true" style="color:var(--muted);">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="col-divider"></div>
+
+  <!-- ══ COLONNE VISITEUR ══ -->
+  <div>
+    <div class="sec-head">
+      <div class="sec-bar sec-bar-blue"></div>
+      <div class="sec-label"><span contenteditable="true">Meylan Handball 2</span> — Joueurs</div>
+      <div class="sec-tag sec-tag-away">EXT</div>
+    </div>
+    <table class="ptable" id="table-away">
+      <thead>
+        <tr>
+          <th style="width:24px">N°</th>
+          <th class="th-name">Nom · Prénom</th>
+          <th style="width:26px">Pos</th>
+          <th style="width:22px">Buts</th>
+          <th style="width:18px">7m</th>
+          <th style="width:22px">Tirs</th>
+          <th style="width:22px">Arrêts</th>
+          <th style="width:16px">Av.</th>
+          <th style="width:16px">2'</th>
+          <th style="width:16px">2'</th>
+          <th style="width:22px">Dis</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-away">
+      </tbody>
+    </table>
+    <div style="padding:4px 8px; border-top:1px solid var(--border);">
+      <button onclick="addRow('tbody-away','away')" style="font-size:8px;padding:2px 8px;background:var(--off);border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);font-family:var(--font-b);">+ Ajouter un joueur</button>
+    </div>
+
+    <!-- Officiels visiteur -->
+    <div class="sec-head">
+      <div class="sec-bar sec-bar-blue"></div>
+      <div class="sec-label"><span>Officiels</span> — Extérieur</div>
+    </div>
+    <div class="off-grid">
+      <div class="off-cell">
+        <div class="off-role">Responsable A</div>
+        <div class="off-name" contenteditable="true">PINTO Benjamin <span style="font-size:8px;color:var(--muted);">5138021103137</span></div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Officiel B</div>
+        <div class="off-name" contenteditable="true">FINI Xavier <span style="font-size:8px;color:var(--muted);">5138021102944</span></div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Officiel C</div>
+        <div class="off-name" contenteditable="true">TOUR Kylian <span style="font-size:8px;color:var(--muted);">5138021103240</span></div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Kiné / Médecin</div>
+        <div class="off-name" contenteditable="true" style="color:var(--muted);">—</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /body-grid -->
+
+<!-- ════ LÉGENDE ════ -->
+<div class="legend-bar">
+  <span class="leg-key">Légende pénalités :</span>
+  <span class="leg-item"><span class="pen-box c-yellow" style="display:inline-flex;">!</span> Avertissement</span>
+  <span class="leg-item"><span class="pen-box c-2min" style="display:inline-flex;">2'</span> Exclusion 2 min (vide)</span>
+  <span class="leg-item"><span class="pen-box c-2min-used" style="display:inline-flex;">✓</span> 2 min infligée</span>
+  <span class="leg-item"><span class="pen-box c-red" style="display:inline-flex;">■</span> Disqualification rouge</span>
+  <span class="leg-item"><span class="pen-box c-blue" style="display:inline-flex;">■</span> Rapport écrit (bleu)</span>
+  <span class="leg-item" style="color:var(--muted);font-size:8px;">· Cliquer sur une case pour changer son état</span>
+</div>
+
+<!-- ════ BOTTOM ════ -->
+<div class="bottom-row">
+  <div class="arb-block">
+    <div class="sec-head">
+      <div class="sec-bar" style="background:var(--gold);"></div>
+      <div class="sec-label" style="background:#1A1A2E;"><span>Arbitres &amp; Table de marque</span></div>
+    </div>
+    <div class="off-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+      <div class="off-cell">
+        <div class="off-role">Arbitre 1</div>
+        <div class="off-name" contenteditable="true">DOS SANTOS Colin<br><span style="font-size:8px;color:var(--muted);">5138016101778</span></div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Arbitre 2</div>
+        <div class="off-name" contenteditable="true" style="color:var(--muted);">—</div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Chronométreur</div>
+        <div class="off-name" contenteditable="true">KLEBER Chrystel · CEPEDA<br><span style="font-size:8px;color:var(--muted);">5138016200646</span></div>
+      </div>
+      <div class="off-cell" style="border-right:none;">
+        <div class="off-role">Secrétaire</div>
+        <div class="off-name" contenteditable="true">LAFASCIANO Flavia<br><span style="font-size:8px;color:var(--muted);">5138016202369</span></div>
+      </div>
+    </div>
+    <div class="period-block">
+      <div class="period-title">Détail du score</div>
+      <div class="period-grid">
+        <div class="pg-header">Équipe</div>
+        <div class="pg-header">Période 1</div>
+        <div class="pg-header">Fin Tps Rég.</div>
+        <div class="pg-header">Prol. 1</div>
+        <div class="pg-header">Prol. 2</div>
+        <div class="pg-header">Tirs au but</div>
+        <div class="pg-row-label">DOM</div>
+        <div class="pg-cell score-val home-score" contenteditable="true">10</div>
+        <div class="pg-cell score-val home-score" contenteditable="true">19</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+        <div class="pg-row-label last">VIS</div>
+        <div class="pg-cell score-val away-score" contenteditable="true">16</div>
+        <div class="pg-cell score-val away-score" contenteditable="true">29</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-block">
+    <div class="stats-title">Récapitulatif</div>
+    <div class="stat-row"><span class="stat-label">Buts Domicile</span><span class="stat-val" contenteditable="true">19</span></div>
+    <div class="stat-row"><span class="stat-label">7m DOM réussi</span><span class="stat-val" contenteditable="true">1</span></div>
+    <div class="stat-row"><span class="stat-label">Tirs DOM</span><span class="stat-val" contenteditable="true">41</span></div>
+    <div class="stat-row"><span class="stat-label">Arrêts Gardiens DOM</span><span class="stat-val" contenteditable="true">21</span></div>
+    <div class="stat-row" style="border-top:2px solid var(--border);margin-top:2px;padding-top:2px;"></div>
+    <div class="stat-row"><span class="stat-label">Buts Visiteur</span><span class="stat-val blue-val" contenteditable="true">29</span></div>
+    <div class="stat-row"><span class="stat-label">7m VIS réussi</span><span class="stat-val blue-val" contenteditable="true">—</span></div>
+    <div class="stat-row"><span class="stat-label">Tirs VIS</span><span class="stat-val blue-val" contenteditable="true">67</span></div>
+    <div class="stat-row"><span class="stat-label">Arrêts Gardiens VIS</span><span class="stat-val blue-val" contenteditable="true">14</span></div>
+    <div class="stat-row" style="border-top:2px solid var(--border);margin-top:2px;padding-top:2px;"></div>
+    <div class="stat-row"><span class="stat-label">Exclusions 2' total</span><span class="stat-val" contenteditable="true">5</span></div>
+    <div class="stat-row"><span class="stat-label">Cartons rouges</span><span class="stat-val red" contenteditable="true">1</span></div>
+    <div class="stat-row"><span class="stat-label">Cartons bleus</span><span class="stat-val" style="color:var(--cyan);" contenteditable="true">0</span></div>
+  </div>
+</div>
+
+<!-- Observations + Signatures -->
+<div class="sig-row">
+  <div class="obs-block" style="flex:2;">
+    <div class="obs-label">Observations / Incidents</div>
+    <div class="obs-content" contenteditable="true">NIEL Guillaume (#10, Meylan) — Avertissement (9'29) puis Disqualification directe (X).</div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-label">Signature Arbitre 1</div>
+    <div class="sig-name" contenteditable="true">DOS SANTOS Colin</div>
+    <div class="sig-line"></div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-label">Signature Arbitre 2</div>
+    <div class="sig-name" contenteditable="true">—</div>
+    <div class="sig-line"></div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-label">Responsable Domicile</div>
+    <div class="sig-name" contenteditable="true">CHAPAYS Bastien</div>
+    <div class="sig-line"></div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-label">Responsable Extérieur</div>
+    <div class="sig-name" contenteditable="true">PINTO Benjamin</div>
+    <div class="sig-line"></div>
+  </div>
+</div>
+
+<!-- ════ FOOTER ════ -->
+<div class="footer">
+  <div class="footer-left" contenteditable="true">Fédération Française de Handball — Document officiel à conserver · Code Renc. VAGLLOF</div>
+  <div class="footer-center">FFHB · Feuille de Match Officielle</div>
+  <div class="footer-right" contenteditable="true">Ligue Auvergne-Rhône-Alpes · Saison 2025-2026</div>
+</div>
+
+</div><!-- /page -->
+
+<script>
+// ════════════════════════════════
+// DONNÉES JOUEURS
+// ════════════════════════════════
+const ORIGINAL_PLAYERS_HOME = [
+  { num:'4',  name:'ANTUNES GONCALVES Thomas', lic:'5138016101947 · JEA', pos:'GK', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty', isGK:true },
+  { num:'62', name:'BOULAS Paul',              lic:'5138016101822 · A',   pos:'J',  goals:'2', m7:'—', tirs:'4', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'53', name:'BOUTI Rayan',              lic:'5138016102219 · A',   pos:'J',  goals:'3', m7:'—', tirs:'4', arrets:'—', av:'empty', p1:'2min-used', p2:'2min-used', dis:'empty' },
+  { num:'58', name:'BROSSE Tom',               lic:'5138016101940 · A',   pos:'J',  goals:'—', m7:'—', tirs:'1', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'6',  name:'COSTARIS Luka',            lic:'5138016101752 · A',   pos:'GK', goals:'—', m7:'—', tirs:'—', arrets:'15', av:'empty', p1:'empty', p2:'empty', dis:'empty', isGK:true },
+  { num:'68', name:'GARNIER Corentin',         lic:'5138016101775 · A',   pos:'J',  goals:'2', m7:'—', tirs:'6', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'60', name:'GAS Dylan',                lic:'5138016102051 · A',   pos:'J',  goals:'—', m7:'—', tirs:'2', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'65', name:'MALCHEAUX Andrea',         lic:'5138016102212 · A',   pos:'J',  goals:'2', m7:'—', tirs:'3', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'50', name:'MEILLEREUX Etienne',       lic:'5138016102262 · A',   pos:'J',  goals:'—', m7:'—', tirs:'1', arrets:'—', av:'empty', p1:'empty', p2:'2min-used', dis:'empty' },
+  { num:'48', name:'PETIT Jules',              lic:'5138016102232 · A',   pos:'J',  goals:'2', m7:'—', tirs:'3', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'71', name:'PONS Théo',                lic:'5138016102115 · A — Capitaine', pos:'J', goals:'1', m7:'—', tirs:'4', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty', isCapt:true, captColor:'home' },
+  { num:'64', name:'ROSSAT Gabin',             lic:'5138016101964 · A',   pos:'J',  goals:'7', m7:'1', tirs:'13', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+];
+
+const ORIGINAL_PLAYERS_AWAY = [
+  { num:'7',  name:'BOUVIER Titouan',          lic:'5138021102546 · A',   pos:'J',  goals:'5', m7:'—', tirs:'10', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'17', name:'CAVALIERE Lenny',          lic:'5138021103335 · A',   pos:'J',  goals:'2', m7:'—', tirs:'6',  arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'8',  name:'CAVALIERE Sam',            lic:'5138021103336 · A',   pos:'J',  goals:'—', m7:'—', tirs:'3',  arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'21', name:'LACHAUD Mathieu',          lic:'5138021102441 · A',   pos:'J',  goals:'3', m7:'—', tirs:'3',  arrets:'—', av:'empty', p1:'2min-used', p2:'2min-used', dis:'empty' },
+  { num:'14', name:'LACHENAL Maxime',          lic:'5138021102849 · A',   pos:'J',  goals:'3', m7:'—', tirs:'3',  arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'18', name:'MERCADIE Gabriel',         lic:'5138021103338 · A',   pos:'J',  goals:'4', m7:'—', tirs:'10', arrets:'—', av:'empty', p1:'2min-used', p2:'empty', dis:'empty' },
+  { num:'15', name:'MILLON FREMILLON Timéo',   lic:'5138021102844 · A',   pos:'J',  goals:'2', m7:'—', tirs:'3',  arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'10', name:'NIEL Guillaume',           lic:'5138021102433 · A — Capitaine', pos:'J', goals:'5', m7:'—', tirs:'13', arrets:'—', av:'yellow', p1:'empty', p2:'empty', dis:'red', isCapt:true, captColor:'away' },
+  { num:'29', name:'PINTO Mallo',              lic:'5138021102633 · A',   pos:'J',  goals:'1', m7:'—', tirs:'1',  arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'9',  name:'PINTO Pablo',              lic:'5138021102631 · A',   pos:'J',  goals:'4', m7:'—', tirs:'10', arrets:'—', av:'empty', p1:'2min-used', p2:'empty', dis:'empty' },
+  { num:'13', name:'RAMACCIOTTI Mathéo',       lic:'5138021102587 · A',   pos:'J',  goals:'4', m7:'—', tirs:'5',  arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' },
+  { num:'12', name:'SALLE Nathan',             lic:'5138021102764 · A',   pos:'GK', goals:'—', m7:'—', tirs:'—',  arrets:'8', av:'empty', p1:'empty', p2:'empty', dis:'empty', isGK:true },
+  { num:'1',  name:'VAILLOUD–MARQUIS Esteban', lic:'5138021103678 · A',   pos:'GK', goals:'—', m7:'—', tirs:'—',  arrets:'6', av:'empty', p1:'empty', p2:'empty', dis:'empty', isGK:true },
+];
+
+// ════════════════════════════════
+// SANCTION CYCLE
+// ════════════════════════════════
+const PEN_STATES = {
+  'empty':    { cls:'c-empty',    label:'—' },
+  'yellow':   { cls:'c-yellow',   label:'!' },
+  '2min':     { cls:'c-2min',     label:"2'" },
+  '2min-used':{ cls:'c-2min-used',label:'✓' },
+  'red':      { cls:'c-red',      label:'■' },
+  'blue':     { cls:'c-blue',     label:'■' },
+};
+
+// av: empty → yellow → empty
+// p1/p2: empty → 2min → 2min-used → empty
+// dis: empty → red → blue → empty
+const PEN_CYCLES = {
+  av:  ['empty','yellow'],
+  p:   ['empty','2min','2min-used'],
+  dis: ['empty','red','blue'],
+};
+
+function cyclePen(el, type) {
+  const currentState = el.dataset.state || 'empty';
+  const cycle = PEN_CYCLES[type];
+  const idx = cycle.indexOf(currentState);
+  const nextState = cycle[(idx + 1) % cycle.length];
+  setPenState(el, nextState);
+
+  // Show hint
+  const hint = document.getElementById('cycleHint');
+  const labels = { 'empty':'Vide', 'yellow':'Avertissement ⚠️', '2min':"2 min (vide)", '2min-used':"2 min infligée ✓", 'red':'Disqualif. rouge ■', 'blue':'Rapport bleu ■' };
+  hint.textContent = '→ ' + labels[nextState];
+  hint.classList.add('show');
+  clearTimeout(hint._t);
+  hint._t = setTimeout(() => hint.classList.remove('show'), 1500);
+}
+
+function setPenState(el, state) {
+  const s = PEN_STATES[state] || PEN_STATES['empty'];
+  // Remove all state classes
+  Object.values(PEN_STATES).forEach(v => el.classList.remove(v.cls));
+  el.classList.add(s.cls);
+  el.textContent = s.label;
+  el.dataset.state = state;
+}
+
+function togglePos(el) {
+  if (el.classList.contains('pos-gk')) {
+    el.classList.remove('pos-gk'); el.classList.add('pos-j'); el.textContent = 'J';
+  } else {
+    el.classList.remove('pos-j'); el.classList.add('pos-gk'); el.textContent = 'GK';
+  }
+}
+
+// ════════════════════════════════
+// RENDER ROWS
+// ════════════════════════════════
+function buildPenBox(state, type) {
+  const s = PEN_STATES[state] || PEN_STATES['empty'];
+  return `<div class="pen-box ${s.cls}" data-state="${state}" onclick="cyclePen(this,'${type}')">${s.label}</div>`;
+}
+
+function buildRow(p, team) {
+  const numClass = p.isGK ? 'td-num gk-num' : (p.captColor === 'home' ? 'td-num capt-home' : (p.captColor === 'away' ? 'td-num capt-away' : 'td-num'));
+  const captIcon = p.isCapt ? `<span style="color:${p.captColor==='away'?'var(--cyan)':'var(--gold)'};font-size:8px;font-weight:900;margin-right:3px;">⚑</span>` : '';
+  const rowClass = p.captColor === 'home' ? 'capt-row-home' : (p.captColor === 'away' ? 'capt-row-away' : '');
+  const goalsClass = p.goals === '—' ? 'td-goals zero' : 'td-goals';
+  const m7Class = p.m7 === '—' ? 'td-7m zero' : 'td-7m';
+  const arsClass = p.arrets === '—' ? 'td-ars zero' : 'td-ars';
+
+  return `<tr class="${rowClass}">
+    <td class="${numClass}" contenteditable="true">${p.num}</td>
+    <td class="td-name" contenteditable="true">${captIcon}${p.name}<span class="lic" contenteditable="true">${p.lic}</span></td>
+    <td><span class="pos-badge ${p.pos==='GK'?'pos-gk':'pos-j'}" onclick="togglePos(this)">${p.pos}</span></td>
+    <td class="${goalsClass}" contenteditable="true">${p.goals}</td>
+    <td class="${m7Class}" contenteditable="true">${p.m7}</td>
+    <td class="td-tirs" contenteditable="true">${p.tirs}</td>
+    <td class="${arsClass}" contenteditable="true">${p.arrets}</td>
+    <td><div class="pen-row">${buildPenBox(p.av,'av')}</div></td>
+    <td><div class="pen-row">${buildPenBox(p.p1,'p')}</div></td>
+    <td><div class="pen-row">${buildPenBox(p.p2,'p')}</div></td>
+    <td><div class="pen-row">${buildPenBox(p.dis,'dis')}</div></td>
+    <td style="width:14px;padding:0;"><span onclick="deleteRow(this)" style="cursor:pointer;color:var(--muted);font-size:8px;padding:2px;" title="Supprimer">✕</span></td>
+  </tr>`;
+}
+
+function renderPlayers(tbodyId, players, team) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = players.map(p => buildRow(p, team)).join('');
+}
+
+function addRow(tbodyId, team) {
+  const tbody = document.getElementById(tbodyId);
+  const newPlayer = { num:'00', name:'Nouveau Joueur', lic:'Licence · A', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', dis:'empty' };
+  const tr = document.createElement('tr');
+  tr.innerHTML = buildRow(newPlayer, team).replace(/^<tr[^>]*>/, '').replace(/<\/tr>$/, '');
+  const row = document.createElement('tr');
+  row.innerHTML = buildRow(newPlayer, team).match(/<tr[^>]*>([\s\S]*)<\/tr>/)[1];
+  
+  // Simpler approach
+  tbody.insertAdjacentHTML('beforeend', buildRow(newPlayer, team));
+}
+
+function deleteRow(el) {
+  const tr = el.closest('tr');
+  if (confirm('Supprimer ce joueur ?')) tr.remove();
+}
+
+function resetToOriginal() {
+  if (!confirm('Réinitialiser toute la feuille aux données originales ?')) return;
+  renderPlayers('tbody-home', ORIGINAL_PLAYERS_HOME, 'home');
+  renderPlayers('tbody-away', ORIGINAL_PLAYERS_AWAY, 'away');
+}
+
+// Init on load
+renderPlayers('tbody-home', ORIGINAL_PLAYERS_HOME, 'home');
+renderPlayers('tbody-away', ORIGINAL_PLAYERS_AWAY, 'away');
+
+// Prevent newlines in single-line fields on Enter
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.activeElement.contentEditable === 'true') {
+    const el = document.activeElement;
+    // Allow newlines only in obs-content
+    if (!el.classList.contains('obs-content') && !el.classList.contains('off-name') && !el.classList.contains('info-val')) {
+      e.preventDefault();
+      el.blur();
+    }
+  }
+});
+</script>
+</body>
+</html>
