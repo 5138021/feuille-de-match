@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feuille de Match — Éditable</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@300;400;500;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --blue:      #0B1829;
+  --blue-mid:  #122038;
+  --blue-soft: #1C3256;
+  --accent:    #E02D37;
+  --gold:      #F5A623;
+  --green:     #00C17A;
+  --cyan:      #4A9FFF;
+  --white:     #FFFFFF;
+  --off:       #F2F5FA;
+  --border:    #D4DCE8;
+  --muted:     #8A9BBE;
+  --font-h:    'Barlow Condensed', sans-serif;
+  --font-b:    'Barlow', sans-serif;
+  --edit-bg:   rgba(74,159,255,0.06);
+  --edit-border: rgba(74,159,255,0.35);
+}
+
+body {
+  background: #CBD5E4;
+  font-family: var(--font-b);
+  color: var(--blue);
+  padding: 16px;
+}
+
+/* ── TOOLBAR ── */
+.toolbar {
+  width: 297mm;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--blue);
+  border-radius: 8px;
+  padding: 8px 14px;
+  flex-wrap: wrap;
+}
+.toolbar-title {
+  font-family: var(--font-h);
+  font-size: 13px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--white); flex: 1;
+}
+.toolbar-hint {
+  font-size: 10px; color: var(--muted);
+}
+.btn {
+  padding: 6px 14px;
+  border: none; border-radius: 5px;
+  font-family: var(--font-h); font-size: 12px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-print {
+  background: var(--accent); color: var(--white);
+}
+.btn-print:hover { background: #c0222c; }
+.btn-reset {
+  background: rgba(255,255,255,0.1); color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.btn-reset:hover { background: rgba(255,255,255,0.18); }
+.btn-import {
+  background: linear-gradient(135deg, #1a6b2f, #27a045);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.btn-import:hover { background: linear-gradient(135deg, #27a045, #1a6b2f); }
+.btn-import:disabled { opacity: 0.5; cursor: wait; }
+
+/* ── PAGE ── */
+.page {
+  width: 297mm;
+  margin: 0 auto;
+  background: var(--white);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ── EDITABLE FIELDS ── */
+[contenteditable="true"] {
+  outline: none;
+  border-radius: 2px;
+  transition: background 0.12s, box-shadow 0.12s;
+  cursor: text;
+  -webkit-user-modify: read-write;
+}
+[contenteditable="true"]:hover {
+  background: var(--edit-bg) !important;
+  box-shadow: 0 0 0 1px var(--edit-border);
+}
+[contenteditable="true"]:focus {
+  background: rgba(74,159,255,0.12) !important;
+  box-shadow: 0 0 0 1.5px var(--cyan);
+}
+
+/* ════════════════════════════════
+   HEADER
+════════════════════════════════ */
+.header { background: var(--blue); }
+
+.header-top {
+  display: flex;
+  align-items: stretch;
+}
+
+.brand {
+  background: var(--accent);
+  padding: 10px 18px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-width: 100px; flex-shrink: 0;
+}
+.brand-logo {
+  font-family: var(--font-h);
+  font-size: 26px; font-weight: 900;
+  letter-spacing: 2px; color: var(--white); line-height: 1;
+}
+.brand-sub {
+  font-family: var(--font-h);
+  font-size: 7px; font-weight: 700;
+  letter-spacing: 2px; color: rgba(255,255,255,0.65);
+  text-transform: uppercase; margin-top: 2px;
+}
+
+.header-titles {
+  flex: 1; padding: 10px 20px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.doc-eyebrow {
+  font-family: var(--font-h); font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
+}
+.doc-title {
+  font-family: var(--font-h); font-size: 26px; font-weight: 900;
+  text-transform: uppercase; color: var(--white); line-height: 1; letter-spacing: 0.5px;
+}
+.doc-comp {
+  font-size: 10px; color: var(--muted); margin-top: 2px; line-height: 1.3;
+}
+
+.header-ids {
+  padding: 10px 16px; border-left: 1px solid rgba(255,255,255,0.08);
+  display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 180px;
+}
+.id-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 9px; color: var(--muted);
+}
+.id-row strong { color: var(--white); font-size: 10px; font-weight: 600; }
+.id-pip { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+/* MATCH HERO */
+.match-hero {
+  display: flex; align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  background: var(--blue-mid);
+  gap: 12px;
+}
+
+.team-side {
+  flex: 1; display: flex; align-items: center; gap: 10px;
+}
+.team-side.away { flex-direction: row-reverse; }
+
+.team-badge {
+  width: 44px; height: 44px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-h); font-size: 16px; font-weight: 900; color: var(--white);
+  flex-shrink: 0;
+}
+.badge-home { background: var(--accent); }
+.badge-away { background: var(--blue-soft); border: 1.5px solid rgba(255,255,255,0.12); }
+
+.team-info { flex: 1; }
+.team-side.away .team-info { text-align: right; }
+.team-tag {
+  font-family: var(--font-h); font-size: 8px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+}
+.team-name {
+  font-family: var(--font-h); font-size: 18px; font-weight: 900;
+  text-transform: uppercase; color: var(--white); line-height: 1.1;
+}
+.team-code { font-size: 9px; color: var(--muted); margin-top: 1px; }
+
+.score-block {
+  text-align: center; flex-shrink: 0; padding: 0 16px;
+}
+.scores {
+  display: flex; align-items: center; gap: 6px;
+}
+.score-box {
+  width: 48px; height: 46px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.14);
+  border-radius: 6px;
+  font-family: var(--font-h); font-size: 32px; font-weight: 900;
+  color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+}
+.score-box.away-win { border-color: var(--cyan); color: var(--cyan); }
+.score-box.home-win { border-color: var(--accent); color: var(--accent); }
+.score-sep {
+  font-family: var(--font-h); font-size: 24px;
+  font-weight: 300; color: var(--muted);
+}
+.score-label {
+  font-family: var(--font-h); font-size: 7.5px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+  margin-top: 4px;
+}
+.ht-score {
+  font-size: 9.5px; color: rgba(255,255,255,0.4); margin-top: 2px;
+}
+
+/* ════════════════════════════════
+   INFO BAND
+════════════════════════════════ */
+.info-band {
+  background: var(--off);
+  border-bottom: 2px solid var(--border);
+  display: flex;
+}
+.info-cell {
+  flex: 1; padding: 7px 12px;
+  border-right: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.info-cell:last-child { border-right: none; }
+.info-icon {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: var(--blue); display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
+}
+.info-key {
+  font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); line-height: 1;
+}
+.info-val {
+  font-size: 10.5px; font-weight: 600; color: var(--blue);
+  line-height: 1.3; margin-top: 1px;
+}
+.info-val small { font-size: 9px; font-weight: 400; color: var(--muted); display: block; }
+
+/* ════════════════════════════════
+   BODY — TWO COLUMNS
+════════════════════════════════ */
+.body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+}
+.col-divider { background: var(--border); }
+
+/* Section header */
+.sec-head {
+  display: flex; align-items: stretch;
+}
+.sec-bar { width: 4px; flex-shrink: 0; }
+.sec-bar-red { background: var(--accent); }
+.sec-bar-blue { background: var(--cyan); }
+
+.sec-label {
+  flex: 1; background: var(--blue);
+  font-family: var(--font-h); font-size: 10px; font-weight: 800;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); padding: 5px 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-label span { color: var(--white); }
+.sec-tag {
+  padding: 5px 10px;
+  font-family: var(--font-h); font-size: 10px; font-weight: 800;
+  letter-spacing: 1px;
+}
+.sec-tag-home { background: rgba(224,45,55,0.15); color: var(--accent); }
+.sec-tag-away { background: rgba(74,159,255,0.15); color: var(--cyan); }
+
+/* Player table */
+.ptable {
+  width: 100%; border-collapse: collapse;
+}
+.ptable thead tr { background: var(--blue); }
+.ptable thead th {
+  font-family: var(--font-h); font-size: 7.5px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--muted); padding: 4px 4px;
+  text-align: center; white-space: nowrap;
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+.ptable thead th.th-name { text-align: left; padding-left: 8px; }
+
+.ptable tbody tr { border-bottom: 1px solid var(--border); }
+.ptable tbody tr:nth-child(even) { background: #F7F9FD; }
+.ptable tbody tr.capt-row-home { background: #FFFBF2; }
+.ptable tbody tr.capt-row-away { background: #F0F6FF; }
+
+.ptable td {
+  padding: 3px 4px;
+  text-align: center; vertical-align: middle;
+  font-size: 9px;
+}
+
+.td-num {
+  font-family: var(--font-h); font-size: 14px; font-weight: 800;
+  color: var(--blue); width: 24px;
+  background: var(--off);
+  border-right: 1px solid var(--border);
+}
+/* Couleur du numéro selon le poste */
+.td-num.num-gk  { color: var(--gold) !important; background: #1c2a0a; }
+.td-num.num-j   { color: var(--accent) !important; }
+/* Ancien (rétrocompat) */
+.td-num.gk-num { color: var(--gold); }
+.td-num.capt-home { color: var(--gold); }
+.td-num.capt-away { color: var(--cyan); font-weight: 900; }
+
+/* Capitaine checkbox */
+.capt-check {
+  width: 12px; height: 12px;
+  cursor: pointer; accent-color: var(--gold);
+  margin: 0; vertical-align: middle;
+}
+.td-capt {
+  width: 16px; text-align: center;
+  padding: 2px !important;
+}
+.capt-flag {
+  font-size: 9px; color: var(--gold); font-weight: 900;
+  display: none;
+}
+.capt-flag.active { display: inline; }
+
+.td-name {
+  text-align: left !important; padding-left: 8px !important;
+  font-weight: 600; color: var(--blue); font-size: 9.5px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 0; min-width: 100px;
+}
+.td-name .lic { display: block; font-size: 7px; font-weight: 400; color: var(--muted); }
+
+.pos-badge {
+  display: inline-block; padding: 1px 4px;
+  border-radius: 8px; font-size: 7px; font-weight: 800;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  cursor: pointer; user-select: none;
+  transition: opacity 0.1s;
+}
+.pos-badge:hover { opacity: 0.75; }
+.pos-gk { background: #FFF3CD; color: #9A6E00; }
+.pos-j  { background: #E3ECFF; color: #2255CC; }
+
+.td-goals {
+  font-family: var(--font-h); font-size: 14px; font-weight: 800;
+  color: var(--green); width: 22px;
+}
+.td-goals.zero, .td-7m.zero, .td-ars.zero { color: var(--border); font-size: 11px; }
+.td-7m { font-family: var(--font-h); font-size: 12px; font-weight: 700; color: #00A068; width: 18px; }
+.td-tirs { font-size: 9px; color: var(--muted); width: 22px; }
+.td-ars { font-family: var(--font-h); font-size: 12px; font-weight: 700; color: #2255CC; width: 22px; }
+
+/* ── PENALTY CELLS ── */
+.pen-row {
+  display: flex; align-items: center; justify-content: center;
+}
+.pen-box {
+  width: 16px; height: 16px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7px; font-weight: 700;
+  cursor: pointer; user-select: none;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.pen-box:hover { transform: scale(1.15); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.c-yellow { background: #FFF3CD; border-color: #E0A800; color: #8A6200; }
+.c-2min   { background: #FFF0E5; border-color: #F5A623; color: #C07000; }
+.c-2min-used { background: #FFD580; border-color: #D08000; color: #6A4000; }
+.c-red    { background: #FFE0E2; border-color: var(--accent); color: var(--accent); }
+.c-blue   { background: #E0EDFF; border-color: #4A9FFF; color: #0055CC; }
+.c-empty  { background: var(--off); border-color: var(--border); color: var(--muted); }
+.c-2min-dis { background: linear-gradient(135deg, #FFD580 50%, #FFE0E2 50%); border-color: #D08000; color: #6A4000; font-size: 6px; font-weight: 900; }
+
+/* ── OFFICIALS ── */
+.off-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+}
+.off-cell {
+  padding: 5px 10px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.off-cell:nth-child(2n) { border-right: none; }
+.off-role {
+  font-size: 7px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
+}
+.off-name { font-size: 10px; font-weight: 600; color: var(--blue); }
+
+/* Sanctions officiels */
+.off-sanctions {
+  display: flex; align-items: center; gap: 4px; margin-top: 4px; flex-wrap: wrap;
+}
+.off-san-label {
+  font-size: 7px; color: var(--muted); font-weight: 600; letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.off-pen-box {
+  width: 16px; height: 16px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7px; font-weight: 700;
+  cursor: pointer; user-select: none;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.off-pen-box:hover { transform: scale(1.15); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.off-pen-box.disabled { cursor: not-allowed; opacity: 0.35; pointer-events: none; }
+/* Étiquette globale (1 seul Av. / 1 seul 2' pour tous les officiels) */
+.off-global-badge {
+  font-size: 7px; background: rgba(255,193,7,0.12); color: #a07000;
+  border: 1px solid rgba(255,193,7,0.4); border-radius: 3px;
+  padding: 1px 4px; font-weight: 700; letter-spacing: 0.5px;
+}
+
+/* ════════════════════════════════
+   BOTTOM
+════════════════════════════════ */
+.bottom-row {
+  display: flex;
+  border-top: 2px solid var(--border);
+}
+.arb-block { flex: 1; border-right: 1px solid var(--border); }
+.stats-block {
+  width: 170px; flex-shrink: 0; border-right: 1px solid var(--border);
+  padding: 8px 12px;
+}
+.stats-title {
+  font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+}
+.stat-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 2px 0; border-bottom: 1px solid var(--border);
+  font-size: 9px;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: var(--muted); }
+.stat-val { font-weight: 700; color: var(--blue); font-family: var(--font-h); font-size: 12px; }
+.stat-val.red { color: var(--accent); }
+.stat-val.blue-val { color: var(--cyan); }
+
+.period-block { padding: 6px 12px; }
+.period-title {
+  font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
+}
+.period-grid {
+  display: grid;
+  grid-template-columns: auto repeat(5, 1fr);
+  border: 1px solid var(--border);
+  border-radius: 4px; overflow: hidden;
+  font-size: 9px;
+}
+.pg-header {
+  background: var(--blue); color: var(--muted);
+  font-family: var(--font-h); font-size: 7px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 6px; text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+.pg-cell {
+  padding: 3px 6px; text-align: center;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.pg-cell:last-child { border-right: none; }
+.pg-row-label {
+  background: var(--off); font-weight: 700; font-size: 8px;
+  padding: 3px 6px; color: var(--blue);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.pg-row-label.last { border-bottom: none; }
+.pg-cell.score-val {
+  font-family: var(--font-h); font-size: 13px; font-weight: 800;
+}
+.pg-cell.home-score { color: var(--accent); }
+.pg-cell.away-score { color: var(--cyan); }
+.pg-cell.empty-p { color: var(--border); font-size: 10px; }
+
+.sig-row {
+  display: flex; border-top: 2px solid var(--border);
+}
+.sig-block {
+  flex: 1; padding: 6px 10px;
+  border-right: 1px solid var(--border);
+}
+.sig-block:last-child { border-right: none; }
+.sig-label {
+  font-size: 7px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+}
+.sig-name { font-size: 8.5px; font-weight: 600; color: var(--blue); margin-bottom: 4px; }
+.sig-line {
+  height: 20px; border-bottom: 1.5px solid var(--border);
+}
+
+.obs-block { flex: 2; padding: 6px 10px; border-right: 1px solid var(--border); }
+.obs-label {
+  font-size: 7px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+}
+.obs-content {
+  font-size: 9px; color: var(--blue);
+  border: 1px solid var(--border); border-radius: 3px;
+  padding: 4px 6px; min-height: 30px;
+  line-height: 1.4;
+}
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 10px;
+  font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  background: rgba(0,193,122,0.12); color: var(--green);
+  border: 1px solid rgba(0,193,122,0.3);
+}
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+
+.footer {
+  background: var(--blue); padding: 5px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-left { font-size: 8px; color: var(--muted); }
+.footer-center {
+  font-family: var(--font-h); font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.2);
+}
+.footer-right { font-size: 8px; color: var(--muted); }
+
+/* ── LEGEND ── */
+.legend-bar {
+  background: var(--off); border-top: 1px solid var(--border);
+  padding: 5px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.leg-key {
+  font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted);
+}
+.leg-item {
+  display: flex; align-items: center; gap: 4px; font-size: 8.5px; color: var(--blue);
+}
+
+/* ── PRINT STYLES ── */
+@media print {
+  body { background: white; padding: 0; }
+  .toolbar { display: none !important; }
+  .page { box-shadow: none; width: 100%; border-radius: 0; }
+  [contenteditable="true"]:hover,
+  [contenteditable="true"]:focus {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .pen-box:hover { transform: none !important; }
+}
+
+/* Cycle tooltip */
+.pen-cycle-hint {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--blue); color: var(--white);
+  font-size: 10px; padding: 6px 12px; border-radius: 6px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 999;
+  font-family: var(--font-b);
+}
+.pen-cycle-hint.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="toolbar-title">✏️ Feuille de Match Vierge — Mode Édition</div>
+  <span class="toolbar-hint">Cliquez sur n'importe quel champ pour le modifier · Cliquez sur les cases de sanction pour les cycler</span>
+  <button class="btn btn-import" id="btnImport" onclick="document.getElementById('pdfImportInput').click()">📂 Importer PDF FFHB</button>
+  <input type="file" id="pdfImportInput" accept="application/pdf,image/*" style="display:none" onchange="handlePdfImport(event)">
+  <button class="btn btn-import" id="btnImport" onclick="document.getElementById('pdfImportInput').click()">📂 Importer PDF FFHB</button>
+  <input type="file" id="pdfImportInput" accept="application/pdf,image/*" style="display:none" onchange="handlePdfImport(event)">
+  <button class="btn btn-reset" onclick="resetToOriginal()">↺ Réinitialiser</button>
+  <button class="btn btn-print" onclick="window.print()">🖨️ Imprimer / PDF</button>
+</div>
+
+<!-- ══ MODALE IMPORT ══ -->
+<div id="importModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.65);align-items:center;justify-content:center;backdrop-filter:blur(3px);">
+  <div style="background:#fff;border-radius:14px;padding:30px 34px;max-width:560px;width:92%;box-shadow:0 32px 100px rgba(0,0,0,0.45);font-family:'Calibri',Arial,sans-serif;">
+
+    <!-- Étape 1 : chargement -->
+    <div id="importStep-loading" style="text-align:center;">
+      <div style="font-size:48px;margin-bottom:10px;animation:spin 1.5s linear infinite;display:inline-block;">⚙️</div>
+      <div style="font-size:16px;font-weight:800;color:#003087;margin-bottom:6px;letter-spacing:0.5px;">Analyse du PDF en cours…</div>
+      <div id="importProgressMsg" style="font-size:11px;color:#888;margin-bottom:18px;">Envoi à Claude pour extraction des données</div>
+      <div style="height:7px;background:#eee;border-radius:4px;overflow:hidden;">
+        <div id="importProgressBar" style="height:100%;width:5%;background:linear-gradient(90deg,#003087,#c8102e);border-radius:4px;transition:width 0.5s ease;"></div>
+      </div>
+      <div style="font-size:10px;color:#bbb;margin-top:8px;">Cela peut prendre 10 à 20 secondes selon la qualité du scan</div>
+    </div>
+
+    <!-- Étape 2 : prévisualisation -->
+    <div id="importStep-preview" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="font-size:26px;">✅</span>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:#003087;">Données extraites avec succès</div>
+          <div style="font-size:10px;color:#888;">Vérifiez les informations avant d'appliquer</div>
+        </div>
+      </div>
+      <div id="importPreviewContent" style="font-size:11px;max-height:380px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;padding:12px;background:#f7f9fc;line-height:1.7;"></div>
+      <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end;">
+        <button onclick="closeImportModal()" style="padding:8px 20px;border:1px solid #ddd;border-radius:7px;background:#fff;cursor:pointer;font-size:12px;font-weight:600;color:#555;">Annuler</button>
+        <button onclick="applyImportData()" style="padding:8px 22px;border:none;border-radius:7px;background:#003087;color:#fff;cursor:pointer;font-size:12px;font-weight:800;box-shadow:0 2px 8px rgba(0,48,135,0.3);">✅ Appliquer dans la feuille</button>
+      </div>
+    </div>
+
+    <!-- Étape 3 : erreur -->
+    <div id="importStep-error" style="display:none;text-align:center;">
+      <div style="font-size:40px;margin-bottom:10px;">⚠️</div>
+      <div style="font-size:14px;font-weight:800;color:#c8102e;margin-bottom:8px;">Erreur lors de l'extraction</div>
+      <div id="importErrorMsg" style="font-size:11px;color:#666;margin-bottom:20px;max-height:150px;overflow-y:auto;"></div>
+      <button onclick="closeImportModal()" style="padding:8px 22px;border:none;border-radius:7px;background:#c8102e;color:#fff;cursor:pointer;font-size:12px;font-weight:800;">Fermer</button>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+</style>
+
+<div class="pen-cycle-hint" id="cycleHint"></div>
+<!-- ══ MODALE IMPORT PDF ══ -->
+<div id="importModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.65);align-items:center;justify-content:center;backdrop-filter:blur(3px);">
+  <div style="background:#fff;border-radius:14px;padding:30px 34px;max-width:560px;width:92%;box-shadow:0 32px 100px rgba(0,0,0,0.45);font-family:'Calibri',Arial,sans-serif;">
+    <div id="importStep-loading" style="text-align:center;">
+      <div style="font-size:48px;margin-bottom:10px;">⚙️</div>
+      <div style="font-size:16px;font-weight:800;color:#003087;margin-bottom:6px;letter-spacing:0.5px;">Analyse du PDF en cours…</div>
+      <div id="importProgressMsg" style="font-size:11px;color:#888;margin-bottom:18px;">Envoi à Claude pour extraction des données</div>
+      <div style="height:7px;background:#eee;border-radius:4px;overflow:hidden;">
+        <div id="importProgressBar" style="height:100%;width:5%;background:linear-gradient(90deg,#003087,#c8102e);border-radius:4px;transition:width 0.5s ease;"></div>
+      </div>
+      <div style="font-size:10px;color:#bbb;margin-top:10px;">Cela peut prendre 10 à 20 secondes selon la qualité du scan</div>
+    </div>
+    <div id="importStep-preview" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="font-size:26px;">✅</span>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:#003087;">Données extraites avec succès</div>
+          <div style="font-size:10px;color:#888;">Vérifiez les informations avant d'appliquer</div>
+        </div>
+      </div>
+      <div id="importPreviewContent" style="font-size:11px;max-height:380px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;padding:12px;background:#f7f9fc;line-height:1.7;"></div>
+      <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end;">
+        <button onclick="closeImportModal()" style="padding:8px 20px;border:1px solid #ddd;border-radius:7px;background:#fff;cursor:pointer;font-size:12px;font-weight:600;color:#555;">Annuler</button>
+        <button onclick="applyImportData()" style="padding:8px 22px;border:none;border-radius:7px;background:#003087;color:#fff;cursor:pointer;font-size:12px;font-weight:800;box-shadow:0 2px 8px rgba(0,48,135,0.3);">✅ Appliquer dans la feuille</button>
+      </div>
+    </div>
+    <div id="importStep-error" style="display:none;text-align:center;">
+      <div style="font-size:40px;margin-bottom:10px;">⚠️</div>
+      <div style="font-size:14px;font-weight:800;color:#c8102e;margin-bottom:8px;">Erreur lors de l'extraction</div>
+      <div id="importErrorMsg" style="font-size:11px;color:#666;margin-bottom:20px;max-height:150px;overflow-y:auto;"></div>
+      <button onclick="closeImportModal()" style="padding:8px 22px;border:none;border-radius:7px;background:#c8102e;color:#fff;cursor:pointer;font-size:12px;font-weight:800;">Fermer</button>
+    </div>
+  </div>
+</div>
+<style>
+.btn-import {
+  background: linear-gradient(135deg, #1a6b2f, #27a045);
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.btn-import:hover { background: linear-gradient(135deg, #27a045, #1a6b2f) !important; }
+.btn-import:disabled { opacity: 0.5; cursor: wait; }
+</style>
+
+<div class="page">
+
+<!-- ════ HEADER ════ -->
+<div class="header">
+  <div class="header-top">
+    <div class="brand" style="background:var(--blue);padding:6px 10px;min-width:220px;flex-direction:row;gap:8px;border-right:1px solid rgba(255,255,255,0.1);">
+      <img src="data:image/jpeg;base64,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REREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREUrpitFHc2iR2IpRwO7vA+qudwJbQVDhzbE4+gXN1bbRdBXWielmI9oZC5u5xxjhIB8+WV2NNt9LHQu7+P4XKv1up7ZR3cr1pRjKSyyVc2WteS8u/VbkfPcFVi41clbVvqJDu47D9EdgUvXVBh0rSQNOOuO/kDn61AKvclwxkLeAAf3KsVY/jfKeST6BbVqkEVyppHfCJG58sq9V9upa+MCeIF2PdcNiPmudrodlrBW26KfO+zX+Yxn9/EK1pLmPD4njOd1W1QOZ0ys5GygqnSj+P8Ag1S3GeUg5DzH3Kds8FTT0DYKuVsj2bNc0kjh2wN/3woW16i4HmnrwQQ4gSAfWPtVignimYHxSMka7kWnIV+iyqXdcJwe8f0qVx1kN6Jdx4/2q7qayOe91bRs4nHeSMcz4hQlputda5S6lmLWk5fG7drvMfbzXQDgjv8AJRd2sdHXOdIPxM5342jYnxHaqt/SBLl0ffyFa0/V313DJII4I5Cgb9qSpu9Eylkp4YmCQSHgJOTgjtPLdQala2w3Cmy5rGzMH5zD9nNRS4JrmD4C3C701595/bSP6j4oiIsKJERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERF9BIOQcL4iIs01TLLTw07yCyEEMGO85KwoiySTysAAcIpOwXR1uqCHZdA/Z47vEKMRbRyOicHtO4WskbZGlruCpLUULI7g6eJzXw1A61jm8jnn5b9i0qeeenfxwTSRO72OIWJEe/qeXDZGtw0NO6lIr9dI2hvtPEP1mgn15r27UV0PKZjfJgP1qIRSC1MBgPPqtDWhJz0j0W5U3OvqARLVylp5tBwD8hstNEUTnOccuOVK1oaMAL//Z" alt="Comité Isère" style="height:38px;object-fit:contain;filter:brightness(0) invert(1);"/>
+      <div style="width:1px;background:rgba(255,255,255,0.15);align-self:stretch;"></div>
+      <img src="data:image/jpeg;base64,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" alt="Ligue AURA" style="height:38px;object-fit:contain;filter:brightness(0) invert(1);"/>
+    </div>
+    <div class="header-titles">
+      <div class="doc-eyebrow" contenteditable="true">Document officiel — Feuille de Match</div>
+      <div class="doc-title" contenteditable="true">Équipe Domicile &nbsp;/&nbsp; Équipe Visiteur</div>
+      <div class="doc-comp" contenteditable="true">Catégorie — Compétition · Poule · Groupe</div>
+    </div>
+    <div class="header-ids">
+      <div class="id-row"><div class="id-pip"></div> Code Renc : <strong contenteditable="true">—</strong></div>
+      <div class="id-row"><div class="id-pip"></div> Ligue : <strong contenteditable="true">—</strong></div>
+      <div class="id-row"><div class="id-pip"></div> Statut : <strong><span class="status-pill"><span class="status-dot"></span><span contenteditable="true">—</span></span></strong></div>
+    </div>
+  </div>
+
+  <!-- MATCH HERO -->
+  <div class="match-hero">
+    <div class="team-side">
+      <div class="team-badge badge-home" style="background:var(--accent);"></div>
+      <div class="team-info">
+        <div class="team-tag">Club Recevant</div>
+        <div class="team-name" contenteditable="true">Équipe Domicile</div>
+        <div class="team-code" contenteditable="true">—</div>
+      </div>
+    </div>
+
+    <div class="score-block">
+      <div class="scores">
+        <div class="score-box" id="score-home" contenteditable="true" oninput="updateScoreColors()">0</div>
+        <div class="score-sep">:</div>
+        <div class="score-box" id="score-away" contenteditable="true" oninput="updateScoreColors()">0</div>
+      </div>
+      <div class="score-label">Score final</div>
+      <div class="ht-score" contenteditable="true">Mi-temps : — – —</div>
+    </div>
+
+    <div class="team-side away">
+      <div class="team-badge badge-away" style="background:var(--blue-soft);border:1.5px solid rgba(255,255,255,0.12);"></div>
+      <div class="team-info">
+        <div class="team-tag">Club Visiteur</div>
+        <div class="team-name" contenteditable="true">Équipe Visiteur</div>
+        <div class="team-code" contenteditable="true">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ INFO BAND ════ -->
+<!-- ════ BODY ════ -->
+<div class="body-grid">
+
+  <!-- ══ COLONNE DOMICILE ══ -->
+  <div>
+    <div class="sec-head">
+      <div class="sec-bar sec-bar-red"></div>
+      <div class="sec-label"><span contenteditable="true">Équipe Domicile</span> — Joueurs</div>
+      <div class="sec-tag sec-tag-home">DOM</div>
+    </div>
+    <table class="ptable" id="table-home">
+      <thead>
+        <tr>
+          <th style="width:16px" title="Capitaine">Cap</th>
+          <th style="width:24px">N°</th>
+          <th class="th-name">Nom · Prénom</th>
+          <th style="width:26px">Pos</th>
+          <th style="width:22px">Buts</th>
+          <th style="width:18px">7m</th>
+          <th style="width:22px">Tirs</th>
+          <th style="width:22px">Arrêts</th>
+          <th style="width:16px" title="Avertissement">Av.</th>
+          <th style="width:16px" title="2 minutes #1">2'</th>
+          <th style="width:16px" title="2 minutes #2">2'</th>
+          <th style="width:18px" title="2min + Disqualification">2'+D</th>
+          <th style="width:22px" title="Disqualification">Dis</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-home">
+      </tbody>
+    </table>
+    <div style="padding:4px 8px; border-top:1px solid var(--border);">
+      <button onclick="addRow('tbody-home','home')" style="font-size:8px;padding:2px 8px;background:var(--off);border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);font-family:var(--font-b);">+ Ajouter un joueur</button>
+    </div>
+
+    <!-- Officiels domicile -->
+    <div class="sec-head">
+      <div class="sec-bar sec-bar-red"></div>
+      <div class="sec-label"><span>Officiels</span> — Domicile</div>
+      <div style="padding:4px 8px;background:var(--blue);display:flex;align-items:center;gap:6px;">
+        <span class="off-global-badge">1 Av. max</span>
+        <span class="off-global-badge">1 Excl. max</span>
+      </div>
+    </div>
+    <div class="off-grid">
+      <div class="off-cell">
+        <div class="off-role">Responsable A</div>
+        <div class="off-name" contenteditable="true">— <span style="font-size:8px;color:var(--muted);">N° licence</span></div>
+        <div class="off-sanctions">
+          <span class="off-san-label">Sanctions :</span>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="home" data-type="off-av" onclick="cycleOffPen(this)" title="Avertissement (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="home" data-type="off-2min" onclick="cycleOffPen(this)" title="Exclusion 2min (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-dis" onclick="cycleOffPen(this)" title="Disqualification">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-rapport" onclick="cycleOffPen(this)" title="Rapport écrit">—</div>
+        </div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Officiel B</div>
+        <div class="off-name" contenteditable="true" style="color:var(--muted);">—</div>
+        <div class="off-sanctions">
+          <span class="off-san-label">Sanctions :</span>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="home" data-type="off-av" onclick="cycleOffPen(this)" title="Avertissement (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="home" data-type="off-2min" onclick="cycleOffPen(this)" title="Exclusion 2min (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-dis" onclick="cycleOffPen(this)" title="Disqualification">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-rapport" onclick="cycleOffPen(this)" title="Rapport écrit">—</div>
+        </div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Officiel C</div>
+        <div class="off-name" contenteditable="true" style="color:var(--muted);">—</div>
+        <div class="off-sanctions">
+          <span class="off-san-label">Sanctions :</span>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="home" data-type="off-av" onclick="cycleOffPen(this)" title="Avertissement (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="home" data-type="off-2min" onclick="cycleOffPen(this)" title="Exclusion 2min (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-dis" onclick="cycleOffPen(this)" title="Disqualification">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-rapport" onclick="cycleOffPen(this)" title="Rapport écrit">—</div>
+        </div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Kiné / Médecin</div>
+        <div class="off-name" contenteditable="true" style="color:var(--muted);">—</div>
+        <div class="off-sanctions">
+          <span class="off-san-label">Sanctions :</span>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="home" data-type="off-av" onclick="cycleOffPen(this)" title="Avertissement (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="home" data-type="off-2min" onclick="cycleOffPen(this)" title="Exclusion 2min (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-dis" onclick="cycleOffPen(this)" title="Disqualification">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-rapport" onclick="cycleOffPen(this)" title="Rapport écrit">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="col-divider"></div>
+
+  <!-- ══ COLONNE VISITEUR ══ -->
+  <div>
+    <div class="sec-head">
+      <div class="sec-bar sec-bar-blue"></div>
+      <div class="sec-label"><span contenteditable="true">Équipe Visiteur</span> — Joueurs</div>
+      <div class="sec-tag sec-tag-away">EXT</div>
+    </div>
+    <table class="ptable" id="table-away">
+      <thead>
+        <tr>
+          <th style="width:16px" title="Capitaine">Cap</th>
+          <th style="width:24px">N°</th>
+          <th class="th-name">Nom · Prénom</th>
+          <th style="width:26px">Pos</th>
+          <th style="width:22px">Buts</th>
+          <th style="width:18px">7m</th>
+          <th style="width:22px">Tirs</th>
+          <th style="width:22px">Arrêts</th>
+          <th style="width:16px">Av.</th>
+          <th style="width:16px">2'</th>
+          <th style="width:16px">2'</th>
+          <th style="width:18px">2'+D</th>
+          <th style="width:22px">Dis</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-away">
+      </tbody>
+    </table>
+    <div style="padding:4px 8px; border-top:1px solid var(--border);">
+      <button onclick="addRow('tbody-away','away')" style="font-size:8px;padding:2px 8px;background:var(--off);border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);font-family:var(--font-b);">+ Ajouter un joueur</button>
+    </div>
+
+    <!-- Officiels visiteur -->
+    <div class="sec-head">
+      <div class="sec-bar sec-bar-blue"></div>
+      <div class="sec-label"><span>Officiels</span> — Extérieur</div>
+      <div style="padding:4px 8px;background:var(--blue);display:flex;align-items:center;gap:6px;">
+        <span class="off-global-badge">1 Av. max</span>
+        <span class="off-global-badge">1 Excl. max</span>
+      </div>
+    </div>
+    <div class="off-grid">
+      <div class="off-cell">
+        <div class="off-role">Responsable A</div>
+        <div class="off-name" contenteditable="true">— <span style="font-size:8px;color:var(--muted);">N° licence</span></div>
+        <div class="off-sanctions">
+          <span class="off-san-label">Sanctions :</span>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="away" data-type="off-av" onclick="cycleOffPen(this)" title="Avertissement (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="away" data-type="off-2min" onclick="cycleOffPen(this)" title="Exclusion 2min (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-dis" onclick="cycleOffPen(this)" title="Disqualification">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-rapport" onclick="cycleOffPen(this)" title="Rapport écrit">—</div>
+        </div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Officiel B</div>
+        <div class="off-name" contenteditable="true">— <span style="font-size:8px;color:var(--muted);">N° licence</span></div>
+        <div class="off-sanctions">
+          <span class="off-san-label">Sanctions :</span>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="away" data-type="off-av" onclick="cycleOffPen(this)" title="Avertissement (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="away" data-type="off-2min" onclick="cycleOffPen(this)" title="Exclusion 2min (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-dis" onclick="cycleOffPen(this)" title="Disqualification">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-rapport" onclick="cycleOffPen(this)" title="Rapport écrit">—</div>
+        </div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Officiel C</div>
+        <div class="off-name" contenteditable="true">— <span style="font-size:8px;color:var(--muted);">N° licence</span></div>
+        <div class="off-sanctions">
+          <span class="off-san-label">Sanctions :</span>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="away" data-type="off-av" onclick="cycleOffPen(this)" title="Avertissement (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="away" data-type="off-2min" onclick="cycleOffPen(this)" title="Exclusion 2min (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-dis" onclick="cycleOffPen(this)" title="Disqualification">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-rapport" onclick="cycleOffPen(this)" title="Rapport écrit">—</div>
+        </div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Kiné / Médecin</div>
+        <div class="off-name" contenteditable="true" style="color:var(--muted);">—</div>
+        <div class="off-sanctions">
+          <span class="off-san-label">Sanctions :</span>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="away" data-type="off-av" onclick="cycleOffPen(this)" title="Avertissement (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-team="away" data-type="off-2min" onclick="cycleOffPen(this)" title="Exclusion 2min (1 max/équipe)">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-dis" onclick="cycleOffPen(this)" title="Disqualification">—</div>
+          <div class="off-pen-box c-empty" data-state="empty" data-type="off-rapport" onclick="cycleOffPen(this)" title="Rapport écrit">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /body-grid -->
+
+<!-- ════ LÉGENDE ════ -->
+<div class="legend-bar">
+  <span class="leg-key">Légende pénalités :</span>
+  <span class="leg-item"><span class="pen-box c-yellow" style="display:inline-flex;">!</span> Avertissement</span>
+  <span class="leg-item"><span class="pen-box c-2min" style="display:inline-flex;">2'</span> Exclusion 2 min (vide)</span>
+  <span class="leg-item"><span class="pen-box c-2min-dis" style="display:inline-flex;">D</span> 2'+D (disqualifiant)</span>
+  <span class="leg-item"><span class="pen-box c-red" style="display:inline-flex;">■</span> Disqualification rouge</span>
+  <span class="leg-item"><span class="pen-box c-blue" style="display:inline-flex;">■</span> Rapport écrit (bleu)</span>
+  <span style="width:1px;background:var(--border);align-self:stretch;margin:0 4px;"></span>
+  <span class="leg-key">Officiels :</span>
+  <span class="leg-item" style="font-size:8px;color:var(--muted);">Av. &amp; Excl. 2' : 1 seul par équipe · Disqual. &amp; Rapport : par officiel</span>
+  <span class="leg-item" style="color:var(--muted);font-size:8px;">· Cliquer sur une case pour changer son état</span>
+</div>
+
+<!-- ════ BOTTOM ════ -->
+<div class="bottom-row">
+  <div class="arb-block">
+    <div class="sec-head">
+      <div class="sec-bar" style="background:var(--gold);"></div>
+      <div class="sec-label" style="background:#1A1A2E;"><span>Arbitres &amp; Table de marque</span></div>
+    </div>
+    <div class="off-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+      <div class="off-cell">
+        <div class="off-role">Arbitre 1</div>
+        <div class="off-name" contenteditable="true">—<br><span style="font-size:8px;color:var(--muted);">N° licence</span></div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Arbitre 2</div>
+        <div class="off-name" contenteditable="true" style="color:var(--muted);">—</div>
+      </div>
+      <div class="off-cell">
+        <div class="off-role">Chronométreur</div>
+        <div class="off-name" contenteditable="true">—<br><span style="font-size:8px;color:var(--muted);">N° licence</span></div>
+      </div>
+      <div class="off-cell" style="border-right:none;">
+        <div class="off-role">Secrétaire</div>
+        <div class="off-name" contenteditable="true">—<br><span style="font-size:8px;color:var(--muted);">N° licence</span></div>
+      </div>
+    </div>
+    <div class="period-block">
+      <div class="period-title">Détail du score</div>
+      <div class="period-grid">
+        <div class="pg-header">Équipe</div>
+        <div class="pg-header">Période 1</div>
+        <div class="pg-header">Fin Tps Rég.</div>
+        <div class="pg-header">Prol. 1</div>
+        <div class="pg-header">Prol. 2</div>
+        <div class="pg-header">Tirs au but</div>
+        <div class="pg-row-label">DOM</div>
+        <div class="pg-cell score-val home-score" contenteditable="true">—</div>
+        <div class="pg-cell score-val home-score" contenteditable="true">—</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+        <div class="pg-row-label last">VIS</div>
+        <div class="pg-cell score-val away-score" contenteditable="true">—</div>
+        <div class="pg-cell score-val away-score" contenteditable="true">—</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+        <div class="pg-cell empty-p" contenteditable="true">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-block">
+    <div class="stats-title">Récapitulatif</div>
+    <div class="stat-row"><span class="stat-label">Buts Domicile</span><span class="stat-val" contenteditable="true">—</span></div>
+    <div class="stat-row"><span class="stat-label">7m DOM réussi</span><span class="stat-val" contenteditable="true">—</span></div>
+    <div class="stat-row"><span class="stat-label">Tirs DOM</span><span class="stat-val" contenteditable="true">—</span></div>
+    <div class="stat-row"><span class="stat-label">Arrêts Gardiens DOM</span><span class="stat-val" contenteditable="true">—</span></div>
+    <div class="stat-row" style="border-top:2px solid var(--border);margin-top:2px;padding-top:2px;"></div>
+    <div class="stat-row"><span class="stat-label">Buts Visiteur</span><span class="stat-val blue-val" contenteditable="true">—</span></div>
+    <div class="stat-row"><span class="stat-label">7m VIS réussi</span><span class="stat-val blue-val" contenteditable="true">—</span></div>
+    <div class="stat-row"><span class="stat-label">Tirs VIS</span><span class="stat-val blue-val" contenteditable="true">—</span></div>
+    <div class="stat-row"><span class="stat-label">Arrêts Gardiens VIS</span><span class="stat-val blue-val" contenteditable="true">—</span></div>
+    <div class="stat-row" style="border-top:2px solid var(--border);margin-top:2px;padding-top:2px;"></div>
+    <div class="stat-row"><span class="stat-label">Exclusions 2' total</span><span class="stat-val" contenteditable="true">—</span></div>
+    <div class="stat-row"><span class="stat-label">Cartons rouges</span><span class="stat-val red" contenteditable="true">—</span></div>
+    <div class="stat-row"><span class="stat-label">Cartons bleus</span><span class="stat-val" style="color:var(--cyan);" contenteditable="true">—</span></div>
+  </div>
+</div>
+
+<!-- Observations + Signatures -->
+<div class="sig-row">
+  <div class="obs-block" style="flex:2;">
+    <div class="obs-label">Observations / Incidents</div>
+    <div class="obs-content" contenteditable="true"></div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-label">Signature Arbitre 1</div>
+    <div class="sig-name" contenteditable="true">—</div>
+    <div class="sig-line"></div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-label">Signature Arbitre 2</div>
+    <div class="sig-name" contenteditable="true">—</div>
+    <div class="sig-line"></div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-label">Responsable Domicile</div>
+    <div class="sig-name" contenteditable="true">—</div>
+    <div class="sig-line"></div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-label">Responsable Extérieur</div>
+    <div class="sig-name" contenteditable="true">—</div>
+    <div class="sig-line"></div>
+  </div>
+</div>
+
+<!-- ════ FOOTER ════ -->
+<div class="footer">
+  <div class="footer-left" contenteditable="true">Fédération Française de Handball — Document officiel à conserver · Code Renc. —</div>
+  <div class="footer-center">FFHB · Feuille de Match Officielle</div>
+  <div class="footer-right" contenteditable="true">Ligue — · Saison —</div>
+</div>
+
+</div><!-- /page -->
+
+<script>
+// ════════════════════════════════
+// DONNÉES JOUEURS
+// ════════════════════════════════
+const ORIGINAL_PLAYERS_HOME = [
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' }
+];
+
+
+const ORIGINAL_PLAYERS_AWAY = [
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' },
+  { num:'—', name:'', lic:'', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' }
+];
+
+
+// ════════════════════════════════
+// SANCTION CYCLE — Joueurs
+// ════════════════════════════════
+const PEN_STATES = {
+  'empty':    { cls:'c-empty',    label:'—' },
+  'yellow':   { cls:'c-yellow',   label:'!' },
+  '2min':     { cls:'c-2min',     label:"2'" },
+  '2min-used':{ cls:'c-2min-used',label:'✓' },
+  '2min-dis': { cls:'c-2min-dis', label:"D" },
+  'red':      { cls:'c-red',      label:'■' },
+  'blue':     { cls:'c-blue',     label:'■' },
+};
+
+const PEN_CYCLES = {
+  av:   ['empty','yellow'],
+  p:    ['empty','2min','2min-used'],
+  p2d:  ['empty','2min-dis'],
+  dis:  ['empty','red','blue'],
+};
+
+function cyclePen(el, type) {
+  const currentState = el.dataset.state || 'empty';
+  const cycle = PEN_CYCLES[type];
+  const idx = cycle.indexOf(currentState);
+  const nextState = cycle[(idx + 1) % cycle.length];
+  setPenState(el, nextState);
+
+  const hint = document.getElementById('cycleHint');
+  const labels = { 'empty':'Vide', 'yellow':'Avertissement ⚠️', '2min':"2 min (vide)", '2min-used':"2 min infligée ✓", '2min-dis':"2'+D (disqualification)", 'red':'Disqualif. rouge ■', 'blue':'Rapport bleu ■' };
+  hint.textContent = '→ ' + labels[nextState];
+  hint.classList.add('show');
+  clearTimeout(hint._t);
+  hint._t = setTimeout(() => hint.classList.remove('show'), 1500);
+}
+
+function setPenState(el, state) {
+  const s = PEN_STATES[state] || PEN_STATES['empty'];
+  Object.values(PEN_STATES).forEach(v => el.classList.remove(v.cls));
+  el.classList.add(s.cls);
+  el.textContent = s.label;
+  el.dataset.state = state;
+}
+
+// ════════════════════════════════
+// SANCTIONS OFFICIELS
+// ════════════════════════════════
+// off-av & off-2min : 1 seul par équipe (home/away)
+// off-dis & off-rapport : 1 par officiel
+const OFF_STATES = {
+  'empty':   { cls:'c-empty',  label:'—' },
+  'yellow':  { cls:'c-yellow', label:'!' },
+  '2min':    { cls:'c-2min-used', label:"2'" },
+  'red':     { cls:'c-red',    label:'■' },
+  'blue':    { cls:'c-blue',   label:'■' },
+};
+
+function cycleOffPen(el) {
+  const type = el.dataset.type;
+  const team = el.dataset.team; // 'home' or 'away' (only for global types)
+  const currentState = el.dataset.state || 'empty';
+
+  if (type === 'off-av') {
+    // Global : 1 seul avertissement pour toute l'équipe
+    if (currentState === 'empty') {
+      // Vérifier si un autre officiel de la même équipe a déjà un avertissement
+      const allAv = document.querySelectorAll(`.off-pen-box[data-type="off-av"][data-team="${team}"]`);
+      const alreadyUsed = [...allAv].some(b => b !== el && b.dataset.state !== 'empty');
+      if (alreadyUsed) {
+        showHint('⛔ Un seul avertissement autorisé pour tous les officiels');
+        return;
+      }
+      setOffState(el, 'yellow');
+    } else {
+      setOffState(el, 'empty');
+    }
+  } else if (type === 'off-2min') {
+    // Global : 1 seule exclusion 2min pour toute l'équipe
+    if (currentState === 'empty') {
+      const all2min = document.querySelectorAll(`.off-pen-box[data-type="off-2min"][data-team="${team}"]`);
+      const alreadyUsed = [...all2min].some(b => b !== el && b.dataset.state !== 'empty');
+      if (alreadyUsed) {
+        showHint('⛔ Une seule exclusion 2min autorisée pour tous les officiels');
+        return;
+      }
+      setOffState(el, '2min');
+    } else {
+      setOffState(el, 'empty');
+    }
+  } else if (type === 'off-dis') {
+    // Par officiel : disqualification
+    const next = currentState === 'empty' ? 'red' : 'empty';
+    setOffState(el, next);
+  } else if (type === 'off-rapport') {
+    // Par officiel : rapport écrit
+    const next = currentState === 'empty' ? 'blue' : 'empty';
+    setOffState(el, next);
+  }
+}
+
+function setOffState(el, state) {
+  const s = OFF_STATES[state] || OFF_STATES['empty'];
+  Object.values(OFF_STATES).forEach(v => el.classList.remove(v.cls));
+  el.classList.add(s.cls);
+  el.textContent = s.label;
+  el.dataset.state = state;
+  const labels = { 'empty':'Vide', 'yellow':'Avertissement', '2min':'Exclusion 2min', 'red':'Disqualification', 'blue':'Rapport écrit' };
+  showHint('→ ' + labels[state]);
+}
+
+function showHint(msg) {
+  const hint = document.getElementById('cycleHint');
+  hint.textContent = msg;
+  hint.classList.add('show');
+  clearTimeout(hint._t);
+  hint._t = setTimeout(() => hint.classList.remove('show'), 2000);
+}
+
+// ════════════════════════════════
+// CAPITAINE — gestion checkbox
+// ════════════════════════════════
+function handleCaptainChange(checkbox) {
+  const team = checkbox.dataset.team;
+  const tbody = checkbox.closest('tbody');
+  // Décoche tous les autres de la même table
+  tbody.querySelectorAll('.capt-check').forEach(cb => {
+    if (cb !== checkbox) {
+      cb.checked = false;
+      updateCaptainRow(cb);
+    }
+  });
+  updateCaptainRow(checkbox);
+}
+
+function updateCaptainRow(checkbox) {
+  const tr = checkbox.closest('tr');
+  const isCapt = checkbox.checked;
+  const team = checkbox.dataset.team;
+  // Mise à jour de la couleur du drapeau dans la colonne nom
+  const flag = tr.querySelector('.capt-flag');
+  if (flag) {
+    if (isCapt) flag.classList.add('active'); else flag.classList.remove('active');
+  }
+  // Mise à jour class de la ligne
+  tr.classList.remove('capt-row-home', 'capt-row-away');
+  if (isCapt) tr.classList.add(team === 'home' ? 'capt-row-home' : 'capt-row-away');
+}
+
+// ════════════════════════════════
+// POSITION — toggle + couleur numéro
+// ════════════════════════════════
+function togglePos(el) {
+  const tr = el.closest('tr');
+  const numTd = tr.querySelector('.td-num');
+  if (el.classList.contains('pos-gk')) {
+    el.classList.remove('pos-gk'); el.classList.add('pos-j'); el.textContent = 'J';
+    if (numTd) { numTd.classList.remove('num-gk'); numTd.classList.add('num-j'); }
+  } else {
+    el.classList.remove('pos-j'); el.classList.add('pos-gk'); el.textContent = 'GK';
+    if (numTd) { numTd.classList.remove('num-j'); numTd.classList.add('num-gk'); }
+  }
+}
+
+// ════════════════════════════════
+// RENDER ROWS
+// ════════════════════════════════
+function buildPenBox(state, type) {
+  const s = PEN_STATES[state] || PEN_STATES['empty'];
+  return `<div class="pen-box ${s.cls}" data-state="${state}" onclick="cyclePen(this,'${type}')">${s.label}</div>`;
+}
+
+function buildRow(p, team) {
+  const isGK = p.isGK || p.pos === 'GK';
+  const numColorClass = isGK ? 'td-num num-gk' : 'td-num num-j';
+  const posClass = isGK ? 'pos-gk' : 'pos-j';
+  const posLabel = isGK ? 'GK' : 'J';
+  const goalsClass = p.goals === '—' ? 'td-goals zero' : 'td-goals';
+  const m7Class = p.m7 === '—' ? 'td-7m zero' : 'td-7m';
+  const arsClass = p.arrets === '—' ? 'td-ars zero' : 'td-ars';
+  const captChecked = p.isCapt ? 'checked' : '';
+  const rowClass = p.isCapt ? (team === 'home' ? 'capt-row-home' : 'capt-row-away') : '';
+  const flagActive = p.isCapt ? 'active' : '';
+
+  return `<tr class="${rowClass}">
+    <td class="td-capt"><input type="checkbox" class="capt-check" data-team="${team}" ${captChecked} onchange="handleCaptainChange(this)" title="Désigner capitaine"></td>
+    <td class="${numColorClass}" contenteditable="true">${p.num}</td>
+    <td class="td-name" contenteditable="true"><span class="capt-flag ${flagActive}">⚑ </span>${p.name}<span class="lic" contenteditable="true">${p.lic}</span></td>
+    <td><span class="pos-badge ${posClass}" onclick="togglePos(this)">${posLabel}</span></td>
+    <td class="${goalsClass}" contenteditable="true">${p.goals}</td>
+    <td class="${m7Class}" contenteditable="true">${p.m7}</td>
+    <td class="td-tirs" contenteditable="true">${p.tirs}</td>
+    <td class="${arsClass}" contenteditable="true">${p.arrets}</td>
+    <td><div class="pen-row">${buildPenBox(p.av,'av')}</div></td>
+    <td><div class="pen-row">${buildPenBox(p.p1,'p')}</div></td>
+    <td><div class="pen-row">${buildPenBox(p.p2,'p')}</div></td>
+    <td><div class="pen-row">${buildPenBox(p.p2d || 'empty','p2d')}</div></td>
+    <td><div class="pen-row">${buildPenBox(p.dis,'dis')}</div></td>
+    <td style="width:14px;padding:0;"><span onclick="deleteRow(this)" style="cursor:pointer;color:var(--muted);font-size:8px;padding:2px;" title="Supprimer">✕</span></td>
+  </tr>`;
+}
+
+function renderPlayers(tbodyId, players, team) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = players.map(p => buildRow(p, team)).join('');
+}
+
+function addRow(tbodyId, team) {
+  const newPlayer = { num:'00', name:'Nouveau Joueur', lic:'Licence · A', pos:'J', goals:'—', m7:'—', tirs:'—', arrets:'—', av:'empty', p1:'empty', p2:'empty', p2d:'empty', dis:'empty' };
+  document.getElementById(tbodyId).insertAdjacentHTML('beforeend', buildRow(newPlayer, team));
+}
+
+function deleteRow(el) {
+  const tr = el.closest('tr');
+  if (confirm('Supprimer ce joueur ?')) tr.remove();
+}
+
+function resetToOriginal() {
+  if (!confirm('Réinitialiser toute la feuille aux données originales ?')) return;
+  renderPlayers('tbody-home', ORIGINAL_PLAYERS_HOME, 'home');
+  renderPlayers('tbody-away', ORIGINAL_PLAYERS_AWAY, 'away');
+  // Reset officiels sanctions
+  document.querySelectorAll('.off-pen-box').forEach(el => {
+    el.dataset.state = 'empty';
+    Object.values(OFF_STATES).forEach(v => el.classList.remove(v.cls));
+    el.classList.add('c-empty');
+    el.textContent = '—';
+  });
+}
+
+// ════════════════════════════════
+// SCORE AUTO COLOR
+// ════════════════════════════════
+function updateScoreColors() {
+  const homeEl = document.getElementById('score-home');
+  const awayEl = document.getElementById('score-away');
+  const h = parseInt(homeEl.textContent.trim()) || 0;
+  const a = parseInt(awayEl.textContent.trim()) || 0;
+  homeEl.className = 'score-box';
+  awayEl.className = 'score-box';
+  if (h > a) {
+    homeEl.classList.add('home-win');
+  } else if (a > h) {
+    awayEl.classList.add('away-win');
+  }
+}
+
+// Init on load
+renderPlayers('tbody-home', ORIGINAL_PLAYERS_HOME, 'home');
+renderPlayers('tbody-away', ORIGINAL_PLAYERS_AWAY, 'away');
+updateScoreColors();
+
+
+// ════════════════════════════════
+// IMPORT PDF FFHB via Claude API
+// ════════════════════════════════
+
+let importedData = null;
+
+function showImportModal(step) {
+  const modal = document.getElementById('importModal');
+  modal.style.display = 'flex';
+  ['loading','preview','error'].forEach(s => {
+    document.getElementById('importStep-' + s).style.display = s === step ? 'block' : 'none';
+  });
+}
+
+function closeImportModal() {
+  document.getElementById('importModal').style.display = 'none';
+  document.getElementById('pdfImportInput').value = '';
+  document.getElementById('btnImport').disabled = false;
+  setProgress(5, 'En attente');
+}
+
+function setProgress(pct, msg) {
+  document.getElementById('importProgressBar').style.width = pct + '%';
+  if (msg) document.getElementById('importProgressMsg').textContent = msg;
+}
+
+async function handlePdfImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  document.getElementById('btnImport').disabled = true;
+  showImportModal('loading');
+  setProgress(10, 'Lecture du fichier…');
+
+  try {
+    const base64 = await fileToBase64(file);
+    setProgress(25, 'Envoi à Claude pour analyse…');
+
+    const isImage = file.type.startsWith('image/');
+    const mediaType = isImage ? file.type : 'application/pdf';
+
+    const prompt = `Tu es un expert en lecture de feuilles de match de handball FFHB.
+Analyse ce document et extrait TOUTES les données visibles.
+Réponds UNIQUEMENT en JSON valide, sans texte avant/après ni balises markdown, avec cette structure exacte :
+
+{
+  "match": {
+    "competition": "", "poule": "", "codeRenc": "", "ligue": "",
+    "dateHeure": "", "salle": "", "scoreHome": "", "scoreAway": "",
+    "miTemps": "", "equipeHome": "", "equipeAway": "",
+    "codeHome": "", "codeAway": ""
+  },
+  "arbitres": [
+    { "role": "Arbitre 1", "nom": "", "licence": "" },
+    { "role": "Arbitre 2", "nom": "", "licence": "" },
+    { "role": "Délégué", "nom": "", "licence": "" },
+    { "role": "Chronométreur", "nom": "", "licence": "" },
+    { "role": "Secrétaire", "nom": "", "licence": "" }
+  ],
+  "officielsHome": [
+    { "role": "Responsable A", "nom": "", "licence": "" },
+    { "role": "Officiel B", "nom": "", "licence": "" },
+    { "role": "Officiel C", "nom": "", "licence": "" },
+    { "role": "Kiné / Médecin", "nom": "", "licence": "" }
+  ],
+  "officielsAway": [
+    { "role": "Responsable A", "nom": "", "licence": "" },
+    { "role": "Officiel B", "nom": "", "licence": "" },
+    { "role": "Officiel C", "nom": "", "licence": "" },
+    { "role": "Kiné / Médecin", "nom": "", "licence": "" }
+  ],
+  "jouteursHome": [
+    {
+      "num": "", "nom": "", "licence": "", "pos": "J",
+      "isGK": false, "isCapt": false,
+      "goals": "—", "m7": "—", "tirs": "—", "arrets": "—",
+      "av": "empty", "p1": "empty", "p2": "empty", "p2d": "empty", "dis": "empty"
+    }
+  ],
+  "jouteursAway": [],
+  "observations": ""
+}
+
+Règles pour les sanctions :
+- av : "empty" ou "yellow"
+- p1/p2 (exclusion 2min) : "empty", "2min" ou "2min-used"
+- p2d (2min+disqual) : "empty" ou "2min-dis"
+- dis : "empty", "red" (disqualif. rouge) ou "blue" (rapport écrit)
+- isGK=true si gardien de but, pos="GK" si gardien sinon "J"
+- goals/tirs/arrêts non renseignés : "—"
+Extrait TOUS les joueurs des deux équipes. Valeur inconnue = chaîne vide.`;
+
+    const contentBlock = isImage
+      ? { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } }
+      : { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } };
+
+    setProgress(40, 'Claude analyse le document…');
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: [contentBlock, { type: 'text', text: prompt }] }]
+      })
+    });
+
+    setProgress(75, 'Réponse reçue, traitement…');
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'Erreur API Anthropic (' + response.status + ')');
+    }
+
+    const result = await response.json();
+    const rawText = result.content.filter(b => b.type === 'text').map(b => b.text).join('');
+    const cleaned = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    importedData = JSON.parse(cleaned);
+
+    setProgress(95, 'Préparation de la prévisualisation…');
+    showPreview(importedData);
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('importErrorMsg').textContent = err.message || String(err);
+    showImportModal('error');
+    document.getElementById('btnImport').disabled = false;
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function showPreview(data) {
+  const m = data.match || {};
+  const pHome = data.jouteursHome || [];
+  const pAway = data.jouteursAway || [];
+
+  let html = `<div style="margin-bottom:10px;">
+    <b style="color:#003087;font-size:12px;">📋 INFOS MATCH</b>
+    <table style="width:100%;border-collapse:collapse;margin-top:6px;">
+      ${pvRow('Équipe Domicile', m.equipeHome)}${pvRow('Équipe Visiteur', m.equipeAway)}
+      ${pvRow('Score', (m.scoreHome||'?')+' – '+(m.scoreAway||'?'))}${pvRow('Mi-temps', m.miTemps)}
+      ${pvRow('Compétition', m.competition)}${pvRow('Date/Heure', m.dateHeure)}
+      ${pvRow('Code rencontre', m.codeRenc)}${pvRow('Salle', m.salle)}
+    </table>
+  </div>`;
+
+  html += pvPlayerTable('🏠 JOUEURS DOMICILE', pHome);
+  html += pvPlayerTable('✈️ JOUEURS VISITEUR', pAway);
+
+  if ((data.officielsHome||[]).some(o=>o.nom)) {
+    html += `<div style="margin-top:10px;"><b style="color:#003087;font-size:12px;">👔 OFFICIELS DOMICILE</b><br>`;
+    (data.officielsHome||[]).forEach(o => { if(o.nom) html += `${o.role} : <b>${o.nom}</b>${o.licence?' ('+o.licence+')':''}<br>`; });
+    html += `</div>`;
+  }
+  if ((data.officielsAway||[]).some(o=>o.nom)) {
+    html += `<div style="margin-top:8px;"><b style="color:#003087;font-size:12px;">👔 OFFICIELS VISITEUR</b><br>`;
+    (data.officielsAway||[]).forEach(o => { if(o.nom) html += `${o.role} : <b>${o.nom}</b>${o.licence?' ('+o.licence+')':''}<br>`; });
+    html += `</div>`;
+  }
+  if (data.observations) {
+    html += `<div style="margin-top:8px;"><b style="color:#003087;font-size:12px;">📝 OBSERVATIONS</b><br><span style="color:#555;">${data.observations}</span></div>`;
+  }
+
+  document.getElementById('importPreviewContent').innerHTML = html;
+  setProgress(100, 'Extraction terminée !');
+  setTimeout(() => showImportModal('preview'), 400);
+}
+
+function pvRow(label, val) {
+  return `<tr><td style="color:#888;padding:1px 6px 1px 0;width:45%;font-size:10px;">${label}</td><td style="font-weight:700;color:#111;font-size:10px;">${val||'<span style="color:#ccc">—</span>'}</td></tr>`;
+}
+
+function pvPlayerTable(title, players) {
+  if (!players.length) return '';
+  let html = `<div style="margin-top:10px;"><b style="color:#003087;font-size:12px;">${title} (${players.length})</b>
+    <table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:10px;">
+      <thead><tr style="background:#003087;color:#fff;">
+        <th style="padding:3px 5px;">N°</th><th style="padding:3px 5px;text-align:left;">Nom / Licence</th>
+        <th>Pos</th><th>Buts</th><th>Av</th><th>2'</th><th>Dis</th>
+      </tr></thead><tbody>`;
+  players.forEach((p, i) => {
+    const bg = i%2===0?'#fff':'#f4f6fb';
+    html += `<tr style="background:${bg};">
+      <td style="padding:2px 5px;text-align:center;font-weight:800;color:${p.isGK?'#1565c0':'#c8102e'};">${p.num||'—'}</td>
+      <td style="padding:2px 5px;">${p.nom||''}${p.isCapt?' <b>⚑</b>':''} <span style="color:#aaa;font-size:9px;">${p.licence||''}</span></td>
+      <td style="text-align:center;font-weight:700;">${p.pos||'J'}</td>
+      <td style="text-align:center;">${p.goals||'—'}</td>
+      <td style="text-align:center;">${p.av==='yellow'?'⚠️':''}</td>
+      <td style="text-align:center;">${(p.p1!=='empty'||p.p2!=='empty')?"2'":" "}</td>
+      <td style="text-align:center;">${p.dis==='red'?'🟥':p.dis==='blue'?'🟦':''}</td>
+    </tr>`;
+  });
+  return html + `</tbody></table></div>`;
+}
+
+function applyImportData() {
+  if (!importedData) return;
+  const d = importedData;
+  const m = d.match || {};
+
+  // Équipes
+  document.querySelectorAll('.team-name-home').forEach(el => { if(m.equipeHome) el.textContent = m.equipeHome; });
+  document.querySelectorAll('.team-name-away').forEach(el => { if(m.equipeAway) el.textContent = m.equipeAway; });
+
+  // Score
+  if (m.scoreHome !== undefined && m.scoreHome !== '') {
+    const el = document.getElementById('score-home'); if(el) el.textContent = m.scoreHome;
+  }
+  if (m.scoreAway !== undefined && m.scoreAway !== '') {
+    const el = document.getElementById('score-away'); if(el) el.textContent = m.scoreAway;
+  }
+
+  // Champs data-import
+  document.querySelectorAll('[data-import]').forEach(el => {
+    const key = el.dataset.import;
+    if (m[key] !== undefined && m[key] !== '') el.textContent = m[key];
+  });
+
+  // Joueurs
+  renderPlayers('tbody-home', mapImportPlayers(d.jouteursHome||[]), 'home');
+  renderPlayers('tbody-away', mapImportPlayers(d.jouteursAway||[]), 'away');
+
+  // Officiels
+  applyOfficiels('home', d.officielsHome||[]);
+  applyOfficiels('away', d.officielsAway||[]);
+
+  // Observations
+  if (d.observations) {
+    const obs = document.querySelector('.obs-content');
+    if (obs) obs.textContent = d.observations;
+  }
+
+  updateScoreColors();
+  closeImportModal();
+
+  const hint = document.getElementById('cycleHint');
+  hint.textContent = '✅ Données importées avec succès !';
+  hint.classList.add('show');
+  clearTimeout(hint._t);
+  hint._t = setTimeout(() => hint.classList.remove('show'), 3000);
+}
+
+function mapImportPlayers(players) {
+  return players.map(p => ({
+    num: p.num||'—', name: p.nom||'', lic: p.licence||'',
+    pos: p.pos||(p.isGK?'GK':'J'), isGK: p.isGK||p.pos==='GK',
+    isCapt: p.isCapt||false,
+    goals: p.goals||'—', m7: p.m7||'—', tirs: p.tirs||'—', arrets: p.arrets||'—',
+    av: p.av||'empty', p1: p.p1||'empty', p2: p.p2||'empty',
+    p2d: p.p2d||'empty', dis: p.dis||'empty',
+  }));
+}
+
+function applyOfficiels(team, officiels) {
+  const secHeads = document.querySelectorAll('.sec-head');
+  let targetGrid = null;
+  secHeads.forEach(sh => {
+    const hasRed  = sh.querySelector('.sec-bar-red');
+    const hasBlue = sh.querySelector('.sec-bar-blue');
+    const label = sh.textContent || '';
+    if (team === 'home' && hasRed  && label.includes('Domicile')) targetGrid = sh.nextElementSibling;
+    if (team === 'away' && hasBlue && label.includes('Extérieur')) targetGrid = sh.nextElementSibling;
+  });
+  if (!targetGrid) return;
+  const cells = targetGrid.querySelectorAll('.off-cell');
+  officiels.forEach((off, i) => {
+    if (!cells[i] || !off.nom) return;
+    const nameEl = cells[i].querySelector('.off-name');
+    if (nameEl) {
+      nameEl.innerHTML = `${off.nom}${off.licence?` <span style="font-size:8px;color:var(--muted);">${off.licence}</span>`:''}`;
+      nameEl.style.color = '';
+    }
+  });
+}
+
+// Prevent newlines in single-line fields on Enter
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.activeElement.contentEditable === 'true') {
+    const el = document.activeElement;
+    if (!el.classList.contains('obs-content') && !el.classList.contains('off-name') && !el.classList.contains('info-val')) {
+      e.preventDefault();
+      el.blur();
+    }
+  }
+});
+</script>
+</body>
+</html>
