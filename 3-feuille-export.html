@@ -207,20 +207,39 @@ body{background:#CBD5E4;font-family:var(--font-b);color:var(--blue);padding:16px
 .leg-key{font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
 .leg-item{display:flex;align-items:center;gap:4px;font-size:8.5px;color:var(--blue);}
 
-/* EVENTS TABLE */
+/* EVENTS SECTION — style Live */
 .events-section{border-top:2px solid var(--border);}
-.events-header{background:var(--blue);display:flex;align-items:center;padding:5px 12px;}
-.events-header-title{font-family:var(--font-h);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.events-table{width:100%;border-collapse:collapse;font-size:8.5px;}
-.events-table th{background:var(--blue);font-family:var(--font-h);font-size:7.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:3px 8px;text-align:left;}
-.events-table td{padding:3px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
-.events-table tr:nth-child(even){background:#F7F9FD;}
-.ev-time{font-family:var(--font-h);font-weight:700;color:var(--muted);white-space:nowrap;}
-.ev-team-home{color:var(--accent);}
-.ev-team-away{color:var(--cyan);}
-.ev-icon-but{color:var(--green);}
-.ev-icon-san{color:var(--gold);}
-.ev-icon-dis{color:var(--accent);}
+.events-header{background:var(--blue);display:flex;align-items:center;padding:7px 14px;}
+.events-header-title{font-family:var(--font-h);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.events-count{font-size:9px;color:var(--muted);margin-left:8px;background:rgba(255,255,255,.07);padding:2px 7px;border-radius:10px;}
+/* Conteneur fond sombre */
+.events-inner{background:var(--blue);padding:8px 10px 12px;}
+/* Items inspirés du live */
+.ev-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border-radius:8px;padding:7px 10px;border-left:3px solid transparent;margin-bottom:5px;}
+.ev-item:last-child{margin-bottom:0;}
+.ev-item.e-but{border-color:#00C17A;}
+.ev-item.e-but7{border-color:#00C17A;opacity:.9;}
+.ev-item.e-save{border-color:#4A9FFF;}
+.ev-item.e-av{border-color:#F5A623;}
+.ev-item.e-2min{border-color:#E02D37;}
+.ev-item.e-dis{border-color:#ff4444;}
+.ev-item.e-rapport{border-color:#4A9FFF;}
+.ev-item.e-tmo{border-color:#9B59B6;}
+.ev-item.e-tir{border-color:rgba(255,255,255,.18);}
+.ev-item.e-blanc{border-color:rgba(255,255,255,.5);}
+.ev-icon{font-size:17px;width:24px;text-align:center;flex-shrink:0;}
+/* Carton inline */
+.ev-san{display:inline-flex;align-items:center;justify-content:center;width:16px;height:21px;border-radius:2px;font-size:0;box-shadow:0 1px 3px rgba(0,0,0,.5);}
+.ev-san.av{background:linear-gradient(170deg,#f5c842,#e6a800);border:1px solid #c98800;}
+.ev-san.s2min{background:linear-gradient(170deg,#e84c3d,#b52020);border:1px solid #8c1a1a;}
+.ev-san.dis{background:linear-gradient(170deg,#e02020,#8b0000);border:1px solid #660000;}
+.ev-san.rap{background:linear-gradient(170deg,#2e9aff,#0060cc);border:1px solid #0040aa;}
+.ev-san.blanc{background:linear-gradient(170deg,#ffffff,#d8e0ec);border:1px solid #9aaccc;}
+.ev-body{flex:1;min-width:0;}
+.ev-title{font-family:var(--font-h);font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--white);}
+.ev-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+.ev-time-badge{font-family:var(--font-h);font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;}
+.ev-type-pill{font-family:var(--font-h);font-size:7.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.25);flex-shrink:0;min-width:56px;text-align:right;}
 
 .pen-cycle-hint{position:fixed;bottom:20px;right:20px;background:var(--blue);color:var(--white);font-size:10px;padding:6px 12px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:999;font-family:var(--font-b);}
 .pen-cycle-hint.show{opacity:1;}
@@ -253,12 +272,13 @@ body{background:#CBD5E4;font-family:var(--font-b);color:var(--blue);padding:16px
 <!-- HEADER -->
 <div class="header">
   <div class="header-top">
-    <div class="brand">
-      <div class="brand-logo">FFHB</div>
-      <div class="brand-sub">Handball</div>
+    <div class="brand" style="background:var(--blue);padding:6px 10px;min-width:220px;flex-direction:row;gap:8px;border-right:1px solid rgba(255,255,255,0.1);">
+      <img src="20767-Photoroom.png" alt="Comité Isère" style="height:38px;object-fit:contain;"/>
+       <div style="width:1px;background:rgba(255,255,255,0.15);align-self:stretch;"></div>
+      <img src="logo-AURA-mobile.png" alt="Ligue AURA" style="height:38px;object-fit:contain;"/>
     </div>
     <div class="header-titles">
-      <div class="doc-eyebrow">Feuille de Match Officielle</div>
+      <div class="doc-eyebrow">Feuille de Match</div>
       <div class="doc-title" id="h-teams">Équipe Domicile / Équipe Visiteur</div>
       <div class="doc-comp" id="h-comp" contenteditable="true">Compétition — Catégorie · Poule</div>
     </div>
@@ -521,20 +541,13 @@ body{background:#CBD5E4;font-family:var(--font-b);color:var(--blue);padding:16px
   </div>
 </div>
 
-<!-- FAITS DE MATCH TABLE -->
+<!-- FAITS DE MATCH -->
 <div class="events-section" id="events-section">
   <div class="events-header">
     <div class="events-header-title">📋 Faits de match</div>
+    <span class="events-count" id="events-count">0 événements</span>
   </div>
-  <table class="events-table" id="events-table">
-    <thead><tr>
-      <th style="width:50px">Temps</th>
-      <th style="width:80px">Équipe</th>
-      <th>Description</th>
-      <th style="width:60px">Type</th>
-    </tr></thead>
-    <tbody id="events-tbody"></tbody>
-  </table>
+  <div class="events-inner" id="events-inner"></div>
 </div>
 
 <!-- LEGEND -->
@@ -654,7 +667,8 @@ function buildRow(p,team){
   const avState = p.av || 'empty';
   const p1State = (p.p1==='2min'||p.p1==='2min-used') ? '2min-used' : (p.p1||'empty');
   const p2State = (p.p2==='2min'||p.p2==='2min-used') ? '2min-used' : (p.p2||'empty');
-  const disState = p.dis==='red'?'red':p.dis==='blue'?'blue':'empty';
+  const p2dState = p.dis==='red3x2' ? '2min-dis' : 'empty';
+  const disState = p.dis==='red' ? 'red' : p.dis==='blue' ? 'blue' : 'empty';
   return `<tr class="${rowCls}">
     <td class="td-capt"><input type="checkbox" class="capt-check" data-team="${team}" ${captChecked} onchange="handleCaptainChange(this)"></td>
     <td class="${numCls}" contenteditable="true">${p.num||'—'}</td>
@@ -667,7 +681,7 @@ function buildRow(p,team){
     <td><div class="pen-row">${buildPenBox(avState,'av')}</div></td>
     <td><div class="pen-row">${buildPenBox(p1State,'p')}</div></td>
     <td><div class="pen-row">${buildPenBox(p2State,'p')}</div></td>
-    <td><div class="pen-row">${buildPenBox('empty','p2d')}</div></td>
+    <td><div class="pen-row">${buildPenBox(p2dState,'p2d')}</div></td>
     <td><div class="pen-row">${buildPenBox(disState,'dis')}</div></td>
     <td style="width:14px;padding:0;"><span onclick="deleteRow(this)" style="cursor:pointer;color:var(--muted);font-size:8px;padding:2px;" title="Supprimer">✕</span></td>
   </tr>`;
@@ -707,7 +721,7 @@ function updateScoreColors(){
 // OFFICIALS GRID
 // ═══════════════════════════════════
 function buildOfficialsGrid(team, officials) {
-  const roles = ['Entraîneur','Entraîneur adj.','Soigneur','Délégué d\'équipe'];
+  const roles = ['Officiel A','Officiel B','Officiel C','Officiel D'];
   return roles.map((role, i) => {
     const off = officials[i] || {};
     const avState = off.av || 'empty';
@@ -730,26 +744,50 @@ function buildOfficialsGrid(team, officials) {
 }
 
 // ═══════════════════════════════════
-// EVENTS TABLE
+// EVENTS — style Live
 // ═══════════════════════════════════
-const EVENT_ICONS = {but:'⚽',but7:'7️⃣',save:'🧤',av:'⚠️','2min':"⏱",dis:'🟥',rapport:'📝',tir:'🎯',tmo:'⏸'};
-const EVENT_LABELS = {but:'But',but7:'But 7m',save:'Arrêt',av:'Avertissement','2min':'Exclusion 2\'',dis:'Disqualification',rapport:'Rapport',tir:'Tir',tmo:'Temps mort'};
+const EVENT_ICONS = {
+  but:'⚽', but7:'7️⃣', save:'🧤',
+  av:'<span class="ev-san av"></span>',
+  '2min':'<span class="ev-san s2min"></span>',
+  dis:'<span class="ev-san dis"></span>',
+  rapport:'<span class="ev-san rap"></span>',
+  blanc:'<span class="ev-san blanc"></span>',
+  tir:'🎯', tmo:'⏸'
+};
+const EVENT_CLS = {
+  but:'e-but', but7:'e-but7', save:'e-save',
+  av:'e-av', '2min':'e-2min', dis:'e-dis',
+  rapport:'e-rapport', tir:'e-tir', tmo:'e-tmo', blanc:'e-blanc'
+};
+const EVENT_LABELS = {
+  but:'But', but7:'But 7m', save:'Arrêt', av:'Avertissement',
+  '2min':"Exclusion 2'", dis:'Disqualification', rapport:'Rapport',
+  tir:'Tir', tmo:'Temps mort', blanc:'Carton blanc'
+};
 function renderEvents(events, homeNom, awayNom) {
-  const tbody = document.getElementById('events-tbody');
+  const inner = document.getElementById('events-inner');
   const section = document.getElementById('events-section');
+  const countEl = document.getElementById('events-count');
   if (!events || !events.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
-  // Show only significant events (no tirs)
-  const filtered = events.filter(e => e.type !== 'tir').reverse();
-  tbody.innerHTML = filtered.map(ev => {
-    const teamClass = ev.team === 'home' ? 'ev-team-home' : 'ev-team-away';
+  const sorted = [...events].reverse();
+  countEl.textContent = sorted.length + ' événement' + (sorted.length > 1 ? 's' : '');
+  inner.innerHTML = sorted.map(ev => {
     const teamName = ev.team === 'home' ? homeNom : awayNom;
-    return `<tr>
-      <td class="ev-time">${ev.time||'—'}</td>
-      <td class="${teamClass}" style="font-weight:700;">${teamName}</td>
-      <td>${EVENT_ICONS[ev.type]||'•'} ${ev.desc||''}</td>
-      <td style="color:var(--muted);font-size:7.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">${EVENT_LABELS[ev.type]||ev.type}</td>
-    </tr>`;
+    const teamColor = ev.team === 'home' ? 'var(--accent)' : 'var(--cyan)';
+    const icon = EVENT_ICONS[ev.type] || '•';
+    const cls = EVENT_CLS[ev.type] || '';
+    const label = EVENT_LABELS[ev.type] || ev.type;
+    return `<div class="ev-item ${cls}">
+      <div class="ev-icon">${icon}</div>
+      <div class="ev-body">
+        <div class="ev-title">${ev.desc || ''}</div>
+        <div class="ev-sub" style="color:${teamColor};">${teamName}</div>
+      </div>
+      <div class="ev-time-badge">${ev.time || '—'}</div>
+      <div class="ev-type-pill">${label}</div>
+    </div>`;
   }).join('');
 }
 
@@ -766,6 +804,7 @@ function calcStats(players) {
     if(p.p1!=='empty')exclu++;
     if(p.p2!=='empty')exclu++;
     if(p.dis==='red')red++;
+    if(p.dis==='red3x2')exclu++; // 3e exclusion = compte comme exclusion, pas rouge direct
     if(p.dis==='blue')blue++;
   });
   return {goals,m7,tirs,arrets,exclu,red,blue};
