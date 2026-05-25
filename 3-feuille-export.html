@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -231,7 +232,7 @@ body{background:#CBD5E4;font-family:var(--font-b);color:var(--blue);padding:16px
 /* Carton inline */
 .ev-san{display:inline-flex;align-items:center;justify-content:center;width:16px;height:21px;border-radius:2px;font-size:0;box-shadow:0 1px 3px rgba(0,0,0,.5);}
 .ev-san.av{background:linear-gradient(170deg,#f5c842,#e6a800);border:1px solid #c98800;}
-.ev-san.s2min{background:linear-gradient(170deg,#d97040,#b04020);border:1px solid #8c3010;}
+.ev-san.s2min{background:linear-gradient(170deg,#e84c3d,#b52020);border:1px solid #8c1a1a;}
 .ev-san.dis{background:linear-gradient(170deg,#e02020,#8b0000);border:1px solid #660000;}
 .ev-san.rap{background:linear-gradient(170deg,#2e9aff,#0060cc);border:1px solid #0040aa;}
 .ev-san.blanc{background:linear-gradient(170deg,#ffffff,#d8e0ec);border:1px solid #9aaccc;}
@@ -774,32 +775,19 @@ function renderEvents(events, homeNom, awayNom) {
   const sorted = [...events].reverse();
   countEl.textContent = sorted.length + ' événement' + (sorted.length > 1 ? 's' : '');
   inner.innerHTML = sorted.map(ev => {
-    const teamName  = ev.team === 'home' ? homeNom : awayNom;
+    const teamName = ev.team === 'home' ? homeNom : awayNom;
     const teamColor = ev.team === 'home' ? 'var(--accent)' : 'var(--cyan)';
-    const cls   = EVENT_CLS[ev.type]    || '';
+    const icon = EVENT_ICONS[ev.type] || '•';
+    const cls = EVENT_CLS[ev.type] || '';
     const label = EVENT_LABELS[ev.type] || ev.type;
-
-    // Extraire "N° Nom" depuis desc (format : "Équipe — Type emoji (N° Nom)")
-    // ou pour officiels : "Équipe — Officiel rôle nom — Type emoji"
-    let playerInfo = '';
-    const desc = ev.desc || '';
-    const parenMatch = desc.match(/\(([^)]+)\)\s*$/);
-    if (parenMatch) {
-      playerInfo = parenMatch[1]; // ex: "4 ROBERT Lucas"
-    } else {
-      // Pas de parenthèse (tmo, officiel sans parens) — on prend après le 2e "—"
-      const parts = desc.split('—');
-      if (parts.length >= 3) playerInfo = parts.slice(2).join('—').replace(/[⚽7️⃣🧤⚠️⏱️🟥📝⬜🎯⏸]/gu,'').trim();
-      else if (parts.length === 2) playerInfo = parts[1].replace(/[⚽7️⃣🧤⚠️⏱️🟥📝⬜🎯⏸]/gu,'').trim();
-    }
-
     return `<div class="ev-item ${cls}">
       <div class="ev-icon">${icon}</div>
       <div class="ev-body">
-        <div class="ev-sub" style="color:${teamColor};margin-bottom:2px;">${teamName}</div>
-        <div class="ev-title">${label}${playerInfo ? ' — ' + playerInfo : ''}</div>
+        <div class="ev-title">${ev.desc || ''}</div>
+        <div class="ev-sub" style="color:${teamColor};">${teamName}</div>
       </div>
       <div class="ev-time-badge">${ev.time || '—'}</div>
+      <div class="ev-type-pill">${label}</div>
     </div>`;
   }).join('');
 }
