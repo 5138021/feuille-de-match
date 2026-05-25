@@ -781,15 +781,15 @@ function renderEvents(events, homeNom, awayNom) {
     const label = EVENT_LABELS[ev.type] || ev.type;
     const playerInfo = ev.playerNum || ev.playerName
       ? `${ev.playerNum ? '#'+ev.playerNum+' ' : ''}${ev.playerName || ''}`
-      : ev.desc || '';
+      : '';
     return `<div class="ev-item ${cls}">
-      <div class="ev-icon">${icon}</div>
-      <div class="ev-body">
-        <div class="ev-sub" style="color:${teamColor};margin-bottom:2px;">${teamName}</div>
-        <div class="ev-title">${playerInfo || '—'}</div>
-      </div>
-      <div class="ev-time-badge">${ev.time || '—'}</div>
-    </div>`;
+  <div class="ev-icon">${icon}</div>
+  <div class="ev-body">
+    <div class="ev-sub" style="color:${teamColor};margin-bottom:2px;">${teamName}</div>
+    <div class="ev-title">${label}${playerInfo ? ' · '+playerInfo : ''}</div>
+  </div>
+  <div class="ev-time-badge">${ev.time || '—'}</div>
+</div>`;
   }).join('');
 }
 
