@@ -779,18 +779,16 @@ function renderEvents(events, homeNom, awayNom) {
     const icon = EVENT_ICONS[ev.type] || '•';
     const cls = EVENT_CLS[ev.type] || '';
     const label = EVENT_LABELS[ev.type] || ev.type;
-    const playerInfo = ev.playerNum || ev.playerName
-      ? `${ev.playerNum ? '#'+ev.playerNum+' ' : ''}${ev.playerName || ''}`
-      : '';
-    const cleanDesc = (ev.desc || '').replace(/^[^\w]*\S+\s+\S+\s+/, '');
-return `<div class="ev-item ${cls}">
-  <div class="ev-icon">${icon}</div>
-  <div class="ev-body">
-    <div class="ev-sub" style="color:${teamColor};margin-bottom:2px;">${teamName}</div>
-    <div class="ev-title">${cleanDesc}</div>
-  </div>
-  <div class="ev-time-badge">${ev.time || '—'}</div>
-</div>`;
+    const player = [ev.playerNum ? '#'+ev.playerNum : '', ev.playerName || ''].filter(Boolean).join(' ');
+    const title = player ? `${label} - ${player}` : label;
+    return `<div class="ev-item ${cls}">
+      <div class="ev-icon">${icon}</div>
+      <div class="ev-body">
+        <div class="ev-sub" style="color:${teamColor};margin-bottom:2px;">${teamName}</div>
+        <div class="ev-title">${title}</div>
+      </div>
+      <div class="ev-time-badge">${ev.time || '—'}</div>
+    </div>`;
   }).join('');
 }
 
