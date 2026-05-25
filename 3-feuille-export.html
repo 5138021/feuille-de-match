@@ -231,7 +231,7 @@ body{background:#CBD5E4;font-family:var(--font-b);color:var(--blue);padding:16px
 /* Carton inline */
 .ev-san{display:inline-flex;align-items:center;justify-content:center;width:16px;height:21px;border-radius:2px;font-size:0;box-shadow:0 1px 3px rgba(0,0,0,.5);}
 .ev-san.av{background:linear-gradient(170deg,#f5c842,#e6a800);border:1px solid #c98800;}
-.ev-san.s2min{background:linear-gradient(170deg,#e84c3d,#b52020);border:1px solid #8c1a1a;}
+.ev-san.s2min{background:linear-gradient(170deg,#d97040,#b04020);border:1px solid #8c3010;}
 .ev-san.dis{background:linear-gradient(170deg,#e02020,#8b0000);border:1px solid #660000;}
 .ev-san.rap{background:linear-gradient(170deg,#2e9aff,#0060cc);border:1px solid #0040aa;}
 .ev-san.blanc{background:linear-gradient(170deg,#ffffff,#d8e0ec);border:1px solid #9aaccc;}
@@ -794,6 +794,7 @@ function renderEvents(events, homeNom, awayNom) {
     }
 
     return `<div class="ev-item ${cls}">
+      <div class="ev-icon">${icon}</div>
       <div class="ev-body">
         <div class="ev-sub" style="color:${teamColor};margin-bottom:2px;">${teamName}</div>
         <div class="ev-title">${label}${playerInfo ? ' — ' + playerInfo : ''}</div>
