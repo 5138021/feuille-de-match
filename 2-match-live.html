@@ -534,7 +534,7 @@ function buildPlayerCard(team,p,idx){
   let cls='player-card'+(isGK?' gk':'')+(hasSan?' sanctioned':'')+((p.excluActive||p.outOfGame)?' excluded':'');
   let overlayHtml='';
   if(p.excluActive){overlayHtml=`<div class="exclu-overlay" id="exclu-${team}-${idx}">2'00</div>`;}
-  else if(p.outOfGame){overlayHtml=`<div class="exclu-overlay out">Hors match</div>`;}
+  else if(p.outOfGame){overlayHtml=` `;}
   return `<div class="${cls}" onclick="openPlayerModal('${team}',${idx})">
     ${ribbon?`<div class="corner-ribbon ribbon-${ribbon.color}">${ribbon.text}</div>`:''}
     ${overlayHtml}
