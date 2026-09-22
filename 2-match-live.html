@@ -639,8 +639,11 @@ function doPA(action){
       const oppTeam=team==='home'?'away':'home';
       const gk=data[oppTeam].players.find(pl=>pl.isGK);
       p.tirs=(p.tirs||0)+1;
-      if(gk)gk.arrets=(gk.arrets||0)+1;
-      addEvent({type:'tir_arret',team,time:t,player:p.num,oppTeam,gkNum:gk?gk.num:null,desc:tn+' — Tir de '+p.num+' '+p.name+' arrêté 🧤'+(gk?' par '+gk.num+' '+gk.name+' ('+data[oppTeam].nom+')':'')});
+      addEvent({type:'tir',team,time:t,player:p.num,desc:tn+' — Tir arrêté 🎯 ('+p.num+' '+p.name+')'});
+      if(gk){
+        gk.arrets=(gk.arrets||0)+1;
+        addEvent({type:'save',team:oppTeam,time:t,player:gk.num,desc:data[oppTeam].nom+' — Arrêt 🧤 ('+gk.num+' '+gk.name+')'});
+      }
       showToast('🧤 Tir arrêté'+(gk?' — '+gk.name:''));
       break;}
     case 'setgk':{
@@ -677,7 +680,6 @@ function undoPlayer(team,p){
         case 'but':case 'but7':p.goals=Math.max(0,(p.goals||1)-1);if(ev.type==='but7')p.m7=Math.max(0,(p.m7||1)-1);p.tirs=Math.max(0,(p.tirs||1)-1);data.match['score'+(team==='home'?'Home':'Away')]=Math.max(0,data.match['score'+(team==='home'?'Home':'Away')]-1);updateScore();break;
         case 'save':p.arrets=Math.max(0,(p.arrets||1)-1);break;
         case 'tir':p.tirs=Math.max(0,(p.tirs||1)-1);break;
-        case 'tir_arret':p.tirs=Math.max(0,(p.tirs||1)-1);if(ev.oppTeam&&ev.gkNum!=null){const gkP=data[ev.oppTeam].players.find(pl=>pl.num===ev.gkNum);if(gkP)gkP.arrets=Math.max(0,(gkP.arrets||1)-1);}break;
         case 'gk':p.isGK=false;if(ev.prevGkNum!=null){const prevP=data[team].players.find(pl=>pl.num===ev.prevGkNum);if(prevP)prevP.isGK=true;}break;
         case 'av':p.av='empty';break;
         case '2min':if(p.p3&&p.p3!=='empty'){p.p3='empty';if(p.dis==='red3x2'){p.dis='empty';p.outOfGame=false;}}else if(p.p2&&p.p2!=='empty')p.p2='empty';else if(p.p1&&p.p1!=='empty')p.p1='empty';p.excluActive=false;stopExcluTimer(team,data[team].players.indexOf(p));break;
@@ -852,8 +854,8 @@ function stopExcluTimer(team,idx,kind){
 
 
 // ═══════════ EVENTS ═══════════
-const EV_ICONS={but:'⚽',but7:'7️⃣',save:'🧤',av:'<span class="san san-av e-san-icon"></span>','2min':'<span class="san san-2min e-san-icon"></span>',dis:'<span class="san san-dis e-san-icon"></span>',rapport:'<span class="san san-rap e-san-icon"></span>',tir:'🎯',tir_arret:'🧤',gk:'🧤',tmo:'⏸',blanc:'<span class="san san-blanc e-san-icon"></span>'};
-const EV_CLS={but:'e-but',but7:'e-but7',save:'e-save',av:'e-av','2min':'e-2min',dis:'e-dis',rapport:'e-dis',tir:'e-tir',tir_arret:'e-save',gk:'e-save',tmo:'e-tmo',blanc:'e-blanc'};
+const EV_ICONS={but:'⚽',but7:'7️⃣',save:'🧤',av:'<span class="san san-av e-san-icon"></span>','2min':'<span class="san san-2min e-san-icon"></span>',dis:'<span class="san san-dis e-san-icon"></span>',rapport:'<span class="san san-rap e-san-icon"></span>',tir:'🎯',gk:'🧤',tmo:'⏸',blanc:'<span class="san san-blanc e-san-icon"></span>'};
+const EV_CLS={but:'e-but',but7:'e-but7',save:'e-save',av:'e-av','2min':'e-2min',dis:'e-dis',rapport:'e-dis',tir:'e-tir',gk:'e-save',tmo:'e-tmo',blanc:'e-blanc'};
 
 function addEvent(ev){ev.id=Date.now();data.events.unshift(ev);renderEvents();}
 function renderEvents(){
