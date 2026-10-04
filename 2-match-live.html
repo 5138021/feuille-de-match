@@ -22,9 +22,6 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 /* HEADER */
 .match-header{background:linear-gradient(180deg,rgba(18,32,56,.99),rgba(11,24,41,.97));padding:8px 12px 0;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(12px);}
 .match-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-.match-nav-tabs{display:flex;gap:3px;}
-.match-nav-tab{padding:5px 10px;border-radius:6px;font-family:var(--font-h);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:all .2s;}
-.match-nav-tab.active{background:rgba(255,255,255,.12);color:var(--white);}
 .btn-export{padding:6px 12px;border:none;border-radius:7px;background:linear-gradient(135deg,#1a6b2f,#27a045);color:var(--white);font-family:var(--font-h);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
 .btn-back{padding:5px 10px;border:1px solid rgba(255,255,255,.15);border-radius:7px;background:rgba(255,255,255,.06);color:var(--muted);font-family:var(--font-h);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
 
@@ -57,12 +54,12 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 
 /* BODY */
 .match-body{padding:10px 12px 80px;}
-.match-panel{display:none;}
-.match-panel.active{display:block;}
 
 /* DEUX ÉQUIPES CÔTE À CÔTE */
-.both-teams{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start;}
+.both-teams{display:grid;grid-template-columns:1fr 78px 1fr;gap:6px;align-items:start;}
 .team-col{min-width:0;}
+.events-col{min-width:0;position:sticky;top:96px;}
+.events-col-title{font-family:var(--font-h);font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:center;margin-bottom:8px;}
 
 /* HEADERS D'ÉQUIPE */
 .team-hdr{display:flex;align-items:center;gap:6px;margin-bottom:8px;padding:7px 10px;border-radius:9px;}
@@ -133,23 +130,23 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .sc-name{font-size:10px;font-weight:600;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* EVENTS */
-.event-list{position:relative;}
-.event-list::before{content:'';position:absolute;top:2px;bottom:2px;left:50%;width:1px;background:rgba(255,255,255,.1);transform:translateX(-50%);}
-.event-row{position:relative;display:grid;grid-template-columns:1fr 46px 1fr;align-items:flex-start;margin-bottom:8px;}
-.ev-side{min-width:0;display:flex;}
-.ev-side.ev-side-home{grid-column:1;justify-content:flex-end;}
-.ev-side.ev-side-away{grid-column:3;justify-content:flex-start;}
-.ev-center-time{grid-column:2;text-align:center;font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--muted);padding-top:10px;}
-.event-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border-radius:8px;padding:9px 10px;border-left:3px solid transparent;max-width:100%;}
-.event-item.e-but{border-color:var(--green);}
-.event-item.e-but7{border-color:var(--green);opacity:.85;}
-.event-item.e-save{border-color:var(--cyan);}
-.event-item.e-av{border-color:var(--gold);}
-.event-item.e-2min{border-color:var(--accent);}
-.event-item.e-dis{border-color:#ff4444;}
-.event-item.e-tmo{border-color:var(--purple);}
-.event-item.e-tir{border-color:rgba(255,255,255,.15);}
-.event-item.e-blanc{border-color:rgba(255,255,255,.5);}
+.event-list{display:flex;flex-direction:column;align-items:center;gap:9px;max-height:calc(100vh - 170px);overflow-y:auto;padding:2px 0 6px;}
+.ev-empty{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:9px;text-align:center;padding-top:20px;opacity:.6;}
+.ev-mini{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%;cursor:pointer;}
+.ev-mini-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);flex-shrink:0;}
+.ev-mini.team-home .ev-mini-icon{border-color:var(--gold);}
+.ev-mini.team-away .ev-mini-icon{border-color:var(--cyan);}
+.ev-mini-time{font-family:var(--font-mono);font-size:8px;font-weight:700;color:var(--muted);}
+.ev-mini-label{font-size:7px;font-weight:700;color:rgba(255,255,255,.55);text-align:center;line-height:1.2;max-width:70px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.ev-mini-icon.e-but{background:rgba(0,193,122,.18);}
+.ev-mini-icon.e-but7{background:rgba(0,193,122,.1);}
+.ev-mini-icon.e-save{background:rgba(74,159,255,.15);}
+.ev-mini-icon.e-av{background:rgba(245,166,35,.15);}
+.ev-mini-icon.e-2min{background:rgba(224,45,55,.15);}
+.ev-mini-icon.e-dis{background:rgba(224,45,55,.3);}
+.ev-mini-icon.e-tmo{background:rgba(155,89,182,.2);}
+.ev-mini-icon.e-tir{background:rgba(255,255,255,.1);}
+.ev-mini-icon.e-blanc{background:rgba(255,255,255,.2);}
 .e-icon{font-size:18px;width:26px;text-align:center;}
 .e-body{flex:1;}
 .e-title{font-family:var(--font-h);font-size:13px;font-weight:800;letter-spacing:.5px;}
@@ -230,7 +227,6 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .fab-row{display:flex;gap:8px;}
 .fab-btn{flex:1;padding:12px 8px;border:none;border-radius:11px;font-family:var(--font-h);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;}
 .fab-btn:active{transform:scale(.97);}
-.fab-events{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--muted);}
 .fab-export{background:linear-gradient(135deg,#1a6b2f,#27a045);color:var(--white);}
 
 /* TOAST */
@@ -257,10 +253,6 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 <div class="match-header">
   <div class="match-nav">
     <button class="btn-back" onclick="goBack()">← Prép.</button>
-    <div class="match-nav-tabs">
-      <div class="match-nav-tab active" onclick="switchPanel('players')" id="ntab-players">⚡ Live</div>
-      <div class="match-nav-tab" onclick="switchPanel('events')" id="ntab-events">📋 Faits</div>
-    </div>
     <button class="btn-export" onclick="exportResults()">📋 Export</button>
   </div>
   <div class="scoreboard">
@@ -287,42 +279,35 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 <!-- BODY -->
 <div class="match-body">
 
-  <!-- PANEL LIVE -->
-  <div class="match-panel active" id="panel-players">
-    <div class="both-teams">
-      <!-- DOMICILE -->
-      <div class="team-col">
-        <div class="team-hdr hm">
-          <div class="team-hdr-name" id="ts-home-name">Domicile</div>
-          <span class="tmo-count" id="tmo-home-badge"></span>
-          <div class="team-hdr-score" id="ts-home-score" style="color:var(--gold)">0</div>
-        </div>
-        <div class="cards-list" id="grid-home"></div>
-        <div class="staff-sep">Staff</div>
-        <div class="cards-list" id="grid-staff-home"></div>
+  <div class="both-teams">
+    <!-- DOMICILE -->
+    <div class="team-col">
+      <div class="team-hdr hm">
+        <div class="team-hdr-name" id="ts-home-name">Domicile</div>
+        <span class="tmo-count" id="tmo-home-badge"></span>
+        <div class="team-hdr-score" id="ts-home-score" style="color:var(--gold)">0</div>
       </div>
-      <!-- EXTÉRIEUR -->
-      <div class="team-col">
-        <div class="team-hdr aw">
-          <div class="team-hdr-name" id="ts-away-name">Extérieur</div>
-          <span class="tmo-count" id="tmo-away-badge"></span>
-          <div class="team-hdr-score" id="ts-away-score" style="color:var(--cyan)">0</div>
-        </div>
-        <div class="cards-list" id="grid-away"></div>
-        <div class="staff-sep">Staff</div>
-        <div class="cards-list" id="grid-staff-away"></div>
+      <div class="cards-list" id="grid-home"></div>
+      <div class="staff-sep">Staff</div>
+      <div class="cards-list" id="grid-staff-home"></div>
+    </div>
+    <!-- FAITS DE MATCH (entre les 2 équipes) -->
+    <div class="events-col">
+      <div class="events-col-title">Faits</div>
+      <div class="event-list" id="event-list">
+        <div class="ev-empty">📋<span>Aucun fait</span></div>
       </div>
     </div>
-  </div>
-
-  <!-- PANEL FAITS -->
-  <div class="match-panel" id="panel-events">
-    <div class="event-list" id="event-list">
-      <div style="text-align:center;padding:40px 0;color:var(--muted);">
-        <div style="font-size:32px;margin-bottom:10px;">📋</div>
-        <div style="font-family:var(--font-h);font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Aucun fait de match</div>
-        <div style="font-size:11px;margin-top:4px;">Les actions apparaîtront ici</div>
+    <!-- EXTÉRIEUR -->
+    <div class="team-col">
+      <div class="team-hdr aw">
+        <div class="team-hdr-name" id="ts-away-name">Extérieur</div>
+        <span class="tmo-count" id="tmo-away-badge"></span>
+        <div class="team-hdr-score" id="ts-away-score" style="color:var(--cyan)">0</div>
       </div>
+      <div class="cards-list" id="grid-away"></div>
+      <div class="staff-sep">Staff</div>
+      <div class="cards-list" id="grid-staff-away"></div>
     </div>
   </div>
 </div>
@@ -330,7 +315,6 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 <!-- FAB -->
 <div class="fab-area">
   <div class="fab-row">
-    <button class="fab-btn fab-events" onclick="switchPanel(currentPanel==='events'?'players':'events')" id="fab-events-btn">📋 Faits de match</button>
     <button class="fab-btn fab-export" onclick="exportResults()">📤 Exporter</button>
   </div>
 </div>
@@ -410,7 +394,6 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 <script>
 // ═══════════ STATE ═══════════
 let data = null;
-let currentPanel = 'players';
 let chronoRunning = false;
 let chronoSeconds = 0;
 let chronoPeriod = 0;
@@ -864,31 +847,15 @@ const EV_CLS={but:'e-but',but7:'e-but7',save:'e-save',av:'e-av','2min':'e-2min',
 function addEvent(ev){ev.id=Date.now();data.events.unshift(ev);renderEvents();}
 function renderEvents(){
   const list=document.getElementById('event-list');
-  if(!data.events.length){list.innerHTML=`<div style="text-align:center;padding:40px 0;color:var(--muted);"><div style="font-size:32px;margin-bottom:10px;">📋</div><div style="font-family:var(--font-h);font-size:14px;font-weight:700;text-transform:uppercase;">Aucun fait de match</div></div>`;return;}
-  list.innerHTML=data.events.map(ev=>{
-    const card=`<div class="event-item ${EV_CLS[ev.type]||''}">
-      <div class="e-icon">${EV_ICONS[ev.type]||'•'}</div>
-      <div class="e-body"><div class="e-title">${ev.desc}</div></div>
-      <button class="e-del" onclick="deleteEvent(${ev.id})">✕</button>
-    </div>`;
-    return `<div class="event-row">
-      <div class="ev-side ev-side-home">${ev.team==='home'?card:''}</div>
-      <div class="ev-center-time">${ev.time}</div>
-      <div class="ev-side ev-side-away">${ev.team==='away'?card:''}</div>
-    </div>`;
-  }).join('');
+  if(!data.events.length){list.innerHTML=`<div class="ev-empty"><span style="font-size:20px;">📋</span><span>Aucun fait</span></div>`;return;}
+  list.innerHTML=data.events.map(ev=>`
+    <div class="ev-mini team-${ev.team}" title="${ev.desc.replace(/"/g,'&quot;')}" onclick="confirmDeleteEvent(${ev.id})">
+      <div class="ev-mini-icon ${EV_CLS[ev.type]||''}">${EV_ICONS[ev.type]||'•'}</div>
+      <div class="ev-mini-time">${ev.time}</div>
+    </div>`).join('');
 }
+function confirmDeleteEvent(id){if(confirm('Supprimer ce fait de match ?'))deleteEvent(id);}
 function deleteEvent(id){data.events=data.events.filter(e=>e.id!==id);renderEvents();saveData();}
-
-// ═══════════ NAVIGATION ═══════════
-function switchPanel(panel){
-  ['players','events'].forEach(p=>{
-    document.getElementById('panel-'+p).className='match-panel'+(p===panel?' active':'');
-    document.getElementById('ntab-'+p).className='match-nav-tab'+(p===panel?' active':'');
-  });
-  currentPanel=panel;
-  document.getElementById('fab-events-btn').textContent=panel==='events'?'⚡ Retour Live':'📋 Faits de match';
-}
 
 function showEndModal(){
   const m=data.match;
