@@ -133,8 +133,14 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .sc-name{font-size:10px;font-weight:600;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* EVENTS */
-.event-list{display:flex;flex-direction:column;gap:6px;}
-.event-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border-radius:8px;padding:9px 12px;border-left:3px solid transparent;}
+.event-list{position:relative;}
+.event-list::before{content:'';position:absolute;top:2px;bottom:2px;left:50%;width:1px;background:rgba(255,255,255,.1);transform:translateX(-50%);}
+.event-row{position:relative;display:grid;grid-template-columns:1fr 46px 1fr;align-items:flex-start;margin-bottom:8px;}
+.ev-side{min-width:0;display:flex;}
+.ev-side.ev-side-home{grid-column:1;justify-content:flex-end;}
+.ev-side.ev-side-away{grid-column:3;justify-content:flex-start;}
+.ev-center-time{grid-column:2;text-align:center;font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--muted);padding-top:10px;}
+.event-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border-radius:8px;padding:9px 10px;border-left:3px solid transparent;max-width:100%;}
 .event-item.e-but{border-color:var(--green);}
 .event-item.e-but7{border-color:var(--green);opacity:.85;}
 .event-item.e-save{border-color:var(--cyan);}
@@ -859,13 +865,18 @@ function addEvent(ev){ev.id=Date.now();data.events.unshift(ev);renderEvents();}
 function renderEvents(){
   const list=document.getElementById('event-list');
   if(!data.events.length){list.innerHTML=`<div style="text-align:center;padding:40px 0;color:var(--muted);"><div style="font-size:32px;margin-bottom:10px;">📋</div><div style="font-family:var(--font-h);font-size:14px;font-weight:700;text-transform:uppercase;">Aucun fait de match</div></div>`;return;}
-  list.innerHTML=data.events.map(ev=>`
-    <div class="event-item ${EV_CLS[ev.type]||''}">
+  list.innerHTML=data.events.map(ev=>{
+    const card=`<div class="event-item ${EV_CLS[ev.type]||''}">
       <div class="e-icon">${EV_ICONS[ev.type]||'•'}</div>
-      <div class="e-body"><div class="e-title">${ev.desc}</div><div class="e-sub">${ev.team==='home'?data.home.nom:data.away.nom}</div></div>
-      <div class="e-time">${ev.time}</div>
+      <div class="e-body"><div class="e-title">${ev.desc}</div></div>
       <button class="e-del" onclick="deleteEvent(${ev.id})">✕</button>
-    </div>`).join('');
+    </div>`;
+    return `<div class="event-row">
+      <div class="ev-side ev-side-home">${ev.team==='home'?card:''}</div>
+      <div class="ev-center-time">${ev.time}</div>
+      <div class="ev-side ev-side-away">${ev.team==='away'?card:''}</div>
+    </div>`;
+  }).join('');
 }
 function deleteEvent(id){data.events=data.events.filter(e=>e.id!==id);renderEvents();saveData();}
 
