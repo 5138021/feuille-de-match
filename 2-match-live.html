@@ -100,7 +100,6 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .san-dis{background:linear-gradient(170deg,#e02020,#8b0000);color:#fff;border:1px solid #660000;}
 .san-rap{background:linear-gradient(170deg,#2e9aff,#0060cc);color:#fff;border:1px solid #0040aa;}
 .san-blanc{background:linear-gradient(170deg,#ffffff,#d8e0ec);color:#334;border:1px solid #9aaccc;}
-/* Numéro de fois pour les 2min */
 .san-count{
   position:absolute;top:-5px;right:-5px;
   background:#111;color:#fff;
@@ -111,7 +110,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
   line-height:1;
 }
 
-/* RUBAN DE SANCTION (bannière diagonale dans le coin de la carte) */
+/* RUBAN DE SANCTION */
 .corner-ribbon{position:absolute;top:10px;right:-32px;width:92px;height:18px;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:9px;font-weight:900;letter-spacing:.5px;z-index:3;box-shadow:0 1px 3px rgba(0,0,0,.4);pointer-events:none;}
 .ribbon-yellow{background:linear-gradient(170deg,#f5c842,#e6a800);color:#5c3d00;}
 .ribbon-orange{background:linear-gradient(170deg,#ff9a3d,#d35400);color:#3a1900;}
@@ -148,12 +147,6 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .e-sub{font-size:8px;color:var(--muted);margin-top:2px;}
 .e-time{font-family:var(--font-mono);font-size:8px;font-weight:700;color:var(--muted);margin-top:2px;}
 .e-del{position:absolute;top:2px;right:2px;background:transparent;border:none;color:rgba(255,255,255,.25);font-size:11px;cursor:pointer;padding:3px;line-height:1;}
-.e-icon{font-size:18px;width:26px;text-align:center;}
-.e-body{flex:1;}
-.e-title{font-family:var(--font-h);font-size:13px;font-weight:800;letter-spacing:.5px;}
-.e-sub{font-size:10px;color:var(--muted);margin-top:1px;}
-.e-time{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--muted);}
-.e-del{background:transparent;border:none;color:rgba(255,255,255,.2);font-size:16px;cursor:pointer;padding:4px;border-radius:4px;}
 
 /* MODALS */
 .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;}
@@ -192,7 +185,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .ab-blocked{opacity:.35;cursor:not-allowed !important;}
 .ab-blocked-lbl{font-size:7px;color:var(--accent);margin-top:1px;}
 
-/* MENU D'ACTION (liste verticale style "palette de commandes") */
+/* MENU D'ACTION */
 .menu-header{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
 .menu-badge{font-family:var(--font-mono);font-size:16px;font-weight:800;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(255,255,255,.08);}
 .menu-badge.gk{color:var(--cyan);background:rgba(74,159,255,.15);border:1px solid rgba(74,159,255,.4);}
@@ -211,14 +204,12 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .menu-item.blocked{opacity:.35;cursor:not-allowed;}
 .menu-note{font-size:9px;color:var(--muted);padding:0 6px 8px;line-height:1.5;}
 
-/* Cartons grands dans les modals */
 .modal-san{
   width:22px !important;height:30px !important;
   border-radius:3px !important;
   display:inline-flex !important;
   box-shadow:0 2px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2) !important;
 }
-/* Cartons dans la liste des événements */
 .e-san-icon{
   display:inline-flex;align-items:center;justify-content:center;
   width:18px;height:24px;border-radius:2px;flex-shrink:0;
@@ -292,7 +283,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
       <div class="staff-sep">Staff</div>
       <div class="cards-list" id="grid-staff-home"></div>
     </div>
-    <!-- FAITS DE MATCH (entre les 2 équipes) -->
+    <!-- FAITS DE MATCH -->
     <div class="events-col">
       <div class="events-col-title">Faits</div>
       <div class="event-list" id="event-list">
@@ -400,7 +391,7 @@ let chronoSeconds = 0;
 let chronoPeriod = 0;
 let chronoInterval = null;
 let currentModalPlayer = null;
-let excluTimers = {}; // uid -> { secsAtStart: chronoSeconds quand exclusion déclenchée, totalSecs: 120 }
+let excluTimers = {}; // uid -> { secsAtStart, totalSecs: 120 }
 
 // ═══════════ INIT ═══════════
 function init() {
@@ -486,7 +477,7 @@ function showTMO(){document.getElementById('tmoModal').classList.add('open');}
 function useTMO(team){
   if(data[team].tmo>=3){showToast('❌ Plus de temps morts !');return;}
   data[team].tmo++;
-  addEvent({type:'tmo',team,time:getTime(),desc:data[team].nom+' — Temps Mort ⏸'});
+  addEvent({type:'tmo',team,time:getTime(),desc:'Temps mort'});
   updateTMOInfo();document.getElementById('tmoModal').classList.remove('open');
   showToast('⏸ Temps Mort — '+data[team].nom);if(chronoRunning)pauseChrono();saveData();
 }
@@ -499,8 +490,7 @@ function updateTMOInfo(){
   document.getElementById('tmo-away-badge').textContent=at>0?`T.O.×${at}`:'';
 }
 
-// ═══════════ SANCTION VISUELLE (ruban diagonal dans le coin) ═══════════
-// Priorité d'affichage : disqualification (rouge) > rapport écrit (bleu) > 2 minutes cumulées (orange, avec compteur) > avertissement (jaune) > carton blanc (blanc)
+// ═══════════ SANCTION VISUELLE (ruban diagonal) ═══════════
 function getPlayerRibbon(p,tot2){
   if(p.dis==='red'||p.dis==='red3x2')return{color:'red',text:''};
   if(p.dis==='blue')return{color:'blue',text:''};
@@ -509,6 +499,9 @@ function getPlayerRibbon(p,tot2){
   if(p.blanc)return{color:'white',text:''};
   return null;
 }
+
+// ═══════════ NOM COMPLET (nom + prénom) ═══════════
+function fullName(p){return [p.name,p.prenom].filter(Boolean).join(' ')||'—';}
 
 // ═══════════ PLAYER CARDS ═══════════
 function renderPlayers(team){
@@ -582,13 +575,13 @@ function openPlayerModal(team,idx){
 
   const statItems=isGK?[
     ['🧤','Arrêt','A','save'],
-    ['⚽','But encaissé','Ctrl+B','goal'],
-    ['🎯','Tir','Maj+T','tir']
+    ['⚽','But encaissé','B','goal'],
+    ['🎯','Tir','T','tir']
   ]:[
-    ['⚽','But','Ctrl+B','goal'],
-    ['7️⃣','But 7m','Alt+7','goal7'],
-    ['🎯','Tir','Maj+T','tir'],
-    ['🧤','Tir et arrêt du gardien','Alt+S','tirarret']
+    ['⚽','But','B','goal'],
+    ['7️⃣','But 7m','7','goal7'],
+    ['🎯','Tir','T','tir'],
+    ['🧤','Tir et arrêt du gardien','S','tirarret']
   ];
   const roleItems=isGK?[]:[['🧤','Nommer gardien','G','setgk']];
   const disOn=(p.dis==='red'||p.dis==='red3x2');
@@ -620,19 +613,20 @@ function doPA(action){
   const{team,idx}=currentModalPlayer;
   const p=data[team].players[idx];
   const t=getTime(),tn=data[team].nom;
+  const nm=fullName(p);
   switch(action){
-    case 'goal':p.goals=(p.goals||0)+1;p.tirs=(p.tirs||0)+1;data.match['score'+(team==='home'?'Home':'Away')]++;updateScore();addEvent({type:'but',team,time:t,player:p.num,desc:tn+' — But ⚽ ('+p.num+' '+p.name+')'});showToast('⚽ But pour '+tn+' !');break;
-    case 'goal7':p.goals=(p.goals||0)+1;p.m7=(p.m7||0)+1;p.tirs=(p.tirs||0)+1;data.match['score'+(team==='home'?'Home':'Away')]++;updateScore();addEvent({type:'but7',team,time:t,player:p.num,desc:tn+' — But 7m 7️⃣ ('+p.num+' '+p.name+')'});showToast('7️⃣ But 7m !');break;
-    case 'save':p.arrets=(p.arrets||0)+1;addEvent({type:'save',team,time:t,player:p.num,desc:tn+' — Arrêt 🧤 ('+p.num+' '+p.name+')'});showToast('🧤 Arrêt de '+p.name);break;
-    case 'tir':p.tirs=(p.tirs||0)+1;addEvent({type:'tir',team,time:t,player:p.num,desc:tn+' — Tir ('+p.num+' '+p.name+')'});showToast('🎯 Tir');break;
+    case 'goal':p.goals=(p.goals||0)+1;p.tirs=(p.tirs||0)+1;data.match['score'+(team==='home'?'Home':'Away')]++;updateScore();addEvent({type:'but',team,time:t,player:p.num,desc:'But — '+nm});showToast('⚽ But pour '+tn+' !');break;
+    case 'goal7':p.goals=(p.goals||0)+1;p.m7=(p.m7||0)+1;p.tirs=(p.tirs||0)+1;data.match['score'+(team==='home'?'Home':'Away')]++;updateScore();addEvent({type:'but7',team,time:t,player:p.num,desc:'But 7m — '+nm});showToast('7️⃣ But 7m !');break;
+    case 'save':p.arrets=(p.arrets||0)+1;addEvent({type:'save',team,time:t,player:p.num,desc:'Arrêt — '+nm});showToast('🧤 Arrêt de '+p.name);break;
+    case 'tir':p.tirs=(p.tirs||0)+1;addEvent({type:'tir',team,time:t,player:p.num,desc:'Tir — '+nm});showToast('🎯 Tir');break;
     case 'tirarret':{
       const oppTeam=team==='home'?'away':'home';
       const gk=data[oppTeam].players.find(pl=>pl.isGK);
       p.tirs=(p.tirs||0)+1;
-      addEvent({type:'tir',team,time:t,player:p.num,desc:tn+' — Tir ('+p.num+' '+p.name+')'});
+      addEvent({type:'tir',team,time:t,player:p.num,desc:'Tir — '+nm});
       if(gk){
         gk.arrets=(gk.arrets||0)+1;
-        addEvent({type:'save',team:oppTeam,time:t,player:gk.num,desc:data[oppTeam].nom+' — Arrêt 🧤 ('+gk.num+' '+gk.name+')'});
+        addEvent({type:'save',team:oppTeam,time:t,player:gk.num,desc:'Arrêt — '+fullName(gk)});
       }
       showToast('🧤 Tir arrêté'+(gk?' — '+gk.name:''));
       break;}
@@ -643,7 +637,7 @@ function doPA(action){
       p.isGK=true;
       showToast('🧤 '+p.name+' nommé gardien');
       break;}
-    case 'av':if(p.av==='yellow'){showToast('⚠️ Déjà attribué');return;}p.av='yellow';addEvent({type:'av',team,time:t,player:p.num,desc:tn+' — Avertissement ⚠️ ('+p.num+' '+p.name+')'});showToast('⚠️ Avert. — '+p.name);break;
+    case 'av':if(p.av==='yellow'){showToast('⚠️ Déjà attribué');return;}p.av='yellow';addEvent({type:'av',team,time:t,player:p.num,desc:'Avertissement — '+nm});showToast('⚠️ Avert. — '+p.name);break;
     case '2min':{
       let isDisq=false;
       if(!p.p1||p.p1==='empty'){p.p1='2min';}
@@ -651,11 +645,11 @@ function doPA(action){
       else if(!p.p3||p.p3==='empty'){p.p3='2min';p.dis='red3x2';p.outOfGame=true;isDisq=true;showToast('🟥 3e exclusion — Disqualification !');}
       else{showToast('❌ 3 exclusions déjà atteintes');return;}
       p.excluActive=true;startExcluTimer(team,idx);
-      addEvent({type:'2min',team,time:t,player:p.num,disq3x2:isDisq,desc:tn+(isDisq?" — Exclusion 2' disqualifiante (3e×2') 🟥 (":" — Exclusion 2' ⏱️ (")+p.num+' '+p.name+')'});
+      addEvent({type:'2min',team,time:t,player:p.num,disq3x2:isDisq,desc:(isDisq?"Exclusion 2' disqualifiante (3e) — ":"Exclusion 2' — ")+nm});
       if(!isDisq)showToast("⏱️ Exclusion 2' — "+p.name);break;}
-    case 'dis':p.dis='red';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({type:'dis',team,time:t,player:p.num,desc:tn+' — Disqualification 🟥 ('+p.num+' '+p.name+')'});showToast('🟥 Disqualif. — '+p.name);break;
-    case 'rapport':p.dis='blue';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({type:'rapport',team,time:t,player:p.num,desc:tn+' — Disqualification avec rapport 📝 ('+p.num+' '+p.name+')'});showToast('📝 Disqualif. + rapport — '+p.name);break;
-    case 'blanc':p.blanc=true;addEvent({type:'blanc',team,time:t,player:p.num,desc:tn+' — Carton blanc ⬜ protocole commotion ('+p.num+' '+p.name+')'});showToast('⬜ Carton blanc — '+p.name);break;
+    case 'dis':p.dis='red';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({type:'dis',team,time:t,player:p.num,desc:'Disqualification — '+nm});showToast('🟥 Disqualif. — '+p.name);break;
+    case 'rapport':p.dis='blue';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({type:'rapport',team,time:t,player:p.num,desc:'Disqualification avec rapport — '+nm});showToast('📝 Disqualif. + rapport — '+p.name);break;
+    case 'blanc':p.blanc=true;addEvent({type:'blanc',team,time:t,player:p.num,desc:'Carton blanc — '+nm});showToast('⬜ Carton blanc — '+p.name);break;
     case 'undo':undoPlayer(team,p);return;
   }
   renderPlayers('home');renderPlayers('away');closeModal();saveData();
@@ -683,7 +677,6 @@ function undoPlayer(team,p){
 
 // ═══════════ MODAL STAFF ═══════════
 function openStaffModal(team,idx){
-  // idx = index dans la liste filtrée (nom non vide)
   const allOffs=data[team].officials||[];
   const filtered=allOffs.map((o,i)=>({...o,_i:i})).filter(o=>o.nom);
   const off=filtered[idx];if(!off)return;
@@ -724,27 +717,27 @@ function closeStaffModal(){document.getElementById('staffModal').classList.remov
 function doSA(action){
   const{team,idx}=currentModalPlayer;
   const off=data[team].officials[idx];
-  const t=getTime(),tn=data[team].nom;
+  const t=getTime();
   const teamOffs=data[team].officials||[];
   switch(action){
     case 'av':
       if(off.av==='yellow'){off.av='empty';showToast('↩️ AV officiel retiré');}
       else{
         if(teamOffs.some((o,i)=>i!==idx&&o.av==='yellow')){showToast('⛔ 1 seul AV autorisé pour l\'équipe !');closeStaffModal();return;}
-        off.av='yellow';addEvent({type:'av',team,time:t,player:off.nom,desc:tn+' — Officiel '+off.role+' '+off.nom+' — Avertissement ⚠️'});showToast('⚠️ AV Officiel — '+off.nom);
+        off.av='yellow';addEvent({type:'av',team,time:t,player:off.nom,desc:'Avertissement — '+off.nom});showToast('⚠️ AV Officiel — '+off.nom);
       }break;
     case 'exclu':
       if(off.exclu==='2min'){off.exclu='empty';off.excluActive=false;stopExcluTimer(team,idx,'s');showToast("↩️ Exclusion 2' retirée");}
       else{
         if(teamOffs.some((o,i)=>i!==idx&&o.exclu==='2min')){showToast("⛔ 1 seule exclusion 2' autorisée !");closeStaffModal();return;}
-        off.exclu='2min';off.excluActive=true;startExcluTimer(team,idx,'s');addEvent({type:'2min',team,time:t,player:off.nom,desc:tn+" — Officiel "+off.role+' '+off.nom+" — Exclusion 2' ⏱️"});showToast("⏱️ Exclusion 2' Officiel — "+off.nom);
+        off.exclu='2min';off.excluActive=true;startExcluTimer(team,idx,'s');addEvent({type:'2min',team,time:t,player:off.nom,desc:"Exclusion 2' — "+off.nom});showToast("⏱️ Exclusion 2' Officiel — "+off.nom);
       }break;
     case 'dis':
       if(off.dis==='red'){off.dis='empty';off.excluActive=false;off.outOfGame=false;stopExcluTimer(team,idx,'s');showToast('↩️ Disqualif. retirée');}
-      else{off.dis='red';off.excluActive=true;off.outOfGame=true;startExcluTimer(team,idx,'s');addEvent({type:'dis',team,time:t,player:off.nom,desc:tn+' — Officiel '+off.role+' '+off.nom+' — Disqualification 🟥'});showToast('🟥 Disqualif. Officiel — '+off.nom);}break;
+      else{off.dis='red';off.excluActive=true;off.outOfGame=true;startExcluTimer(team,idx,'s');addEvent({type:'dis',team,time:t,player:off.nom,desc:'Disqualification — '+off.nom});showToast('🟥 Disqualif. Officiel — '+off.nom);}break;
     case 'rapport':
       if(off.rapport==='blue'){off.rapport='empty';off.excluActive=false;off.outOfGame=false;stopExcluTimer(team,idx,'s');showToast('↩️ Rapport retiré');}
-      else{off.rapport='blue';off.excluActive=true;off.outOfGame=true;startExcluTimer(team,idx,'s');addEvent({type:'rapport',team,time:t,player:off.nom,desc:tn+' — Officiel '+off.role+' '+off.nom+' — Disqualification avec rapport 📝'});showToast('📝 Disqualif. + rapport Officiel — '+off.nom);}break;
+      else{off.rapport='blue';off.excluActive=true;off.outOfGame=true;startExcluTimer(team,idx,'s');addEvent({type:'rapport',team,time:t,player:off.nom,desc:'Disqualification avec rapport — '+off.nom});showToast('📝 Disqualif. + rapport Officiel — '+off.nom);}break;
     case 'undo':
       for(let i=data.events.length-1;i>=0;i--){
         const ev=data.events[i];
@@ -761,7 +754,6 @@ function doSA(action){
   renderStaff(team);closeStaffModal();saveData();
 }
 
-
 // ═══════════ RACCOURCIS CLAVIER (modal ouverte) ═══════════
 document.addEventListener('keydown', function(e){
   const pmOpen=document.getElementById('playerModal').classList.contains('open');
@@ -772,10 +764,10 @@ document.addEventListener('keydown', function(e){
   const key=e.key.toLowerCase();
   if(pmOpen){
     const p=data[currentModalPlayer.team].players[currentModalPlayer.idx];
-    if(e.ctrlKey&&key==='b'){e.preventDefault();doPA('goal');}
-    else if(e.altKey&&e.key==='7'){e.preventDefault();doPA(p.isGK?'goal':'goal7');}
-    else if(e.altKey&&key==='s'&&!p.isGK){e.preventDefault();doPA('tirarret');}
-    else if(e.shiftKey&&key==='t'){e.preventDefault();doPA('tir');}
+    if(key==='b'){e.preventDefault();doPA('goal');}
+    else if(key==='7'){e.preventDefault();doPA(p.isGK?'goal':'goal7');}
+    else if(key==='s'&&!p.isGK){e.preventDefault();doPA('tirarret');}
+    else if(key==='t'){e.preventDefault();doPA('tir');}
     else if(key==='a'&&p.isGK){doPA('save');}
     else if(key==='g'&&!p.isGK){doPA('setgk');}
     else if(key==='j'){doPA('av');}
@@ -791,17 +783,15 @@ document.addEventListener('keydown', function(e){
   }
 });
 
-// ═══════════ TIMER EXCLU (synchronisé avec le chrono du match) — joueurs (p) et staff (s) ═══════════
+// ═══════════ TIMER EXCLU (synchronisé avec le chrono) — joueurs (p) et staff (s) ═══════════
 function startExcluTimer(team,idx,kind){
   kind=kind||'p';
   const uid=team+'-'+kind+'-'+idx;
-  // On enregistre le chrono au moment où l'exclusion est déclenchée
   excluTimers[uid]={secsAtStart:chronoSeconds,totalSecs:120};
   updateExcluDisplay(team,idx,undefined,kind);
 }
 
 function tickExcluTimers(){
-  // Appelé à chaque seconde du chrono principal
   Object.keys(excluTimers).forEach(uid=>{
     const parts=uid.split('-');
     const team=parts[0],kind=parts[1],idx=parseInt(parts[2]);
@@ -810,7 +800,6 @@ function tickExcluTimers(){
     const elapsed=chronoSeconds-excluTimers[uid].secsAtStart;
     const remaining=excluTimers[uid].totalSecs-elapsed;
     if(remaining<=0){
-      // Fin du décompte (la carte reste grisée si l'entité est définitivement sortie)
       delete excluTimers[uid];
       entity.excluActive=false;
       if(kind==='s')renderStaff(team);else renderPlayers(team);
@@ -839,7 +828,6 @@ function stopExcluTimer(team,idx,kind){
   const uid=team+'-'+kind+'-'+idx;
   delete excluTimers[uid];
 }
-
 
 // ═══════════ EVENTS ═══════════
 const EV_ICONS={but:'⚽',but7:'7️⃣',save:'🧤',av:'<span class="san san-av e-san-icon"></span>','2min':'<span class="san san-2min e-san-icon"></span>',dis:'<span class="san san-dis e-san-icon"></span>',rapport:'<span class="san san-rap e-san-icon"></span>',tir:'🎯',tmo:'⏸',blanc:'<span class="san san-blanc e-san-icon"></span>'};
