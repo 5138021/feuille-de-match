@@ -13,6 +13,9 @@
   --accent:#E02D37;--gold:#F5A623;--green:#00C17A;
   --cyan:#4A9FFF;--purple:#9B59B6;--white:#FFFFFF;
   --off:#F2F5FA;--border:#D4DCE8;--muted:#8A9BBE;
+  /* Couleurs d'équipe (écrasées au chargement par les paramètres du match) */
+  --home:#F5A623;--home-rgb:245,166,35;
+  --away:#4A9FFF;--away-rgb:74,159,255;
   --font-h:'Barlow Condensed',sans-serif;
   --font-b:'Barlow',sans-serif;
   --font-mono:'JetBrains Mono',monospace;
@@ -30,8 +33,8 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .sb-team{flex:1;text-align:center;}
 .sb-name{font-family:var(--font-h);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sb-score{font-family:var(--font-mono);font-size:38px;font-weight:700;line-height:1;padding:2px 8px;background:rgba(255,255,255,.06);border-radius:8px;min-width:60px;text-align:center;display:inline-block;}
-.sb-score.h{color:var(--gold);}
-.sb-score.a{color:var(--cyan);}
+.sb-score.h{color:var(--home);}
+.sb-score.a{color:var(--away);}
 
 /* CHRONO */
 .chrono-wrap{text-align:center;}
@@ -46,6 +49,14 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .btn-per{background:rgba(255,255,255,.1);color:var(--white);}
 .btn-tmo{background:rgba(155,89,182,.25);color:var(--purple);border:1px solid rgba(155,89,182,.4);}
 .tmo-badge{font-size:8px;display:block;margin-top:1px;opacity:.7;}
+
+/* BANDEAU TEMPS MORT */
+.tmo-banner{display:none;align-items:center;gap:10px;margin:0 -12px;padding:7px 12px;background:rgba(155,89,182,.22);border-top:1px solid rgba(155,89,182,.4);font-family:var(--font-h);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;}
+.tmo-banner .tb-txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tmo-banner .tb-time{font-family:var(--font-mono);font-size:18px;color:#fff;}
+.tmo-banner button{background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:6px;padding:5px 10px;font-family:var(--font-h);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+.tmo-banner.done{background:rgba(224,45,55,.28);border-top-color:rgba(224,45,55,.5);animation:tbFlash 1s ease-in-out 4;}
+@keyframes tbFlash{50%{background:rgba(224,45,55,.55);}}
 
 /* TABS */
 .match-tabs{display:flex;gap:2px;}
@@ -63,8 +74,8 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 
 /* HEADERS D'ÉQUIPE */
 .team-hdr{display:flex;align-items:center;gap:6px;margin-bottom:8px;padding:7px 10px;border-radius:9px;}
-.team-hdr.hm{background:rgba(245,166,35,.1);border-left:3px solid var(--gold);}
-.team-hdr.aw{background:rgba(74,159,255,.1);border-left:3px solid var(--cyan);}
+.team-hdr.hm{background:rgba(var(--home-rgb),.12);border-left:3px solid var(--home);}
+.team-hdr.aw{background:rgba(var(--away-rgb),.12);border-left:3px solid var(--away);}
 .team-hdr-name{font-family:var(--font-h);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .team-hdr-score{font-family:var(--font-mono);font-size:16px;font-weight:700;flex-shrink:0;}
 .tmo-count{font-size:9px;color:var(--purple);font-family:var(--font-h);font-weight:700;flex-shrink:0;}
@@ -257,7 +268,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
       <div class="chrono-period" id="chronoPeriod">Avant match</div>
       <div class="chrono-btns">
         <button class="btn-ch btn-play" id="btnPlay" onclick="toggleChrono()">▶ Start</button>
-        <button class="btn-ch btn-per" onclick="endPeriod()" id="btnPer">Mi-T1 →</button>
+        <button class="btn-ch btn-per" onclick="endPeriod()" id="btnPer">Fin MT1 →</button>
         <button class="btn-ch btn-tmo" onclick="showTMO()">⏸ T.O.<span class="tmo-badge" id="tmoInfo"></span></button>
       </div>
     </div>
@@ -265,6 +276,12 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
       <div class="sb-name" id="sb-away-name">EXT</div>
       <div class="sb-score a" id="sb-away-score">00</div>
     </div>
+  </div>
+  <!-- Décompte du temps mort en cours -->
+  <div class="tmo-banner" id="tmoBanner">
+    <span class="tb-txt" id="tmoBannerTxt">T.O.</span>
+    <span class="tb-time" id="tmoBannerTime">1:00</span>
+    <button onclick="endTMOCountdown()">Terminer</button>
   </div>
 </div>
 
@@ -277,7 +294,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
       <div class="team-hdr hm">
         <div class="team-hdr-name" id="ts-home-name">Domicile</div>
         <span class="tmo-count" id="tmo-home-badge"></span>
-        <div class="team-hdr-score" id="ts-home-score" style="color:var(--gold)">0</div>
+        <div class="team-hdr-score" id="ts-home-score" style="color:var(--home)">0</div>
       </div>
       <div class="cards-list" id="grid-home"></div>
       <div class="staff-sep">Staff</div>
@@ -295,7 +312,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
       <div class="team-hdr aw">
         <div class="team-hdr-name" id="ts-away-name">Extérieur</div>
         <span class="tmo-count" id="tmo-away-badge"></span>
-        <div class="team-hdr-score" id="ts-away-score" style="color:var(--cyan)">0</div>
+        <div class="team-hdr-score" id="ts-away-score" style="color:var(--away)">0</div>
       </div>
       <div class="cards-list" id="grid-away"></div>
       <div class="staff-sep">Staff</div>
@@ -348,19 +365,19 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
   <div class="modal-sheet">
     <div class="modal-hdr">
       <div style="font-size:30px;">⏸</div>
-      <div><div class="modal-name">Temps Mort</div><div class="modal-sub">Sélectionner l'équipe</div></div>
+      <div><div class="modal-name">Temps Mort</div><div class="modal-sub" id="tmo-modal-sub">Sélectionner l'équipe</div></div>
       <button class="modal-close" onclick="document.getElementById('tmoModal').classList.remove('open')">✕</button>
     </div>
     <div class="action-grid" style="grid-template-columns:1fr 1fr;">
-      <button class="action-btn ab-av" onclick="useTMO('home')">
-        <span class="ab-icon">🟡</span>
+      <button class="action-btn" id="tmo-btn-home" style="background:rgba(var(--home-rgb),.14);border:1px solid rgba(var(--home-rgb),.4);color:var(--home);" onclick="useTMO('home')">
+        <span class="ab-icon">⬤</span>
         <span class="ab-label" id="tmo-btn-home-name">Domicile</span>
-        <span style="font-size:9px;color:var(--muted);" id="tmo-home-left">T.O. restants: 3</span>
+        <span style="font-size:9px;color:var(--muted);" id="tmo-home-left"></span>
       </button>
-      <button class="action-btn ab-save" onclick="useTMO('away')">
-        <span class="ab-icon">🔵</span>
+      <button class="action-btn" id="tmo-btn-away" style="background:rgba(var(--away-rgb),.14);border:1px solid rgba(var(--away-rgb),.4);color:var(--away);" onclick="useTMO('away')">
+        <span class="ab-icon">⬤</span>
         <span class="ab-label" id="tmo-btn-away-name">Extérieur</span>
-        <span style="font-size:9px;color:var(--muted);" id="tmo-away-left">T.O. restants: 3</span>
+        <span style="font-size:9px;color:var(--muted);" id="tmo-away-left"></span>
       </button>
     </div>
   </div>
@@ -388,21 +405,69 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 let data = null;
 let chronoRunning = false;
 let chronoSeconds = 0;
-let chronoPeriod = 0;
 let chronoInterval = null;
 let currentModalPlayer = null;
-let excluTimers = {}; // uid -> { secsAtStart, totalSecs: 120 }
+let excluTimers = {}; // uid -> { secsAtStart, totalSecs }
+
+// Paramètres du match (définis dans la page de préparation → modal « Démarrer le match »)
+const CFG_DEFAULT = { nbPeriods:2, periodMin:30, pauseMin:10, excluSec:120, tmoTeam:3, tmoPeriod:2, tmoSec:60 };
+let cfg = { ...CFG_DEFAULT };
+
+// Déroulement : 'pre' (avant match) · 'play' (période en cours) · 'break' (pause entre périodes) · 'end'
+let phase = 'pre';
+let periodIdx = 1;          // période en cours (ou prochaine période pendant une pause)
+let breakInterval = null;
+let breakRemaining = 0;
+let tmoCountdown = null;    // { team, rem, interval }
 
 // ═══════════ INIT ═══════════
 function init() {
   const raw = localStorage.getItem('ffhb_match_data');
   if (!raw) { alert('Pas de données. Retour préparation.'); window.location.href='1-preparation.html'; return; }
   data = JSON.parse(raw);
+  data.events = data.events || [];
+  cfg = { ...CFG_DEFAULT, ...(data.config || {}) };
+  if (!data.config && data.match) { // compatibilité anciennes données
+    if (data.match.duree) cfg.periodMin = data.match.duree;
+    if (data.match.pause != null) cfg.pauseMin = data.match.pause;
+  }
+  ['home','away'].forEach(t => { data[t].tmo = data[t].tmo || 0; data[t].tmoByPeriod = data[t].tmoByPeriod || {}; });
+
+  applyTeamColors();
+  document.getElementById('btnPer').textContent = 'Fin ' + perShort(1) + ' →';
   renderScoreboard();
   renderPlayers('home'); renderPlayers('away');
   renderStaff('home'); renderStaff('away');
   updateTMOInfo(); renderEvents();
 }
+
+// ═══════════ COULEURS D'ÉQUIPE ═══════════
+function hexToRgb(h){
+  h=(h||'').replace('#','');
+  if(h.length===3)h=h.split('').map(c=>c+c).join('');
+  if(!/^[0-9a-f]{6}$/i.test(h))return null;
+  const n=parseInt(h,16);return [n>>16&255,n>>8&255,n&255];
+}
+function applyTeamColors(){
+  const root=document.documentElement.style;
+  [['home',data.home.color,'#F5A623'],['away',data.away.color,'#4A9FFF']].forEach(([t,c,def])=>{
+    let rgb=hexToRgb(c),col=c;
+    if(!rgb){rgb=hexToRgb(def);col=def;}
+    // Couleur trop sombre pour le fond bleu nuit → on l'éclaircit pour rester lisible
+    const lum=0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2];
+    if(lum<60){rgb=rgb.map(v=>Math.min(255,Math.round(v+(255-v)*.55)));col='rgb('+rgb.join(',')+')';}
+    root.setProperty('--'+t,col);
+    root.setProperty('--'+t+'-rgb',rgb.join(','));
+  });
+}
+
+// ═══════════ FORMATS / LIBELLÉS DÉPENDANT DES PARAMÈTRES ═══════════
+function fmtMMSS(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');}
+function fmtClock(sec){sec=Math.max(0,sec);return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');}
+function exLbl(){const s=cfg.excluSec;return s%60===0?(s/60)+"'":Math.floor(s/60)+"'"+String(s%60).padStart(2,'0');}
+function nbP(){return cfg.nbPeriods;}
+function perLabel(k){return k===1?'1ère Période':k+'ème Période';}
+function perShort(k){return nbP()===2?'MT'+k:'P'+k;}
 
 // ═══════════ SCOREBOARD ═══════════
 function renderScoreboard() {
@@ -425,8 +490,19 @@ function updateScore() {
 
 // ═══════════ CHRONO ═══════════
 function toggleChrono(){
-  if(chronoPeriod===0){chronoPeriod=1;startChrono();document.getElementById('chronoPeriod').textContent='1ère Période';document.getElementById('btnPer').textContent='Fin MT1 →';}
+  if(phase==='end')return;
+  if(phase==='pre')beginPeriod(1);
+  else if(phase==='break')beginPeriod(periodIdx);
   else if(chronoRunning)pauseChrono();else startChrono();
+}
+function beginPeriod(k){
+  clearBreak();
+  phase='play';periodIdx=k;chronoSeconds=0;updateChronoDisplay();
+  document.getElementById('chronoPeriod').textContent=perLabel(k);
+  document.getElementById('btnPer').textContent=(k<nbP()?'Fin '+perShort(k):'Fin Match')+' →';
+  if(k>1)showToast('🏐 Début — '+perLabel(k)+' !');
+  updateTMOInfo();
+  startChrono();
 }
 function startChrono(){
   chronoRunning=true;
@@ -436,8 +512,8 @@ function startChrono(){
   chronoInterval=setInterval(()=>{
     chronoSeconds++;updateChronoDisplay();
     tickExcluTimers();
-    const dur=(data.match.duree||30)*60;
-    if((chronoPeriod===1||chronoPeriod===3)&&chronoSeconds>=dur)pauseChrono();
+    // Pause automatique à la fin du temps réglementaire (le chrono peut ensuite être relancé manuellement)
+    if(phase==='play'&&chronoSeconds===Math.round(cfg.periodMin*60)){pauseChrono();showToast('⏱ Fin du temps de la période');}
   },1000);
 }
 function pauseChrono(){
@@ -446,48 +522,120 @@ function pauseChrono(){
   document.getElementById('btnPlay').className='btn-ch btn-play';
   document.getElementById('chronoDisplay').className='chrono-time paused';
 }
-function updateChronoDisplay(){const m=Math.floor(chronoSeconds/60),s=chronoSeconds%60;document.getElementById('chronoDisplay').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
-function getTime(){const m=Math.floor(chronoSeconds/60),s=chronoSeconds%60;return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+function updateChronoDisplay(){document.getElementById('chronoDisplay').textContent=fmtClock(chronoSeconds);}
+function getTime(){return fmtClock(chronoSeconds);}
+
 function endPeriod(){
+  if(phase==='pre'){showToast('▶ Lance d\'abord le chrono');return;}
+  if(phase==='end')return;
+  if(phase==='break'){beginPeriod(periodIdx);return;}
+
+  // Fin d'une période en cours de jeu
   pauseChrono();
-  if(chronoPeriod===1){
-    data.match.scoreHTHome=data.match.scoreHome;data.match.scoreHTAway=data.match.scoreAway;
-    chronoPeriod=2;chronoSeconds=0;updateChronoDisplay();
-    document.getElementById('chronoPeriod').textContent='Mi-temps · Pause';
-    document.getElementById('btnPer').textContent='Début MT2 →';
+  endTMOCountdown();
+  const m=data.match;
+  m.periodScores=m.periodScores||[];
+  m.periodScores[periodIdx-1]={home:m.scoreHome,away:m.scoreAway};
+  if(periodIdx===Math.max(1,Math.floor(nbP()/2))){m.scoreHTHome=m.scoreHome;m.scoreHTAway=m.scoreAway;}
+
+  if(periodIdx<nbP()){
+    const finished=periodIdx;
+    phase='break';periodIdx++;chronoSeconds=0;
+    const isHalf=nbP()%2===0&&finished===nbP()/2;
+    document.getElementById('chronoPeriod').textContent=isHalf?'Mi-temps · Pause':'Pause · fin '+perShort(finished);
+    document.getElementById('btnPer').textContent='Début '+perShort(periodIdx)+' →';
     document.getElementById('btnPlay').textContent='▶ Démarrer';
-    showToast('⏸ Fin de la 1ère Mi-Temps !');
-  }else if(chronoPeriod===2){
-    chronoPeriod=3;chronoSeconds=0;updateChronoDisplay();
-    document.getElementById('chronoPeriod').textContent='2ème Période';
-    document.getElementById('btnPer').textContent='Fin Match →';
-    showToast('🏐 Début de la 2ème Mi-Temps !');startChrono();
-  }else if(chronoPeriod===3){
-    chronoPeriod=4;
+    document.getElementById('btnPlay').className='btn-ch btn-play';
+    startBreak();
+    updateTMOInfo();
+    showToast(isHalf?'⏸ Fin de la mi-temps !':'⏸ Fin '+perLabel(finished)+' !');
+  }else{
+    phase='end';
     document.getElementById('chronoPeriod').textContent='Match Terminé';
     document.getElementById('btnPer').textContent='✅ Terminé';
     document.getElementById('btnPlay').style.display='none';
-    data.match.matchEnded=true;showEndModal();
+    m.matchEnded=true;showEndModal();
   }
   saveData();
 }
 
+// Décompte de la pause entre deux périodes (affichage uniquement)
+function startBreak(){
+  clearBreak();
+  breakRemaining=Math.round(cfg.pauseMin*60);
+  showBreak();
+  if(breakRemaining<=0)return;
+  breakInterval=setInterval(()=>{
+    breakRemaining--;showBreak();
+    if(breakRemaining<=0){clearBreak();showToast('⏱ Fin de la pause');}
+  },1000);
+}
+function showBreak(){
+  const d=document.getElementById('chronoDisplay');
+  d.textContent=fmtClock(breakRemaining);d.className='chrono-time paused';
+}
+function clearBreak(){if(breakInterval){clearInterval(breakInterval);breakInterval=null;}}
+
 // ═══════════ TMO ═══════════
-function showTMO(){document.getElementById('tmoModal').classList.add('open');}
+function tmoUsedPeriod(team,period){return (data[team].tmoByPeriod||{})[period]||0;}
+function tmoLeftTeam(team){return Math.max(0,cfg.tmoTeam-data[team].tmo);}
+function tmoLeftPeriod(team){return Math.max(0,cfg.tmoPeriod-tmoUsedPeriod(team,periodIdx));}
+
+function showTMO(){
+  if(phase!=='play'){showToast('⏸ T.O. possible uniquement pendant une période');return;}
+  if(tmoCountdown){showToast('Un temps mort est déjà en cours');return;}
+  updateTMOInfo();
+  document.getElementById('tmoModal').classList.add('open');
+}
 function useTMO(team){
-  if(data[team].tmo>=3){showToast('❌ Plus de temps morts !');return;}
+  if(tmoLeftTeam(team)<=0){showToast('❌ Plus de temps morts pour cette équipe !');return;}
+  if(tmoLeftPeriod(team)<=0){showToast('❌ Max. '+cfg.tmoPeriod+' T.O. atteint sur cette période');return;}
   data[team].tmo++;
-  addEvent({type:'tmo',team,time:getTime(),desc:'Temps mort'});
+  data[team].tmoByPeriod[periodIdx]=tmoUsedPeriod(team,periodIdx)+1;
+  addEvent({type:'tmo',team,time:getTime(),period:periodIdx,desc:'Temps mort'});
   updateTMOInfo();document.getElementById('tmoModal').classList.remove('open');
-  showToast('⏸ Temps Mort — '+data[team].nom);if(chronoRunning)pauseChrono();saveData();
+  showToast('⏸ Temps Mort — '+data[team].nom);
+  if(chronoRunning)pauseChrono();
+  startTMOCountdown(team);
+  saveData();
 }
 function updateTMOInfo(){
   const ht=data.home.tmo,at=data.away.tmo;
-  document.getElementById('tmoInfo').textContent=`D:${ht}/3 E:${at}/3`;
-  document.getElementById('tmo-home-left').textContent=`T.O. restants: ${3-ht}`;
-  document.getElementById('tmo-away-left').textContent=`T.O. restants: ${3-at}`;
+  document.getElementById('tmoInfo').textContent=`D:${ht}/${cfg.tmoTeam} E:${at}/${cfg.tmoTeam}`;
+  document.getElementById('tmo-home-left').textContent=`Restants : ${tmoLeftTeam('home')} · cette période : ${tmoLeftPeriod('home')}`;
+  document.getElementById('tmo-away-left').textContent=`Restants : ${tmoLeftTeam('away')} · cette période : ${tmoLeftPeriod('away')}`;
+  document.getElementById('tmo-modal-sub').textContent=`${cfg.tmoTeam} par équipe · max ${cfg.tmoPeriod} par période · ${cfg.tmoSec>=60&&cfg.tmoSec%60===0?(cfg.tmoSec/60)+' min':cfg.tmoSec+' s'}`;
   document.getElementById('tmo-home-badge').textContent=ht>0?`T.O.×${ht}`:'';
   document.getElementById('tmo-away-badge').textContent=at>0?`T.O.×${at}`:'';
+}
+
+// Décompte du temps mort
+function startTMOCountdown(team){
+  endTMOCountdown();
+  tmoCountdown={team,rem:Math.round(cfg.tmoSec),interval:null};
+  const b=document.getElementById('tmoBanner');
+  b.classList.remove('done');b.style.display='flex';
+  document.getElementById('tmoBannerTxt').textContent='⏸ T.O. — '+(data[team].abr||data[team].nom);
+  renderTMOBanner();
+  tmoCountdown.interval=setInterval(()=>{
+    if(!tmoCountdown)return;
+    tmoCountdown.rem--;renderTMOBanner();
+    if(tmoCountdown.rem<=0){
+      clearInterval(tmoCountdown.interval);
+      b.classList.add('done');
+      document.getElementById('tmoBannerTxt').textContent='⏱ Fin du temps mort';
+      showToast('⏱ Fin du temps mort');
+    }
+  },1000);
+}
+function renderTMOBanner(){
+  if(!tmoCountdown)return;
+  document.getElementById('tmoBannerTime').textContent=fmtMMSS(Math.max(0,tmoCountdown.rem));
+}
+function endTMOCountdown(){
+  if(tmoCountdown){clearInterval(tmoCountdown.interval);tmoCountdown=null;}
+  const b=document.getElementById('tmoBanner');
+  b.style.display='none';b.classList.remove('done');
 }
 
 // ═══════════ SANCTION VISUELLE (ruban diagonal) ═══════════
@@ -515,7 +663,7 @@ function buildPlayerCard(team,p,idx){
   const hasSan=!!ribbon;
   let cls='player-card'+(isGK?' gk':'')+(hasSan?' sanctioned':'')+((p.excluActive||p.outOfGame)?' excluded':'');
   let overlayHtml='';
-  if(p.excluActive){overlayHtml=`<div class="exclu-overlay" id="exclu-p-${team}-${idx}">2'00</div>`;}
+  if(p.excluActive){overlayHtml=`<div class="exclu-overlay" id="exclu-p-${team}-${idx}">${fmtMMSS(cfg.excluSec)}</div>`;}
   return `<div class="${cls}" onclick="openPlayerModal('${team}',${idx})">
     ${ribbon?`<div class="corner-ribbon ribbon-${ribbon.color}">${ribbon.text}</div>`:''}
     ${overlayHtml}
@@ -544,7 +692,7 @@ function buildStaffCard(team,off,idx,realIdx){
   else if(off.av==='yellow')ribbon={color:'yellow',text:''};
   const hasSan=!!ribbon;
   const cls='staff-card'+(hasSan?' sanctioned':'')+((off.excluActive||off.outOfGame)?' excluded':'');
-  const overlayHtml=off.excluActive?`<div class="exclu-overlay" id="exclu-s-${team}-${realIdx}">2'00</div>`:'';
+  const overlayHtml=off.excluActive?`<div class="exclu-overlay" id="exclu-s-${team}-${realIdx}">${fmtMMSS(cfg.excluSec)}</div>`:'';
   return `<div class="${cls}" onclick="openStaffModal('${team}',${idx})">
     ${ribbon?`<div class="corner-ribbon ribbon-${ribbon.color}">${ribbon.text}</div>`:''}
     ${overlayHtml}
@@ -588,7 +736,7 @@ function openPlayerModal(team,idx){
   const rapOn=p.dis==='blue';
   const sancItems=[
     [sanIcon('san-av'),'Avertissement','J','av',p.av==='yellow'],
-    [sanIcon('san-2min'),"2 minutes",'2','2min',false],
+    [sanIcon('san-2min'),'Exclusion '+exLbl(),'2','2min',false],
     [sanIcon('san-dis'),'Disqualification','D','dis',disOn],
     [sanIcon('san-rap'),'Disqual. rapport','R','rapport',rapOn]
   ];
@@ -645,8 +793,8 @@ function doPA(action){
       else if(!p.p3||p.p3==='empty'){p.p3='2min';p.dis='red3x2';p.outOfGame=true;isDisq=true;showToast('🟥 3e exclusion — Disqualification !');}
       else{showToast('❌ 3 exclusions déjà atteintes');return;}
       p.excluActive=true;startExcluTimer(team,idx);
-      addEvent({type:'2min',team,time:t,player:p.num,disq3x2:isDisq,desc:(isDisq?"Exclusion 2' disqualifiante (3e) — ":"Exclusion 2' — ")+nm});
-      if(!isDisq)showToast("⏱️ Exclusion 2' — "+p.name);break;}
+      addEvent({type:'2min',team,time:t,player:p.num,disq3x2:isDisq,desc:(isDisq?'Exclusion '+exLbl()+' disqualifiante (3e) — ':'Exclusion '+exLbl()+' — ')+nm});
+      if(!isDisq)showToast('⏱️ Exclusion '+exLbl()+' — '+p.name);break;}
     case 'dis':p.dis='red';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({type:'dis',team,time:t,player:p.num,desc:'Disqualification — '+nm});showToast('🟥 Disqualif. — '+p.name);break;
     case 'rapport':p.dis='blue';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({type:'rapport',team,time:t,player:p.num,desc:'Disqualification avec rapport — '+nm});showToast('📝 Disqualif. + rapport — '+p.name);break;
     case 'blanc':p.blanc=true;addEvent({type:'blanc',team,time:t,player:p.num,desc:'Carton blanc — '+nm});showToast('⬜ Carton blanc — '+p.name);break;
@@ -697,13 +845,13 @@ function openStaffModal(team,idx){
 
   const items=[
     [sanIcon('san-av'),'Avertissement','J','av',hasAv,avBlocked],
-    [sanIcon('san-2min'),"Exclusion 2'",'2','exclu',hasExclu,excluBlocked],
+    [sanIcon('san-2min'),'Exclusion '+exLbl(),'2','exclu',hasExclu,excluBlocked],
     [sanIcon('san-dis'),'Disqualification','D','dis',hasDis,false],
     [sanIcon('san-rap'),'Rapport écrit','R','rapport',hasRap,false]
   ];
 
   const html=[
-    `<div class="menu-note">1 Av. max / équipe · 1×2' max / équipe · Disqualif. &amp; Rapport : individuel</div>`,
+    `<div class="menu-note">1 Av. max / équipe · 1×${exLbl()} max / équipe · Disqualif. &amp; Rapport : individuel</div>`,
     ...items.map(it=>menuItemHTML(it[0],it[1],it[2],`doSA('${it[3]}')`,it[4],it[5])),
     '<div class="menu-sep"></div>',
     menuItemHTML('↩️','Annuler dernier','⌫',`doSA('undo')`),
@@ -727,10 +875,10 @@ function doSA(action){
         off.av='yellow';addEvent({type:'av',team,time:t,player:off.nom,desc:'Avertissement — '+off.nom});showToast('⚠️ AV Officiel — '+off.nom);
       }break;
     case 'exclu':
-      if(off.exclu==='2min'){off.exclu='empty';off.excluActive=false;stopExcluTimer(team,idx,'s');showToast("↩️ Exclusion 2' retirée");}
+      if(off.exclu==='2min'){off.exclu='empty';off.excluActive=false;stopExcluTimer(team,idx,'s');showToast('↩️ Exclusion '+exLbl()+' retirée');}
       else{
-        if(teamOffs.some((o,i)=>i!==idx&&o.exclu==='2min')){showToast("⛔ 1 seule exclusion 2' autorisée !");closeStaffModal();return;}
-        off.exclu='2min';off.excluActive=true;startExcluTimer(team,idx,'s');addEvent({type:'2min',team,time:t,player:off.nom,desc:"Exclusion 2' — "+off.nom});showToast("⏱️ Exclusion 2' Officiel — "+off.nom);
+        if(teamOffs.some((o,i)=>i!==idx&&o.exclu==='2min')){showToast('⛔ 1 seule exclusion '+exLbl()+' autorisée !');closeStaffModal();return;}
+        off.exclu='2min';off.excluActive=true;startExcluTimer(team,idx,'s');addEvent({type:'2min',team,time:t,player:off.nom,desc:'Exclusion '+exLbl()+' — '+off.nom});showToast('⏱️ Exclusion '+exLbl()+' Officiel — '+off.nom);
       }break;
     case 'dis':
       if(off.dis==='red'){off.dis='empty';off.excluActive=false;off.outOfGame=false;stopExcluTimer(team,idx,'s');showToast('↩️ Disqualif. retirée');}
@@ -787,7 +935,7 @@ document.addEventListener('keydown', function(e){
 function startExcluTimer(team,idx,kind){
   kind=kind||'p';
   const uid=team+'-'+kind+'-'+idx;
-  excluTimers[uid]={secsAtStart:chronoSeconds,totalSecs:120};
+  excluTimers[uid]={secsAtStart:chronoSeconds,totalSecs:cfg.excluSec};
   updateExcluDisplay(team,idx,undefined,kind);
 }
 
@@ -818,8 +966,7 @@ function updateExcluDisplay(team,idx,remaining,kind){
   }
   const el=document.getElementById('exclu-'+kind+'-'+team+'-'+idx);
   if(el){
-    const m=Math.floor(remaining/60),s=remaining%60;
-    el.textContent=`${m}:${String(s).padStart(2,'0')}`;
+    el.textContent=fmtMMSS(Math.max(0,remaining));
   }
 }
 
@@ -833,7 +980,7 @@ function stopExcluTimer(team,idx,kind){
 const EV_ICONS={but:'⚽',but7:'7️⃣',save:'🧤',av:'<span class="san san-av e-san-icon"></span>','2min':'<span class="san san-2min e-san-icon"></span>',dis:'<span class="san san-dis e-san-icon"></span>',rapport:'<span class="san san-rap e-san-icon"></span>',tir:'🎯',tmo:'⏸',blanc:'<span class="san san-blanc e-san-icon"></span>'};
 const EV_CLS={but:'e-but',but7:'e-but7',save:'e-save',av:'e-av','2min':'e-2min',dis:'e-dis',rapport:'e-dis',tir:'e-tir',tmo:'e-tmo',blanc:'e-blanc'};
 
-function addEvent(ev){ev.id=Date.now();data.events.unshift(ev);renderEvents();}
+function addEvent(ev){ev.id=Date.now()+Math.random();data.events.unshift(ev);renderEvents();}
 function renderEvents(){
   const list=document.getElementById('event-list');
   if(!data.events.length){list.innerHTML=`<div class="ev-empty"><span style="font-size:20px;">📋</span><span>Aucun fait</span></div>`;return;}
@@ -848,7 +995,17 @@ function renderEvents(){
       <button class="e-del" onclick="deleteEvent(${ev.id})">✕</button>
     </div>`).join('');
 }
-function deleteEvent(id){data.events=data.events.filter(e=>e.id!==id);renderEvents();saveData();}
+function deleteEvent(id){
+  const ev=data.events.find(e=>e.id===id);
+  // Supprimer un temps mort le rend à l'équipe (total + compteur de la période)
+  if(ev&&ev.type==='tmo'){
+    const t=data[ev.team];
+    t.tmo=Math.max(0,t.tmo-1);
+    if(ev.period&&t.tmoByPeriod)t.tmoByPeriod[ev.period]=Math.max(0,(t.tmoByPeriod[ev.period]||1)-1);
+    updateTMOInfo();
+  }
+  data.events=data.events.filter(e=>e.id!==id);renderEvents();saveData();
+}
 
 function showEndModal(){
   const m=data.match;
