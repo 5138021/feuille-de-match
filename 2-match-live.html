@@ -58,6 +58,52 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .tmo-banner.done{background:rgba(224,45,55,.28);border-top-color:rgba(224,45,55,.5);animation:tbFlash 1s ease-in-out 4;}
 @keyframes tbFlash{50%{background:rgba(224,45,55,.55);}}
 
+
+/* BOUTONS OUTILS (header) */
+.nav-tools{display:flex;gap:5px;}
+.btn-tool{padding:5px 9px;border:1px solid rgba(255,255,255,.15);border-radius:7px;background:rgba(255,255,255,.08);color:var(--white);font-family:var(--font-h);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
+.btn-tool:active{transform:scale(.96);}
+
+/* MODALS RÉGLAGES / EFFECTIFS */
+.sheet-tall{max-height:92vh;overflow-y:auto;padding-bottom:26px;}
+.f-sec{font-family:var(--font-h);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin:16px 0 9px;display:flex;align-items:center;gap:8px;}
+.f-sec::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
+.f-row{display:grid;gap:8px;margin-bottom:8px;}
+.f-row.c1{grid-template-columns:1fr;}
+.f-row.c2{grid-template-columns:1fr 1fr;}
+.f-row.c3{grid-template-columns:1fr 1fr 1fr;}
+.f-row.cn{grid-template-columns:70px 1fr 58px;}
+.f-grp label{display:block;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+.f-grp input,.f-grp select{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--white);font-family:var(--font-b);font-size:13px;padding:9px 11px;outline:none;-webkit-appearance:none;}
+.f-grp input:focus,.f-grp select:focus{border-color:var(--cyan);background:rgba(74,159,255,.08);}
+.f-grp input::placeholder{color:rgba(138,155,190,.6);}
+.f-grp select option{background:#1C3256;color:#fff;}
+.f-num{font-family:var(--font-mono);font-weight:700;text-align:center;color:var(--gold) !important;}
+.f-pos{align-self:end;height:38px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--muted);font-family:var(--font-h);font-size:13px;font-weight:800;letter-spacing:1px;cursor:pointer;}
+.f-pos.is-gk{background:rgba(74,159,255,.2);border-color:var(--cyan);color:var(--cyan);}
+.f-btns{display:flex;gap:8px;margin-top:14px;}
+.f-btn{flex:1;padding:13px;border:none;border-radius:10px;font-family:var(--font-h);font-size:14px;font-weight:900;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+.f-btn:active{transform:scale(.97);}
+.f-btn.ghost{flex:0 0 32%;background:rgba(255,255,255,.08);color:var(--white);}
+.f-btn.go{background:linear-gradient(135deg,var(--green),#00a066);color:var(--blue);}
+.f-btn.add{background:rgba(74,159,255,.16);border:1px solid rgba(74,159,255,.35);color:var(--cyan);margin-top:2px;}
+.f-note{font-size:10px;color:var(--muted);line-height:1.45;margin-top:4px;}
+.f-err{display:none;color:var(--accent);font-size:11px;font-weight:600;margin-top:10px;}
+.set-team{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.set-team-lbl{width:78px;flex-shrink:0;font-family:var(--font-h);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;line-height:1.15;}
+.set-team-lbl small{display:block;font-family:var(--font-b);font-size:10px;font-weight:500;color:var(--muted);letter-spacing:0;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.set-colors{display:flex;gap:7px;flex-wrap:wrap;align-items:center;flex:1;}
+.color-dot{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0;}
+.color-dot.sel{border-color:var(--white);transform:scale(1.2);}
+.cfg-custom{width:26px;height:26px;border-radius:50%;border:2px dashed rgba(255,255,255,.3);padding:0;background:transparent;cursor:pointer;overflow:hidden;flex-shrink:0;}
+.cfg-custom.sel{border:2px solid var(--white);}
+.cfg-custom::-webkit-color-swatch-wrapper{padding:0;}
+.cfg-custom::-webkit-color-swatch{border:none;border-radius:50%;}
+.team-switch{display:flex;background:rgba(255,255,255,.06);border-radius:10px;padding:3px;gap:3px;margin-bottom:4px;}
+.team-switch button{flex:1;padding:9px 6px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-family:var(--font-h);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.team-switch button.on-home{background:rgba(var(--home-rgb),.25);color:var(--home);}
+.team-switch button.on-away{background:rgba(var(--away-rgb),.25);color:var(--away);}
+
 /* TABS */
 .match-tabs{display:flex;gap:2px;}
 .match-tab{flex:1;padding:7px 4px;text-align:center;border-bottom:2px solid transparent;font-family:var(--font-h);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:all .2s;}
@@ -256,6 +302,10 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 <div class="match-header">
   <div class="match-nav">
     <button class="btn-back" onclick="goBack()">← Prép.</button>
+    <div class="nav-tools">
+      <button class="btn-tool" onclick="openSettings()">⚙️ Réglages</button>
+      <button class="btn-tool" onclick="openRoster()">👥 Effectifs</button>
+    </div>
     <button class="btn-export" onclick="exportResults()">📋 Export</button>
   </div>
   <div class="scoreboard">
@@ -380,6 +430,90 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
         <span style="font-size:9px;color:var(--muted);" id="tmo-away-left"></span>
       </button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL RÉGLAGES DU MATCH -->
+<div class="modal-overlay" id="settingsModal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal-sheet sheet-tall">
+    <div class="modal-hdr" style="margin-bottom:4px;">
+      <div style="font-size:28px;">⚙️</div>
+      <div><div class="modal-name">Réglages du match</div><div class="modal-sub">Modifiables à tout moment pendant le match</div></div>
+      <button class="modal-close" onclick="closeSettings()">✕</button>
+    </div>
+
+    <div class="f-sec">Couleurs des équipes</div>
+    <div class="set-team">
+      <div class="set-team-lbl" style="color:var(--home);">Recevante<small id="set-home-name">Domicile</small></div>
+      <div class="set-colors" id="set-colors-home"></div>
+    </div>
+    <div class="set-team">
+      <div class="set-team-lbl" style="color:var(--away);">Visiteuse<small id="set-away-name">Extérieur</small></div>
+      <div class="set-colors" id="set-colors-away"></div>
+    </div>
+
+    <div class="f-sec">Périodes</div>
+    <div class="f-row c3">
+      <div class="f-grp"><label>Nb de périodes</label>
+        <select id="set-nbPeriods"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
+      </div>
+      <div class="f-grp"><label>Durée (min)</label><input id="set-periodMin" type="number" inputmode="decimal" min="1" max="90" step="1"></div>
+      <div class="f-grp"><label>Pause (min)</label><input id="set-pauseMin" type="number" inputmode="decimal" min="0" max="30" step="1"></div>
+    </div>
+    <div class="f-note" id="set-per-note"></div>
+
+    <div class="f-sec">Exclusions</div>
+    <div class="f-row c1">
+      <div class="f-grp"><label>Durée d'une exclusion (min)</label><input id="set-excluMin" type="number" inputmode="decimal" min="0.5" max="10" step="0.5"></div>
+    </div>
+    <div class="f-note">Les exclusions déjà en cours gardent leur durée initiale ; le nouveau réglage s'applique aux suivantes.</div>
+
+    <div class="f-sec">Temps morts (TME)</div>
+    <div class="f-row c3">
+      <div class="f-grp"><label>Par équipe</label><input id="set-tmoTeam" type="number" inputmode="numeric" min="0" max="10" step="1"></div>
+      <div class="f-grp"><label>Max / période</label><input id="set-tmoPeriod" type="number" inputmode="numeric" min="0" max="10" step="1"></div>
+      <div class="f-grp"><label>Durée (sec)</label><input id="set-tmoSec" type="number" inputmode="numeric" min="10" max="300" step="5"></div>
+    </div>
+    <div class="f-note">Les temps morts déjà pris restent comptabilisés.</div>
+
+    <div class="f-err" id="set-err"></div>
+    <div class="f-btns">
+      <button class="f-btn ghost" onclick="closeSettings()">Annuler</button>
+      <button class="f-btn go" onclick="applySettings()">✔ Appliquer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EFFECTIFS (ajout joueurs / officiels) -->
+<div class="modal-overlay" id="rosterModal" onclick="if(event.target===this)closeRoster()">
+  <div class="modal-sheet sheet-tall">
+    <div class="modal-hdr" style="margin-bottom:10px;">
+      <div style="font-size:28px;">👥</div>
+      <div><div class="modal-name">Ajouter à l'effectif</div><div class="modal-sub" id="roster-count"></div></div>
+      <button class="modal-close" onclick="closeRoster()">✕</button>
+    </div>
+
+    <div class="team-switch">
+      <button id="rs-home" onclick="setRosterTeam('home')">Domicile</button>
+      <button id="rs-away" onclick="setRosterTeam('away')">Extérieur</button>
+    </div>
+
+    <div class="f-sec">Nouveau joueur</div>
+    <div class="f-row cn">
+      <div class="f-grp"><label>N°</label><input id="ad-num" class="f-num" type="text" inputmode="numeric" maxlength="3" placeholder="N°"></div>
+      <div class="f-grp"><label>Nom / Prénom</label><input id="ad-name" type="text" placeholder="Nom Prénom" autocomplete="off"></div>
+      <button class="f-pos" id="ad-pos" onclick="toggleNewPos()">J</button>
+    </div>
+    <button class="f-btn add" style="width:100%;" onclick="addRosterPlayer()">＋ Ajouter le joueur</button>
+
+    <div class="f-sec">Nouvel officiel</div>
+    <div class="f-row c2">
+      <div class="f-grp"><label>Fonction</label><select id="ad-role"></select></div>
+      <div class="f-grp"><label>Nom / Prénom</label><input id="ad-off-name" type="text" placeholder="Nom Prénom" autocomplete="off"></div>
+    </div>
+    <button class="f-btn add" style="width:100%;" onclick="addRosterOfficial()">＋ Ajouter l'officiel</button>
+
+    <div class="f-btns"><button class="f-btn ghost" style="flex:1;" onclick="closeRoster()">Fermer</button></div>
   </div>
 </div>
 
@@ -793,7 +927,7 @@ function doPA(action){
       else if(!p.p3||p.p3==='empty'){p.p3='2min';p.dis='red3x2';p.outOfGame=true;isDisq=true;showToast('🟥 3e exclusion — Disqualification !');}
       else{showToast('❌ 3 exclusions déjà atteintes');return;}
       p.excluActive=true;startExcluTimer(team,idx);
-      addEvent({type:'2min',team,time:t,player:p.num,disq3x2:isDisq,desc:(isDisq?'Exclusion '+exLbl()+' disqualifiante (3e) — ':'Exclusion '+exLbl()+' — ')+nm});
+      addEvent({type:'2min',team,time:t,player:p.num,disq3x2:isDisq,desc:'Exclusion '+exLbl()+' — '+nm});
       if(!isDisq)showToast('⏱️ Exclusion '+exLbl()+' — '+p.name);break;}
     case 'dis':p.dis='red';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({type:'dis',team,time:t,player:p.num,desc:'Disqualification — '+nm});showToast('🟥 Disqualif. — '+p.name);break;
     case 'rapport':p.dis='blue';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({type:'rapport',team,time:t,player:p.num,desc:'Disqualification avec rapport — '+nm});showToast('📝 Disqualif. + rapport — '+p.name);break;
@@ -1019,6 +1153,189 @@ function showEndModal(){
 // ═══════════ TOAST ═══════════
 let toastTimer=null;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
+
+// ═══════════ RÉGLAGES PENDANT LE MATCH ═══════════
+const PALETTE=['#E02D37','#F5A623','#00C17A','#4A9FFF','#9B59B6','#FFFFFF','#1C3256','#FF6B35','#2ECC71','#E74C3C'];
+let setColors={home:'#F5A623',away:'#4A9FFF'};
+
+function refreshPerButton(){
+  const b=document.getElementById('btnPer');
+  if(phase==='pre')b.textContent='Fin '+perShort(1)+' →';
+  else if(phase==='play')b.textContent=(periodIdx<nbP()?'Fin '+perShort(periodIdx):'Fin Match')+' →';
+  else if(phase==='break')b.textContent='Début '+perShort(periodIdx)+' →';
+}
+
+function openSettings(){
+  setColors.home=data.home.color||'#F5A623';
+  setColors.away=data.away.color||'#4A9FFF';
+  document.getElementById('set-home-name').textContent=data.home.nom||'Domicile';
+  document.getElementById('set-away-name').textContent=data.away.nom||'Extérieur';
+  renderSetColors('home');renderSetColors('away');
+  const sel=document.getElementById('set-nbPeriods');
+  sel.value=String(cfg.nbPeriods);
+  [...sel.options].forEach(o=>{o.disabled=parseInt(o.value)<periodIdx;});
+  sel.disabled=(phase==='end');
+  document.getElementById('set-per-note').textContent=phase==='end'?'Match terminé : le nombre de périodes ne peut plus changer.':(periodIdx>1?'Le nombre de périodes ne peut pas être inférieur à la période en cours ('+periodIdx+').':'');
+  document.getElementById('set-periodMin').value=cfg.periodMin;
+  document.getElementById('set-pauseMin').value=cfg.pauseMin;
+  document.getElementById('set-excluMin').value=cfg.excluSec/60;
+  document.getElementById('set-tmoTeam').value=cfg.tmoTeam;
+  document.getElementById('set-tmoPeriod').value=cfg.tmoPeriod;
+  document.getElementById('set-tmoSec').value=cfg.tmoSec;
+  document.getElementById('set-err').style.display='none';
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings(){document.getElementById('settingsModal').classList.remove('open');}
+
+function renderSetColors(team){
+  const cur=(setColors[team]||'').toUpperCase();
+  const inPal=PALETTE.some(c=>c.toUpperCase()===cur);
+  document.getElementById('set-colors-'+team).innerHTML=
+    PALETTE.map(c=>`<div class="color-dot${c.toUpperCase()===cur?' sel':''}" style="background:${c}" onclick="pickSetColor('${team}','${c}')"></div>`).join('')+
+    `<input type="color" class="cfg-custom${inPal?'':' sel'}" value="${/^#[0-9a-f]{6}$/i.test(cur)?cur:'#E02D37'}" title="Couleur personnalisée" oninput="pickSetColor('${team}',this.value,true)">`;
+}
+function pickSetColor(team,color,fromInput){
+  setColors[team]=color;
+  if(!fromInput)renderSetColors(team);
+  else document.querySelectorAll('#set-colors-'+team+' .color-dot').forEach(d=>d.classList.remove('sel'));
+  // aperçu immédiat
+  data[team].color=color;applyTeamColors();
+}
+
+function applySettings(){
+  const num=id=>parseFloat(document.getElementById(id).value);
+  const n={
+    nbPeriods:parseInt(document.getElementById('set-nbPeriods').value),
+    periodMin:num('set-periodMin'),
+    pauseMin:num('set-pauseMin'),
+    excluSec:Math.round(num('set-excluMin')*60),
+    tmoTeam:parseInt(document.getElementById('set-tmoTeam').value),
+    tmoPeriod:parseInt(document.getElementById('set-tmoPeriod').value),
+    tmoSec:parseInt(document.getElementById('set-tmoSec').value)
+  };
+  let err='';
+  if(!(n.nbPeriods>=periodIdx))err='Le nombre de périodes ne peut pas être inférieur à la période en cours.';
+  else if(!(n.periodMin>=1))err='La durée des périodes doit être d\'au moins 1 minute.';
+  else if(!(n.pauseMin>=0))err='La durée de la pause est invalide.';
+  else if(!(n.excluSec>=15))err='La durée d\'exclusion est invalide.';
+  else if(!(n.tmoTeam>=0))err='Le nombre de temps morts par équipe est invalide.';
+  else if(!(n.tmoPeriod>=0))err='Le nombre de temps morts par période est invalide.';
+  else if(!(n.tmoSec>=10))err='La durée d\'un temps mort doit être d\'au moins 10 secondes.';
+  if(err){const e=document.getElementById('set-err');e.textContent='⚠️ '+err;e.style.display='block';return;}
+
+  const nChanged=n.nbPeriods!==cfg.nbPeriods;
+  cfg=n;
+  data.config={...cfg};
+  data.match.duree=cfg.periodMin;data.match.pause=cfg.pauseMin;
+  data.home.color=setColors.home;data.away.color=setColors.away;
+  // Le score « mi-temps » dépend du nombre de périodes : on le recalcule
+  if(nChanged){
+    const hp=Math.max(1,Math.floor(cfg.nbPeriods/2));
+    const ps=(data.match.periodScores||[])[hp-1];
+    data.match.scoreHTHome=ps?ps.home:0;data.match.scoreHTAway=ps?ps.away:0;
+  }
+  localStorage.setItem('ffhb_match_config',JSON.stringify(cfg));
+  applyTeamColors();refreshPerButton();updateTMOInfo();
+  renderPlayers('home');renderPlayers('away');renderStaff('home');renderStaff('away');
+  saveData();closeSettings();showToast('⚙️ Réglages appliqués');
+}
+
+// ═══════════ AJOUT D'EFFECTIF PENDANT LE MATCH ═══════════
+let rosterTeam='home';
+let newPosGK=false;
+
+function openRoster(){
+  newPosGK=false;
+  document.getElementById('ad-name').value='';
+  document.getElementById('ad-off-name').value='';
+  setRosterTeam('home');
+  document.getElementById('rosterModal').classList.add('open');
+}
+function closeRoster(){document.getElementById('rosterModal').classList.remove('open');}
+
+function setRosterTeam(team){
+  rosterTeam=team;
+  const bh=document.getElementById('rs-home'),ba=document.getElementById('rs-away');
+  bh.textContent=data.home.nom||'Domicile';ba.textContent=data.away.nom||'Extérieur';
+  bh.className=team==='home'?'on-home':'';ba.className=team==='away'?'on-away':'';
+  newPosGK=false;refreshNewPos();
+  document.getElementById('ad-num').value=nextPlayerNum(team);
+  document.getElementById('ad-name').value='';
+  document.getElementById('ad-off-name').value='';
+  refreshRosterInfo();
+}
+function nextPlayerNum(team){
+  const nums=data[team].players.map(p=>parseInt(p.num)).filter(n=>!isNaN(n));
+  return nums.length?Math.max(...nums)+1:1;
+}
+function refreshNewPos(){
+  const b=document.getElementById('ad-pos');
+  b.textContent=newPosGK?'GK':'J';b.classList.toggle('is-gk',newPosGK);
+}
+function toggleNewPos(){newPosGK=!newPosGK;refreshNewPos();}
+
+function refreshRosterInfo(){
+  const t=data[rosterTeam];
+  const nOff=(t.officials||[]).filter(o=>o.nom).length;
+  document.getElementById('roster-count').textContent=`${t.players.length} joueur${t.players.length>1?'s':''} · ${nOff} officiel${nOff>1?'s':''}`;
+  // fonctions disponibles : emplacements libres + « Autre officiel »
+  const sel=document.getElementById('ad-role');
+  let html='';
+  (t.officials||[]).forEach((o,i)=>{if(!o.nom)html+=`<option value="${i}">${o.role}</option>`;});
+  html+='<option value="extra">Autre officiel</option>';
+  sel.innerHTML=html;
+}
+
+function cleanName(v){return (v||'').replace(/[<>]/g,'').trim();}
+
+function addRosterPlayer(){
+  const team=rosterTeam,t=data[team];
+  const num=document.getElementById('ad-num').value.trim();
+  const name=cleanName(document.getElementById('ad-name').value);
+  if(!name){showToast('⚠️ Nom du joueur manquant');document.getElementById('ad-name').focus();return;}
+  if(!num){showToast('⚠️ Numéro manquant');document.getElementById('ad-num').focus();return;}
+  if(t.players.some(p=>String(p.num)===num)){showToast('⛔ Le n° '+num+' est déjà utilisé');return;}
+  if(newPosGK){
+    const prev=t.players.find(p=>p.isGK);
+    if(prev){
+      if(!confirm('Cette équipe a déjà un gardien (n° '+prev.num+' '+(prev.name||'')+'). Le remplacer par ce joueur ?'))return;
+      prev.isGK=false;
+    }
+  }
+  t.players.push({
+    num,name,lic:'',isGK:newPosGK,isCapt:false,
+    goals:0,m7:0,tirs:0,arrets:0,
+    av:'empty',p1:'empty',p2:'empty',p3:'empty',p2d:'empty',dis:'empty',
+    excluTimer:0,excluActive:false
+  });
+  renderPlayers(team);saveData();
+  showToast('✅ '+name+' ajouté ('+(t.abr||t.nom)+')');
+  newPosGK=false;refreshNewPos();
+  document.getElementById('ad-num').value=nextPlayerNum(team);
+  document.getElementById('ad-name').value='';
+  document.getElementById('ad-name').focus();
+  refreshRosterInfo();
+}
+
+function addRosterOfficial(){
+  const team=rosterTeam,t=data[team];
+  const name=cleanName(document.getElementById('ad-off-name').value);
+  if(!name){showToast('⚠️ Nom de l\'officiel manquant');document.getElementById('ad-off-name').focus();return;}
+  t.officials=t.officials||[];
+  const v=document.getElementById('ad-role').value;
+  if(v==='extra'){
+    t.officials.push({role:'Officiel',nom:name,lic:'',av:'empty',exclu:'empty',rapport:'empty'});
+  }else{
+    const o=t.officials[parseInt(v)];
+    if(!o){showToast('⚠️ Fonction invalide');return;}
+    o.nom=name;
+    o.av=o.av||'empty';o.exclu=o.exclu||'empty';o.rapport=o.rapport||'empty';
+  }
+  renderStaff(team);saveData();
+  showToast('✅ '+name+' ajouté ('+(t.abr||t.nom)+')');
+  document.getElementById('ad-off-name').value='';
+  refreshRosterInfo();
+}
 
 // ═══════════ SAVE / EXPORT ═══════════
 function saveData(){localStorage.setItem('ffhb_match_data',JSON.stringify(data));}
