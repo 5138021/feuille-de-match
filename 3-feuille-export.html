@@ -1,577 +1,587 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📋 Feuille de Match — Export FFHB</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --blue:#0B1829;--blue-mid:#122038;--blue-soft:#1C3256;
-  --accent:#E02D37;--gold:#F5A623;--green:#00C17A;
-  --cyan:#4A9FFF;--white:#FFFFFF;--off:#F2F5FA;
-  --border:#D4DCE8;--muted:#8A9BBE;
-  --font-h:'Barlow Condensed',sans-serif;
-  --font-b:'Barlow',sans-serif;
-  --edit-bg:rgba(74,159,255,0.06);
-  --edit-border:rgba(74,159,255,0.35);
-}
-body{background:#CBD5E4;font-family:var(--font-b);color:var(--blue);padding:16px;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📋 Feuille de Match — Export</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* TOOLBAR */
-.toolbar{
-  width:297mm;margin:0 auto 10px;display:flex;align-items:center;gap:10px;
-  background:var(--blue);border-radius:8px;padding:8px 14px;flex-wrap:wrap;
-}
-.toolbar-title{font-family:var(--font-h);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--white);flex:1;}
-.toolbar-hint{font-size:10px;color:var(--muted);}
-.btn{padding:6px 14px;border:none;border-radius:5px;font-family:var(--font-h);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
-.btn-print{background:var(--accent);color:var(--white);}
-.btn-print:hover{background:#c0222c;}
-.btn-back{background:rgba(255,255,255,.08);color:var(--muted);border:1px solid rgba(255,255,255,.15);}
-.btn-back:hover{background:rgba(255,255,255,.15);}
-.btn-reset{background:rgba(255,255,255,.08);color:var(--muted);border:1px solid rgba(255,255,255,.15);}
+    :root {
+      --blue: #0B1829;
+      --blue-mid: #122038;
+      --blue-soft: #1C3256;
+      --accent: #E02D37;
+      --gold: #F5A623;
+      --green: #00C17A;
+      --cyan: #4A9FFF;
+      --white: #FFFFFF;
+      --off: #F2F5FA;
+      --border: #D4DCE8;
+      --muted: #8A9BBE;
+      --font-h: 'Barlow Condensed', sans-serif;
+      --font-b: 'Barlow', sans-serif;
+      --edit-bg: rgba(74, 159, 255, 0.06);
+      --edit-border: rgba(74, 159, 255, 0.35);
+      /* Couleurs d'équipe (écrasées au chargement par les paramètres du match)
+         --home / --away : couleur brute · -text : lisible sur fond clair · -d : lisible sur fond sombre */
+      --home: #E02D37; --home-rgb: 224,45,55; --home-text: #E02D37; --home-d: #E02D37;
+      --away: #4A9FFF; --away-rgb: 74,159,255; --away-text: #4A9FFF; --away-d: #4A9FFF;
+    }
 
-/* PAGE */
-.page{width:297mm;margin:0 auto;background:var(--white);box-shadow:0 24px 80px rgba(0,0,0,.25);border-radius:8px;overflow:hidden;}
+    body { background: #CBD5E4; font-family: var(--font-b); color: var(--blue); padding: 16px; }
 
-/* EDITABLE */
-[contenteditable="true"]{outline:none;border-radius:2px;transition:background .12s,box-shadow .12s;cursor:text;}
-[contenteditable="true"]:hover{background:var(--edit-bg) !important;box-shadow:0 0 0 1px var(--edit-border);}
-[contenteditable="true"]:focus{background:rgba(74,159,255,.12) !important;box-shadow:0 0 0 1.5px var(--cyan);}
+    /* TOOLBAR */
+    .toolbar { width: 297mm; margin: 0 auto 10px; display: flex; align-items: center; gap: 10px; background: var(--blue); border-radius: 8px; padding: 8px 14px; flex-wrap: wrap; }
+    .toolbar-title { font-family: var(--font-h); font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--white); flex: 1; }
+    .toolbar-hint { font-size: 10px; color: var(--muted); }
+    .btn { padding: 6px 14px; border: none; border-radius: 5px; font-family: var(--font-h); font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all .15s; }
+    .btn-print { background: var(--accent); color: var(--white); }
+    .btn-print:hover { background: #c0222c; }
+    .btn-print:disabled { opacity: .6; cursor: wait; }
+    .btn-back { background: rgba(255, 255, 255, .08); color: var(--muted); border: 1px solid rgba(255, 255, 255, .15); }
+    .btn-back:hover { background: rgba(255, 255, 255, .15); }
+    .btn-reset { background: rgba(255, 255, 255, .08); color: var(--muted); border: 1px solid rgba(255, 255, 255, .15); }
 
-/* HEADER */
-.header{background:var(--blue);}
-.header-top{display:flex;align-items:stretch;}
-.brand{background:var(--accent);padding:10px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:100px;flex-shrink:0;}
-.brand-logo{font-family:var(--font-h);font-size:26px;font-weight:900;letter-spacing:2px;color:var(--white);line-height:1;}
-.brand-sub{font-family:var(--font-h);font-size:7px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.65);text-transform:uppercase;margin-top:2px;}
-.header-titles{flex:1;padding:10px 20px;display:flex;flex-direction:column;justify-content:center;}
-.doc-eyebrow{font-family:var(--font-h);font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
-.doc-title{font-family:var(--font-h);font-size:26px;font-weight:900;text-transform:uppercase;color:var(--white);line-height:1;letter-spacing:.5px;}
-.doc-comp{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3;}
-.header-ids{padding:10px 16px;border-left:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:180px;}
-.id-row{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted);}
-.id-row strong{color:var(--white);font-size:10px;font-weight:600;}
-.id-pip{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0;}
+    /* PAGE */
+    .page { width: 297mm; margin: 0 auto; background: var(--white); box-shadow: 0 24px 80px rgba(0, 0, 0, .25); border-radius: 8px; overflow: hidden; }
 
-/* MATCH HERO */
-.match-hero{display:flex;align-items:center;padding:12px 20px;border-top:1px solid rgba(255,255,255,.07);background:var(--blue-mid);gap:12px;}
-.team-side{flex:1;display:flex;align-items:center;gap:10px;}
-.team-side.away{flex-direction:row-reverse;}
-.team-badge{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-h);font-size:16px;font-weight:900;color:var(--white);flex-shrink:0;}
-.badge-home{background:var(--accent);}
-.badge-away{background:var(--blue-soft);border:1.5px solid rgba(255,255,255,.12);}
-.team-info{flex:1;}
-.team-side.away .team-info{text-align:right;}
-.team-tag{font-family:var(--font-h);font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.team-name{font-family:var(--font-h);font-size:18px;font-weight:900;text-transform:uppercase;color:var(--white);line-height:1.1;}
-.team-code{font-size:9px;color:var(--muted);margin-top:1px;}
-.score-block{text-align:center;flex-shrink:0;padding:0 16px;}
-.scores{display:flex;align-items:center;gap:6px;}
-.score-box{width:48px;height:46px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.14);border-radius:6px;font-family:var(--font-h);font-size:32px;font-weight:900;color:var(--white);display:flex;align-items:center;justify-content:center;}
-.score-box.away-win{border-color:var(--cyan);color:var(--cyan);}
-.score-box.home-win{border-color:var(--accent);color:var(--accent);}
-.score-sep{font-family:var(--font-h);font-size:24px;font-weight:300;color:var(--muted);}
-.score-label{font-family:var(--font-h);font-size:7.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
-.ht-score{font-size:9.5px;color:rgba(255,255,255,.4);margin-top:2px;}
+    /* EDITABLE */
+    [contenteditable="true"] { outline: none; border-radius: 2px; transition: background .12s, box-shadow .12s; cursor: text; }
+    [contenteditable="true"]:hover { background: var(--edit-bg) !important; box-shadow: 0 0 0 1px var(--edit-border); }
+    [contenteditable="true"]:focus { background: rgba(74, 159, 255, .12) !important; box-shadow: 0 0 0 1.5px var(--cyan); }
 
-/* INFO BAND */
-.info-band{background:var(--off);border-bottom:2px solid var(--border);display:flex;}
-.info-cell{flex:1;padding:7px 12px;border-right:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-.info-cell:last-child{border-right:none;}
-.info-icon{width:26px;height:26px;border-radius:6px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
-.info-key{font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);line-height:1;}
-.info-val{font-size:10.5px;font-weight:600;color:var(--blue);line-height:1.3;margin-top:1px;}
-.info-val small{font-size:9px;font-weight:400;color:var(--muted);display:block;}
+    /* HEADER */
+    .header { background: var(--blue); }
+    .header-top { display: flex; align-items: stretch; }
+    .brand { background: var(--accent); padding: 10px 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 100px; flex-shrink: 0; }
+    .brand-logo { font-family: var(--font-h); font-size: 26px; font-weight: 900; letter-spacing: 2px; color: var(--white); line-height: 1; }
+    .brand-sub { font-family: var(--font-h); font-size: 7px; font-weight: 700; letter-spacing: 2px; color: rgba(255, 255, 255, .65); text-transform: uppercase; margin-top: 2px; }
+    .header-titles { flex: 1; padding: 10px 20px; display: flex; flex-direction: column; justify-content: center; }
+    .doc-eyebrow { font-family: var(--font-h); font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+    .doc-title { font-family: var(--font-h); font-size: 26px; font-weight: 900; text-transform: uppercase; color: var(--white); line-height: 1; letter-spacing: .5px; }
+    .doc-comp { font-size: 10px; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+    .header-ids { padding: 10px 16px; border-left: 1px solid rgba(255, 255, 255, .08); display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 180px; }
+    .id-row { display: flex; align-items: center; gap: 6px; font-size: 9px; color: var(--muted); }
+    .id-row strong { color: var(--white); font-size: 10px; font-weight: 600; }
+    .id-pip { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
 
-/* BODY */
-.body-grid{display:grid;grid-template-columns:1fr 1px 1fr;}
-.col-divider{background:var(--border);}
-.sec-head{display:flex;align-items:stretch;}
-.sec-bar{width:4px;flex-shrink:0;}
-.sec-bar-red{background:var(--accent);}
-.sec-bar-blue{background:var(--cyan);}
-.sec-label{flex:1;background:var(--blue);font-family:var(--font-h);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:5px 12px;display:flex;align-items:center;gap:8px;}
-.sec-label span{color:var(--white);}
-.sec-tag{padding:5px 10px;font-family:var(--font-h);font-size:10px;font-weight:800;letter-spacing:1px;}
-.sec-tag-home{background:rgba(224,45,55,.15);color:var(--accent);}
-.sec-tag-away{background:rgba(74,159,255,.15);color:var(--cyan);}
+    /* MATCH HERO */
+    .match-hero { display: flex; align-items: center; padding: 12px 20px; border-top: 1px solid rgba(255, 255, 255, .07); background: var(--blue-mid); gap: 12px; }
+    .team-side { flex: 1; display: flex; align-items: center; gap: 10px; }
+    .team-side.away { flex-direction: row-reverse; }
+    .team-badge { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-h); font-size: 16px; font-weight: 900; color: var(--white); flex-shrink: 0; }
+    .badge-home { background: var(--home); }
+    .badge-away { background: var(--blue-soft); border: 1.5px solid rgba(255, 255, 255, .12); }
+    .team-info { flex: 1; }
+    .team-side.away .team-info { text-align: right; }
+    .team-tag { font-family: var(--font-h); font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .team-name { font-family: var(--font-h); font-size: 18px; font-weight: 900; text-transform: uppercase; color: var(--white); line-height: 1.1; }
+    .team-code { font-size: 9px; color: var(--muted); margin-top: 1px; }
+    .score-block { text-align: center; flex-shrink: 0; padding: 0 16px; }
+    .scores { display: flex; align-items: center; gap: 6px; }
+    .score-box { width: 48px; height: 46px; background: rgba(255, 255, 255, .06); border: 1.5px solid rgba(255, 255, 255, .14); border-radius: 6px; font-family: var(--font-h); font-size: 32px; font-weight: 900; color: var(--white); display: flex; align-items: center; justify-content: center; }
+    .score-box.away-win { border-color: var(--away-d); color: var(--away-d); }
+    .score-box.home-win { border-color: var(--home-d); color: var(--home-d); }
+    .score-sep { font-family: var(--font-h); font-size: 24px; font-weight: 300; color: var(--muted); }
+    .score-label { font-family: var(--font-h); font-size: 7.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+    .ht-score { font-size: 9.5px; color: rgba(255, 255, 255, .4); margin-top: 2px; min-height: 12px; }
 
-/* PLAYER TABLE */
-.ptable{width:100%;border-collapse:collapse;}
-.ptable thead tr{background:var(--blue);}
-.ptable thead th{font-family:var(--font-h);font-size:7.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:4px 4px;text-align:center;white-space:nowrap;border-right:1px solid rgba(255,255,255,.05);}
-.ptable thead th.th-name{text-align:left;padding-left:8px;}
-.ptable tbody tr{border-bottom:1px solid var(--border);}
-.ptable tbody tr:nth-child(even){background:#F7F9FD;}
-.ptable tbody tr.capt-row-home{background:#FFFBF2;}
-.ptable tbody tr.capt-row-away{background:#F0F6FF;}
-.ptable td{padding:3px 4px;text-align:center;vertical-align:middle;font-size:9px;}
-.td-num{font-family:var(--font-h);font-size:14px;font-weight:800;color:var(--blue);width:24px;background:var(--off);border-right:1px solid var(--border);}
-.td-num.num-gk{color:var(--gold) !important;background:#1c2a0a;}
-.td-num.num-j{color:var(--accent) !important;}
-.capt-check{width:12px;height:12px;cursor:pointer;accent-color:var(--gold);margin:0;vertical-align:middle;}
-.td-capt{width:16px;text-align:center;padding:2px !important;}
-.capt-flag{font-size:9px;color:var(--gold);font-weight:900;display:none;}
-.capt-flag.active{display:inline;}
-.td-name{text-align:left !important;padding-left:8px !important;font-weight:600;color:var(--blue);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0;min-width:100px;}
-.td-name .lic{display:block;font-size:7px;font-weight:400;color:var(--muted);}
-.pos-badge{display:inline-block;padding:1px 4px;border-radius:8px;font-size:7px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;user-select:none;transition:opacity .1s;}
-.pos-gk{background:#FFF3CD;color:#9A6E00;}
-.pos-j{background:#E3ECFF;color:#2255CC;}
-.td-goals{font-family:var(--font-h);font-size:14px;font-weight:800;color:var(--green);width:22px;}
-.td-goals.zero,.td-7m.zero,.td-ars.zero{color:var(--border);font-size:11px;}
-.td-7m{font-family:var(--font-h);font-size:12px;font-weight:700;color:#00A068;width:18px;}
-.td-tirs{font-size:9px;color:var(--muted);width:22px;}
-.td-ars{font-family:var(--font-h);font-size:12px;font-weight:700;color:#2255CC;width:22px;}
+    /* INFO BAND */
+    .info-band { background: var(--off); border-bottom: 2px solid var(--border); display: flex; }
+    .info-cell { flex: 1; padding: 7px 12px; border-right: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .info-cell:last-child { border-right: none; }
+    .info-icon { width: 26px; height: 26px; border-radius: 6px; background: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+    .info-key { font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); line-height: 1; }
+    .info-val { font-size: 10.5px; font-weight: 600; color: var(--blue); line-height: 1.3; margin-top: 1px; }
+    .info-val small { font-size: 9px; font-weight: 400; color: var(--muted); display: block; }
 
-/* PENALTIES */
-.pen-row{display:flex;align-items:center;justify-content:center;}
-.pen-box{width:16px;height:16px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;cursor:pointer;user-select:none;transition:transform .1s,box-shadow .1s;}
-.pen-box:hover{transform:scale(1.15);box-shadow:0 2px 6px rgba(0,0,0,.15);}
-.c-yellow{background:#FFF3CD;border-color:#E0A800;color:#8A6200;}
-.c-2min{background:#FFF0E5;border-color:#F5A623;color:#C07000;}
-.c-2min-used{background:#FFD580;border-color:#D08000;color:#6A4000;}
-.c-red{background:#FFE0E2;border-color:var(--accent);color:var(--accent);}
-.c-blue{background:#E0EDFF;border-color:#4A9FFF;color:#0055CC;}
-.c-empty{background:var(--off);border-color:var(--border);color:var(--muted);}
-.c-2min-dis{background:linear-gradient(135deg,#FFD580 50%,#FFE0E2 50%);border-color:#D08000;color:#6A4000;font-size:6px;font-weight:900;}
+    /* BODY */
+    .body-grid { display: grid; grid-template-columns: 1fr 1px 1fr; }
+    .col-divider { background: var(--border); }
+    .sec-head { display: flex; align-items: stretch; }
+    .sec-bar { width: 4px; flex-shrink: 0; }
+    .sec-bar-red { background: var(--home); }
+    .sec-bar-blue { background: var(--away); }
+    .sec-label { flex: 1; background: var(--blue); font-family: var(--font-h); font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 5px 12px; display: flex; align-items: center; gap: 8px; }
+    .sec-label span { color: var(--white); }
+    .sec-tag { padding: 5px 10px; font-family: var(--font-h); font-size: 10px; font-weight: 800; letter-spacing: 1px; }
+    .sec-tag-home { background: rgba(var(--home-rgb), .15); color: var(--home-text); }
+    .sec-tag-away { background: rgba(var(--away-rgb), .15); color: var(--away-text); }
 
-/* OFFICIALS */
-.off-grid{display:grid;grid-template-columns:1fr 1fr;}
-.off-cell{padding:5px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
-.off-cell:nth-child(2n){border-right:none;}
-.off-role{font-size:7px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
-.off-name{font-size:10px;font-weight:600;color:var(--blue);}
-.off-sanctions{display:flex;align-items:center;gap:4px;margin-top:4px;flex-wrap:wrap;}
-.off-san-label{font-size:7px;color:var(--muted);font-weight:600;letter-spacing:.8px;text-transform:uppercase;}
-.off-pen-box{width:16px;height:16px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;cursor:pointer;user-select:none;transition:transform .1s,box-shadow .1s;}
-.off-pen-box:hover{transform:scale(1.15);box-shadow:0 2px 6px rgba(0,0,0,.15);}
-.off-global-badge{font-size:7px;background:rgba(255,193,7,.12);color:#a07000;border:1px solid rgba(255,193,7,.4);border-radius:3px;padding:1px 4px;font-weight:700;letter-spacing:.5px;}
+    /* PLAYER TABLE */
+    .ptable { width: 100%; border-collapse: collapse; }
+    .ptable thead tr { background: var(--blue); }
+    .ptable thead th { font-family: var(--font-h); font-size: 7.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); padding: 4px 4px; text-align: center; white-space: nowrap; border-right: 1px solid rgba(255, 255, 255, .05); }
+    .ptable thead th.th-name { text-align: left; padding-left: 8px; }
+    .ptable tbody tr { border-bottom: 1px solid var(--border); }
+    .ptable tbody tr:nth-child(even) { background: #F7F9FD; }
+    .ptable tbody tr.capt-row-home { background: #FFFBF2; }
+    .ptable tbody tr.capt-row-away { background: #F0F6FF; }
+    .ptable td { padding: 3px 4px; text-align: center; vertical-align: middle; font-size: 9px; }
+    .td-num { font-family: var(--font-h); font-size: 14px; font-weight: 800; color: var(--blue); width: 24px; background: var(--off); border-right: 1px solid var(--border); }
+    .td-num.num-gk { color: var(--gold) !important; background: #1c2a0a; }
+    .td-num.num-j { color: var(--accent) !important; }
+    .capt-check { width: 12px; height: 12px; cursor: pointer; accent-color: var(--gold); margin: 0; vertical-align: middle; }
+    .td-capt { width: 16px; text-align: center; padding: 2px !important; }
+    .capt-flag { font-size: 9px; color: var(--gold); font-weight: 900; display: none; }
+    .capt-flag.active { display: inline; }
+    .td-name { text-align: left !important; padding-left: 8px !important; font-weight: 600; color: var(--blue); font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 0; min-width: 100px; }
+    .pos-badge { display: inline-block; padding: 1px 4px; border-radius: 8px; font-size: 7px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; cursor: pointer; user-select: none; transition: opacity .1s; }
+    .pos-gk { background: #FFF3CD; color: #9A6E00; }
+    .pos-j { background: #E3ECFF; color: #2255CC; }
+    .td-goals { font-family: var(--font-h); font-size: 14px; font-weight: 800; color: var(--green); width: 22px; }
+    .td-goals.zero, .td-7m.zero, .td-ars.zero { color: var(--border); font-size: 11px; }
+    .td-7m { font-family: var(--font-h); font-size: 12px; font-weight: 700; color: #00A068; width: 18px; }
+    .td-tirs { font-size: 9px; color: var(--muted); width: 22px; }
+    .td-ars { font-family: var(--font-h); font-size: 12px; font-weight: 700; color: #2255CC; width: 22px; }
 
-/* BOTTOM */
-.bottom-row{display:flex;border-top:2px solid var(--border);}
-.arb-block{flex:1;border-right:1px solid var(--border);}
-.stats-block{width:170px;flex-shrink:0;border-right:1px solid var(--border);padding:8px 12px;}
-.stats-title{font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.stat-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;border-bottom:1px solid var(--border);}
-.stat-label{font-size:8px;color:var(--muted);}
-.stat-val{font-family:var(--font-h);font-size:13px;font-weight:800;color:var(--green);}
-.stat-val.blue-val{color:var(--cyan);}
-.stat-val.red{color:var(--accent);}
+    /* PENALTIES */
+    .pen-row { display: flex; align-items: center; justify-content: center; }
+    .pen-box { width: 16px; height: 16px; border-radius: 3px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 700; cursor: pointer; user-select: none; transition: transform .1s, box-shadow .1s; }
+    .pen-box:hover { transform: scale(1.15); box-shadow: 0 2px 6px rgba(0, 0, 0, .15); }
+    .c-yellow { background: #FFF3CD; border-color: #E0A800; color: #8A6200; }
+    .c-2min, .c-2min-used { background: #FFD580; border-color: #D08000; color: #6A4000; }
+    .c-red { background: #FFE0E2; border-color: var(--accent); color: var(--accent); }
+    .c-blue { background: #E0EDFF; border-color: #4A9FFF; color: #0055CC; }
+    .c-empty { background: var(--off); border-color: var(--border); color: var(--muted); }
 
-/* ARBITRES */
-.arb-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:1px solid var(--border);}
-.arb-cell{padding:6px 10px;border-right:1px solid var(--border);}
-.arb-cell:last-child{border-right:none;}
-.arb-role{font-size:7px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
-.arb-name{font-size:10px;font-weight:600;color:var(--blue);}
-.arb-lic{font-size:7.5px;color:var(--muted);}
+    /* OFFICIALS */
+    .off-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    .off-cell { padding: 5px 10px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .off-cell:nth-child(2n) { border-right: none; }
+    .off-role { font-size: 7px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+    .off-name { font-size: 10px; font-weight: 600; color: var(--blue); }
+    .off-sanctions { display: flex; align-items: center; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+    .off-san-label { font-size: 7px; color: var(--muted); font-weight: 600; letter-spacing: .8px; text-transform: uppercase; }
+    .off-pen-box { width: 16px; height: 16px; border-radius: 3px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 700; cursor: pointer; user-select: none; transition: transform .1s, box-shadow .1s; }
+    .off-pen-box:hover { transform: scale(1.15); box-shadow: 0 2px 6px rgba(0, 0, 0, .15); }
+    .off-global-badge { font-size: 7px; background: rgba(255, 193, 7, .12); color: #a07000; border: 1px solid rgba(255, 193, 7, .4); border-radius: 3px; padding: 1px 4px; font-weight: 700; letter-spacing: .5px; }
 
-/* PERIOD DETAIL */
-.period-block{padding:6px 10px;border-bottom:1px solid var(--border);}
-.period-title{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
-.period-grid{display:grid;grid-template-columns:60px 1fr 1fr 1fr 1fr 1fr;gap:0;font-size:8px;border:1px solid var(--border);border-radius:3px;overflow:hidden;}
-.pg-header{background:var(--blue);color:var(--muted);font-family:var(--font-h);font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 6px;text-align:center;border-right:1px solid rgba(255,255,255,.06);}
-.pg-row-label{background:var(--off);font-weight:700;font-size:8px;color:var(--muted);padding:3px 8px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
-.pg-cell{text-align:center;padding:3px 6px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
-.pg-row-label.last{border-bottom:none;}
-.pg-cell.score-val{font-family:var(--font-h);font-size:13px;font-weight:800;}
-.pg-cell.home-score{color:var(--accent);}
-.pg-cell.away-score{color:var(--cyan);}
-.pg-cell.empty-p{color:var(--border);font-size:10px;}
+    /* BOTTOM */
+    .bottom-row { display: flex; border-top: 2px solid var(--border); }
+    .arb-block { flex: 1; border-right: 1px solid var(--border); }
+    .stats-block { width: 170px; flex-shrink: 0; border-right: 1px solid var(--border); padding: 8px 12px; }
+    .stats-title { font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; border-bottom: 1px solid var(--border); }
+    .stat-label { font-size: 8px; color: var(--muted); }
+    .stat-val { font-family: var(--font-h); font-size: 13px; font-weight: 800; color: var(--green); }
+    .stat-val.blue-val { color: var(--cyan); }
 
-/* SIGNATURES */
-.sig-row{display:flex;border-top:2px solid var(--border);}
-.sig-block{flex:1;padding:6px 10px;border-right:1px solid var(--border);}
-.sig-block:last-child{border-right:none;}
-.sig-label{font-size:7px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
-.sig-name{font-size:8.5px;font-weight:600;color:var(--blue);margin-bottom:4px;}
-.sig-line{height:20px;border-bottom:1.5px solid var(--border);}
-.obs-block{flex:2;padding:6px 10px;border-right:1px solid var(--border);}
-.obs-label{font-size:7px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
-.obs-content{font-size:9px;color:var(--blue);border:1px solid var(--border);border-radius:3px;padding:4px 6px;min-height:30px;line-height:1.4;}
+    /* ARBITRES */
+    .arb-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; border-bottom: 1px solid var(--border); }
+    .arb-cell { padding: 6px 10px; border-right: 1px solid var(--border); }
+    .arb-cell:last-child { border-right: none; }
+    .arb-role { font-size: 7px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+    .arb-name { font-size: 10px; font-weight: 600; color: var(--blue); }
 
-.status-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;background:rgba(0,193,122,.12);color:var(--green);border:1px solid rgba(0,193,122,.3);}
-.status-dot{width:5px;height:5px;border-radius:50%;background:var(--green);}
+    /* PERIOD DETAIL */
+    .period-block { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+    .period-title { font-size: 7px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .period-grid { display: grid; grid-template-columns: 60px repeat(5, 1fr); gap: 0; font-size: 8px; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+    .pg-header { background: var(--blue); color: var(--muted); font-family: var(--font-h); font-size: 7px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 6px; text-align: center; border-right: 1px solid rgba(255, 255, 255, .06); }
+    .pg-row-label { background: var(--off); font-weight: 700; font-size: 8px; color: var(--muted); padding: 3px 8px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .pg-cell { text-align: center; padding: 3px 6px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .pg-row-label.last { border-bottom: none; }
+    .pg-cell.score-val { font-family: var(--font-h); font-size: 13px; font-weight: 800; }
+    .pg-cell.home-score { color: var(--home-text); }
+    .pg-cell.away-score { color: var(--away-text); }
+    .pg-cell.empty-p { color: var(--border); font-size: 10px; }
 
-.footer{background:var(--blue);padding:5px 20px;display:flex;align-items:center;justify-content:space-between;}
-.footer-left{font-size:8px;color:var(--muted);}
-.footer-center{font-family:var(--font-h);font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.2);}
-.footer-right{font-size:8px;color:var(--muted);}
+    .status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 10px; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; background: rgba(0, 193, 122, .12); color: var(--green); border: 1px solid rgba(0, 193, 122, .3); }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
 
-.legend-bar{background:var(--off);border-top:1px solid var(--border);padding:5px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-.leg-key{font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
-.leg-item{display:flex;align-items:center;gap:4px;font-size:8.5px;color:var(--blue);}
+    .footer { background: var(--blue); padding: 5px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-left { font-size: 8px; color: var(--muted); }
+    .footer-center { font-family: var(--font-h); font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255, 255, 255, .2); }
+    .footer-right { font-size: 8px; color: var(--muted); }
 
-/* EVENTS SECTION — style Live */
-.events-section{border-top:2px solid var(--border);}
-.events-header{background:var(--blue);display:flex;align-items:center;padding:7px 14px;}
-.events-header-title{font-family:var(--font-h);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.events-count{font-size:9px;color:var(--muted);margin-left:8px;background:rgba(255,255,255,.07);padding:2px 7px;border-radius:10px;}
-/* Conteneur fond sombre */
-.events-inner{background:var(--blue);padding:8px 10px 12px;}
-/* Items inspirés du live */
-.ev-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border-radius:8px;padding:7px 10px;border-left:3px solid transparent;margin-bottom:5px;}
-.ev-item:last-child{margin-bottom:0;}
-.ev-item.e-but{border-color:#00C17A;}
-.ev-item.e-but7{border-color:#00C17A;opacity:.9;}
-.ev-item.e-save{border-color:#4A9FFF;}
-.ev-item.e-av{border-color:#F5A623;}
-.ev-item.e-2min{border-color:#E02D37;}
-.ev-item.e-dis{border-color:#ff4444;}
-.ev-item.e-rapport{border-color:#4A9FFF;}
-.ev-item.e-tmo{border-color:#9B59B6;}
-.ev-item.e-tir{border-color:rgba(255,255,255,.18);}
-.ev-item.e-blanc{border-color:rgba(255,255,255,.5);}
-.ev-icon{font-size:17px;width:24px;text-align:center;flex-shrink:0;}
-/* Carton inline */
-.ev-san{display:inline-flex;align-items:center;justify-content:center;width:16px;height:21px;border-radius:2px;font-size:0;box-shadow:0 1px 3px rgba(0,0,0,.5);}
-.ev-san.av{background:linear-gradient(170deg,#f5c842,#e6a800);border:1px solid #c98800;}
-.ev-san.s2min{background:linear-gradient(170deg,#d97040,#b04020);border:1px solid #8c3010;}
-.ev-san.dis{background:linear-gradient(170deg,#e02020,#8b0000);border:1px solid #660000;}
-.ev-san.rap{background:linear-gradient(170deg,#2e9aff,#0060cc);border:1px solid #0040aa;}
-.ev-san.blanc{background:linear-gradient(170deg,#ffffff,#d8e0ec);border:1px solid #9aaccc;}
-.ev-body{flex:1;min-width:0;}
-.ev-title{font-family:var(--font-h);font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--white);}
-.ev-sub{font-size:9px;color:var(--muted);margin-top:1px;}
-.ev-time-badge{font-family:var(--font-h);font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;}
-.ev-type-pill{font-family:var(--font-h);font-size:7.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.25);flex-shrink:0;min-width:56px;text-align:right;}
+    .legend-bar { background: var(--off); border-top: 1px solid var(--border); padding: 5px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .leg-key { font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+    .leg-item { display: flex; align-items: center; gap: 4px; font-size: 8.5px; color: var(--blue); }
 
-.pen-cycle-hint{position:fixed;bottom:20px;right:20px;background:var(--blue);color:var(--white);font-size:10px;padding:6px 12px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:999;font-family:var(--font-b);}
-.pen-cycle-hint.show{opacity:1;}
+    /* EVENTS SECTION — style Live */
+    .events-section { border-top: 2px solid var(--border); }
+    .events-header { background: var(--blue); display: flex; align-items: center; padding: 7px 14px; }
+    .events-header-title { font-family: var(--font-h); font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .events-count { font-size: 9px; color: var(--muted); margin-left: 8px; background: rgba(255, 255, 255, .07); padding: 2px 7px; border-radius: 10px; }
+    .events-inner { background: var(--blue); padding: 8px 10px 12px; }
+    .ev-item { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, .04); border-radius: 8px; padding: 7px 10px; border-left: 3px solid transparent; margin-bottom: 5px; }
+    .ev-item:last-child { margin-bottom: 0; }
+    .ev-item.e-but { border-color: #00C17A; }
+    .ev-item.e-but7 { border-color: #00C17A; opacity: .9; }
+    .ev-item.e-save { border-color: #4A9FFF; }
+    .ev-item.e-av { border-color: #F5A623; }
+    .ev-item.e-2min { border-color: #E02D37; }
+    .ev-item.e-dis { border-color: #ff4444; }
+    .ev-item.e-rapport { border-color: #4A9FFF; }
+    .ev-item.e-tmo { border-color: #9B59B6; }
+    .ev-item.e-tir { border-color: rgba(255, 255, 255, .18); }
+    .ev-item.e-blanc { border-color: rgba(255, 255, 255, .5); }
+    .ev-icon { font-size: 17px; width: 24px; text-align: center; flex-shrink: 0; }
+    .ev-san { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 21px; border-radius: 2px; font-size: 0; box-shadow: 0 1px 3px rgba(0, 0, 0, .5); }
+    .ev-san.av { background: linear-gradient(170deg, #f5c842, #e6a800); border: 1px solid #c98800; }
+    .ev-san.s2min { background: linear-gradient(170deg, #d97040, #b04020); border: 1px solid #8c3010; }
+    .ev-san.dis { background: linear-gradient(170deg, #e02020, #8b0000); border: 1px solid #660000; }
+    .ev-san.rap { background: linear-gradient(170deg, #2e9aff, #0060cc); border: 1px solid #0040aa; }
+    .ev-san.blanc { background: linear-gradient(170deg, #ffffff, #d8e0ec); border: 1px solid #9aaccc; }
+    .ev-body { flex: 1; min-width: 0; }
+    .ev-title { font-family: var(--font-h); font-size: 12px; font-weight: 800; letter-spacing: .4px; color: var(--white); }
+    .ev-sub { font-size: 9px; color: var(--muted); margin-top: 1px; }
+    .ev-time-badge { font-family: var(--font-h); font-size: 11px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+    .ev-type-pill { font-family: var(--font-h); font-size: 7.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: rgba(255, 255, 255, .25); flex-shrink: 0; min-width: 56px; text-align: right; }
 
-/* PRINT */
-@media print{
-  body{background:white;padding:0;}
-  .toolbar{display:none !important;}
-  .page{box-shadow:none;width:100%;border-radius:0;}
-  [contenteditable="true"]:hover,[contenteditable="true"]:focus{background:transparent !important;box-shadow:none !important;}
-  .pen-box:hover{transform:none !important;}
-}
-</style>
+    .pen-cycle-hint { position: fixed; bottom: 20px; right: 20px; background: var(--blue); color: var(--white); font-size: 10px; padding: 6px 12px; border-radius: 6px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 999; font-family: var(--font-b); }
+    .pen-cycle-hint.show { opacity: 1; }
+
+    /* EXPORT PDF (html2pdf) */
+    .no-export { transition: none; }
+    body.exporting .no-export { display: none !important; }
+    body.exporting .toolbar { display: none !important; }
+    body.exporting { background: #ffffff; padding: 0; }
+    body.exporting .page { box-shadow: none; width: 100%; border-radius: 0; }
+    body.exporting [contenteditable="true"] { cursor: default; }
+    body.exporting [contenteditable="true"]:hover, body.exporting [contenteditable="true"]:focus { background: transparent !important; box-shadow: none !important; }
+    body.exporting .pen-box:hover, body.exporting .off-pen-box:hover { transform: none !important; box-shadow: none !important; }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .toolbar { display: none !important; }
+      .no-export { display: none !important; }
+      .page { box-shadow: none; width: 100%; border-radius: 0; }
+      [contenteditable="true"]:hover, [contenteditable="true"]:focus { background: transparent !important; box-shadow: none !important; }
+      .pen-box:hover { transform: none !important; }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <div class="toolbar-title">📋 Feuille de Match — Export FFHB</div>
-  <span class="toolbar-hint">Données importées automatiquement · Cliquer pour modifier · Imprimer / PDF</span>
-  <button class="btn btn-back" onclick="goBack()">← Match Live</button>
-  <button class="btn btn-reset" onclick="resetPage()">↺ Vider</button>
-  <button class="btn btn-print" onclick="window.print()">🖨️ Imprimer / PDF</button>
-</div>
-
-<div class="pen-cycle-hint" id="cycleHint"></div>
-
-<div class="page">
-
-<!-- HEADER -->
-<div class="header">
-  <div class="header-top">
-    <div class="brand" style="background:var(--blue);padding:6px 10px;min-width:220px;flex-direction:row;gap:8px;border-right:1px solid rgba(255,255,255,0.1);">
-      <img src="20767-Photoroom.png" alt="Comité Isère" style="height:38px;object-fit:contain;"/>
-       <div style="width:1px;background:rgba(255,255,255,0.15);align-self:stretch;"></div>
-      <img src="logo-AURA-mobile.png" alt="Ligue AURA" style="height:38px;object-fit:contain;"/>
-    </div>
-    <div class="header-titles">
-      <div class="doc-eyebrow">Feuille de Match</div>
-      <div class="doc-title" id="h-teams">Équipe Domicile / Équipe Visiteur</div>
-      <div class="doc-comp" id="h-comp" contenteditable="true">Compétition — Catégorie · Poule</div>
-    </div>
-    <div class="header-ids">
-      <div class="id-row"><div class="id-pip"></div> Code Renc : <strong id="h-code" contenteditable="true">—</strong></div>
-      <div class="id-row"><div class="id-pip"></div> Date : <strong id="h-date" contenteditable="true">—</strong></div>
-      <div class="id-row"><div class="id-pip"></div> Statut : <strong><span class="status-pill"><span class="status-dot"></span><span id="h-status">Terminé</span></span></strong></div>
-    </div>
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="toolbar-title">📋 Feuille de Match — Export</div>
+    <span class="toolbar-hint">Données importées automatiquement · Cliquer pour modifier · Imprimer / PDF</span>
+    <button class="btn btn-back" onclick="goBack()">← Match Live</button>
+    <a class="btn btn-back" href="0-matchs.html">Accueil Matchs</a>
+    <button class="btn btn-reset" onclick="resetPage()">↺ Vider</button>
+    <button class="btn btn-print" onclick="exportPDF()">🖨️ Imprimer / PDF</button>
   </div>
 
-  <!-- MATCH HERO -->
-  <div class="match-hero">
-    <div class="team-side">
-      <div class="team-badge badge-home" id="badge-home"></div>
-      <div class="team-info">
-        <div class="team-tag">Club Recevant</div>
-        <div class="team-name" id="h-home-name">Équipe Domicile</div>
-        <div class="team-code" id="h-home-code" contenteditable="true">—</div>
+  <div class="pen-cycle-hint" id="cycleHint"></div>
+
+  <div class="page">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-top">
+        <div class="brand"
+          style="background:var(--blue);padding:6px 10px;min-width:220px;flex-direction:row;gap:8px;border-right:1px solid rgba(255,255,255,0.1);">
+          <img src="20767-Photoroom.png" alt="Comité Isère" style="height:38px;object-fit:contain;"/>
+          <div style="width:1px;background:rgba(255,255,255,0.15);align-self:stretch;"></div>
+          <img src="logo-AURA-mobile.png" alt="Ligue AURA" style="height:38px;object-fit:contain;"/>
+        </div>
+        <div class="header-titles">
+          <div class="doc-eyebrow">Feuille de Match</div>
+          <div class="doc-title" id="h-teams">Équipe Domicile / Équipe Visiteur</div>
+          <div class="doc-comp" id="h-comp" contenteditable="true">Compétition — Catégorie · Poule</div>
+        </div>
+        <div class="header-ids">
+          <div class="id-row">
+            <div class="id-pip"></div> Code Renc : <strong id="h-code" contenteditable="true">—</strong>
+          </div>
+          <div class="id-row">
+            <div class="id-pip"></div> Date : <strong id="h-date" contenteditable="true">—</strong>
+          </div>
+          <div class="id-row">
+            <div class="id-pip"></div> Statut :
+            <strong><span class="status-pill"><span class="status-dot"></span><span id="h-status">Terminé</span></span></strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATCH HERO -->
+      <div class="match-hero">
+        <div class="team-side">
+          <div class="team-badge badge-home" id="badge-home"></div>
+          <div class="team-info">
+            <div class="team-tag">Club Recevant</div>
+            <div class="team-name" id="h-home-name">Équipe Domicile</div>
+            <div class="team-code" id="h-home-code" contenteditable="true">—</div>
+          </div>
+        </div>
+        <div class="score-block">
+          <div class="scores">
+            <div class="score-box" id="score-home" contenteditable="true" oninput="updateScoreColors()">0</div>
+            <div class="score-sep">:</div>
+            <div class="score-box" id="score-away" contenteditable="true" oninput="updateScoreColors()">0</div>
+          </div>
+          <div class="score-label">Score final</div>
+          <div class="ht-score" id="h-ht-score" contenteditable="true"></div>
+        </div>
+        <div class="team-side away">
+          <div class="team-badge badge-away" id="badge-away"></div>
+          <div class="team-info">
+            <div class="team-tag">Club Visiteur</div>
+            <div class="team-name" id="h-away-name">Équipe Visiteur</div>
+            <div class="team-code" id="h-away-code" contenteditable="true">—</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="score-block">
-      <div class="scores">
-        <div class="score-box" id="score-home" contenteditable="true" oninput="updateScoreColors()">0</div>
-        <div class="score-sep">:</div>
-        <div class="score-box" id="score-away" contenteditable="true" oninput="updateScoreColors()">0</div>
+
+    <!-- INFO BAND -->
+    <div class="info-band">
+      <div class="info-cell">
+        <div class="info-icon">📅</div>
+        <div>
+          <div class="info-key">Date & Heure</div>
+          <div class="info-val" id="ib-date" contenteditable="true">—</div>
+        </div>
       </div>
-      <div class="score-label">Score final</div>
-      <div class="ht-score" id="h-ht-score" contenteditable="true">Mi-temps : — – —</div>
-    </div>
-    <div class="team-side away">
-      <div class="team-badge badge-away" id="badge-away"></div>
-      <div class="team-info">
-        <div class="team-tag">Club Visiteur</div>
-        <div class="team-name" id="h-away-name">Équipe Visiteur</div>
-        <div class="team-code" id="h-away-code" contenteditable="true">—</div>
+      <div class="info-cell">
+        <div class="info-icon">🏟️</div>
+        <div>
+          <div class="info-key">Salle</div>
+          <div class="info-val" id="ib-salle" contenteditable="true">—</div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- INFO BAND -->
-<div class="info-band">
-  <div class="info-cell">
-    <div class="info-icon">📅</div>
-    <div>
-      <div class="info-key">Date & Heure</div>
-      <div class="info-val" id="ib-date" contenteditable="true">—</div>
-    </div>
-  </div>
-  <div class="info-cell">
-    <div class="info-icon">🏟️</div>
-    <div>
-      <div class="info-key">Salle</div>
-      <div class="info-val" id="ib-salle" contenteditable="true">—</div>
-    </div>
-  </div>
-  <div class="info-cell">
-    <div class="info-icon">⏱️</div>
-    <div>
-      <div class="info-key">Durée mi-temps</div>
-      <div class="info-val" id="ib-duree" contenteditable="true">30 min</div>
-    </div>
-  </div>
-  <div class="info-cell">
-    <div class="info-icon">🏙️</div>
-    <div>
-      <div class="info-key">Ville</div>
-      <div class="info-val" id="ib-ville" contenteditable="true">—</div>
-    </div>
-  </div>
-</div>
-
-<!-- BODY GRID -->
-<div class="body-grid">
-
-  <!-- ══ COLONNE DOMICILE ══ -->
-  <div>
-    <div class="sec-head">
-      <div class="sec-bar sec-bar-red"></div>
-      <div class="sec-label"><span id="sl-home">Équipe Domicile</span> — Joueurs</div>
-      <div class="sec-tag sec-tag-home" id="sl-home-abr">DOM</div>
-    </div>
-    <table class="ptable">
-      <thead>
-        <tr>
-          <th style="width:16px" title="Capitaine">Cap</th>
-          <th style="width:24px">N°</th>
-          <th class="th-name">Nom · Prénom</th>
-          <th style="width:26px">Pos</th>
-          <th style="width:22px">Buts</th>
-          <th style="width:18px">7m</th>
-          <th style="width:22px">Tirs</th>
-          <th style="width:22px">Arrêts</th>
-          <th style="width:16px" title="Avertissement">Av.</th>
-          <th style="width:16px" title="2 minutes #1">2'</th>
-          <th style="width:16px" title="2 minutes #2">2'</th>
-          <th style="width:18px" title="2min + Disqualification">2'+D</th>
-          <th style="width:22px" title="Disqualification">Dis</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-home"></tbody>
-    </table>
-    <div style="padding:4px 8px;border-top:1px solid var(--border);">
-      <button onclick="addRow('tbody-home','home')" style="font-size:8px;padding:2px 8px;background:var(--off);border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);font-family:var(--font-b);">+ Ajouter un joueur</button>
-    </div>
-
-    <!-- Officiels domicile -->
-    <div class="sec-head">
-      <div class="sec-bar sec-bar-red"></div>
-      <div class="sec-label"><span>Officiels</span> — Domicile</div>
-      <div style="padding:4px 8px;background:var(--blue);display:flex;align-items:center;gap:6px;">
-        <span class="off-global-badge">1 Av. max</span>
-        <span class="off-global-badge">1 Excl. max</span>
+      <div class="info-cell">
+        <div class="info-icon">⏱️</div>
+        <div>
+          <div class="info-key">Périodes</div>
+          <div class="info-val" id="ib-duree" contenteditable="true">2 × 30 min</div>
+        </div>
+      </div>
+      <div class="info-cell">
+        <div class="info-icon">🏙️</div>
+        <div>
+          <div class="info-key">Ville</div>
+          <div class="info-val" id="ib-ville" contenteditable="true">—</div>
+        </div>
       </div>
     </div>
-    <div class="off-grid" id="off-home-grid"></div>
-  </div>
 
-  <div class="col-divider"></div>
+    <!-- BODY GRID -->
+    <div class="body-grid">
 
-  <!-- ══ COLONNE VISITEUR ══ -->
-  <div>
-    <div class="sec-head">
-      <div class="sec-bar sec-bar-blue"></div>
-      <div class="sec-label"><span id="sl-away">Équipe Visiteur</span> — Joueurs</div>
-      <div class="sec-tag sec-tag-away" id="sl-away-abr">EXT</div>
-    </div>
-    <table class="ptable">
-      <thead>
-        <tr>
-          <th style="width:16px" title="Capitaine">Cap</th>
-          <th style="width:24px">N°</th>
-          <th class="th-name">Nom · Prénom</th>
-          <th style="width:26px">Pos</th>
-          <th style="width:22px">Buts</th>
-          <th style="width:18px">7m</th>
-          <th style="width:22px">Tirs</th>
-          <th style="width:22px">Arrêts</th>
-          <th style="width:16px">Av.</th>
-          <th style="width:16px">2'</th>
-          <th style="width:16px">2'</th>
-          <th style="width:18px">2'+D</th>
-          <th style="width:22px">Dis</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-away"></tbody>
-    </table>
-    <div style="padding:4px 8px;border-top:1px solid var(--border);">
-      <button onclick="addRow('tbody-away','away')" style="font-size:8px;padding:2px 8px;background:var(--off);border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);font-family:var(--font-b);">+ Ajouter un joueur</button>
-    </div>
+      <!-- ══ COLONNE DOMICILE ══ -->
+      <div>
+        <div class="sec-head">
+          <div class="sec-bar sec-bar-red"></div>
+          <div class="sec-label"><span id="sl-home">Équipe Domicile</span> — Joueurs</div>
+          <div class="sec-tag sec-tag-home" id="sl-home-abr">DOM</div>
+        </div>
+        <table class="ptable">
+          <thead>
+            <tr>
+              <th style="width:16px" title="Capitaine">Cap</th>
+              <th style="width:24px">N°</th>
+              <th class="th-name">Nom · Prénom</th>
+              <th style="width:26px">Pos</th>
+              <th style="width:22px">Buts</th>
+              <th style="width:18px">7m</th>
+              <th style="width:22px">Tirs</th>
+              <th style="width:22px">Arrêts</th>
+              <th style="width:16px" title="Avertissement">Av.</th>
+              <th style="width:16px" title="Exclusion #1">2'</th>
+              <th style="width:16px" title="Exclusion #2">2'</th>
+              <th style="width:16px" title="Exclusion #3">2'</th>
+              <th style="width:22px" title="Disqualification">Dis</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-home"></tbody>
+        </table>
+        <div class="no-export" style="padding:4px 8px;border-top:1px solid var(--border);">
+          <button onclick="addRow('tbody-home','home')" style="font-size:8px;padding:2px 8px;background:var(--off);border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);font-family:var(--font-b);">+ Ajouter un joueur</button>
+        </div>
 
-    <!-- Officiels visiteur -->
-    <div class="sec-head">
-      <div class="sec-bar sec-bar-blue"></div>
-      <div class="sec-label"><span>Officiels</span> — Extérieur</div>
-      <div style="padding:4px 8px;background:var(--blue);display:flex;align-items:center;gap:6px;">
-        <span class="off-global-badge">1 Av. max</span>
-        <span class="off-global-badge">1 Excl. max</span>
+        <!-- Officiels domicile -->
+        <div class="sec-head">
+          <div class="sec-bar sec-bar-red"></div>
+          <div class="sec-label"><span>Officiels</span> — Domicile</div>
+          <div style="padding:4px 8px;background:var(--blue);display:flex;align-items:center;gap:6px;">
+            <span class="off-global-badge">1 Av. max</span>
+            <span class="off-global-badge">1 Excl. max</span>
+          </div>
+        </div>
+        <div class="off-grid" id="off-home-grid"></div>
+      </div>
+
+      <div class="col-divider"></div>
+
+      <!-- ══ COLONNE VISITEUR ══ -->
+      <div>
+        <div class="sec-head">
+          <div class="sec-bar sec-bar-blue"></div>
+          <div class="sec-label"><span id="sl-away">Équipe Visiteur</span> — Joueurs</div>
+          <div class="sec-tag sec-tag-away" id="sl-away-abr">EXT</div>
+        </div>
+        <table class="ptable">
+          <thead>
+            <tr>
+              <th style="width:16px" title="Capitaine">Cap</th>
+              <th style="width:24px">N°</th>
+              <th class="th-name">Nom · Prénom</th>
+              <th style="width:26px">Pos</th>
+              <th style="width:22px">Buts</th>
+              <th style="width:18px">7m</th>
+              <th style="width:22px">Tirs</th>
+              <th style="width:22px">Arrêts</th>
+              <th style="width:16px">Av.</th>
+              <th style="width:16px">2'</th>
+              <th style="width:16px">2'</th>
+              <th style="width:16px">2'</th>
+              <th style="width:22px">Dis</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-away"></tbody>
+        </table>
+        <div class="no-export" style="padding:4px 8px;border-top:1px solid var(--border);">
+          <button onclick="addRow('tbody-away','away')" style="font-size:8px;padding:2px 8px;background:var(--off);border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);font-family:var(--font-b);">+ Ajouter un joueur</button>
+        </div>
+
+        <!-- Officiels visiteur -->
+        <div class="sec-head">
+          <div class="sec-bar sec-bar-blue"></div>
+          <div class="sec-label"><span>Officiels</span> — Extérieur</div>
+          <div style="padding:4px 8px;background:var(--blue);display:flex;align-items:center;gap:6px;">
+            <span class="off-global-badge">1 Av. max</span>
+            <span class="off-global-badge">1 Excl. max</span>
+          </div>
+        </div>
+        <div class="off-grid" id="off-away-grid"></div>
+      </div>
+
+    </div><!-- /body-grid -->
+
+    <!-- BOTTOM SECTION -->
+    <div class="bottom-row">
+      <!-- Arbitres + Période -->
+      <div class="arb-block">
+        <div class="arb-grid">
+          <div class="arb-cell">
+            <div class="arb-role">Arbitre 1</div>
+            <div class="arb-name" id="arb1-name" contenteditable="true">—</div>
+          </div>
+          <div class="arb-cell">
+            <div class="arb-role">Arbitre 2</div>
+            <div class="arb-name" id="arb2-name" contenteditable="true">—</div>
+          </div>
+          <div class="arb-cell">
+            <div class="arb-role">Accompagnateur</div>
+            <div class="arb-name" id="del-name" contenteditable="true">—</div>
+          </div>
+          <div class="arb-cell">
+            <div class="arb-role">Chronométreur / Secrétaire</div>
+            <div class="arb-name" id="chrono-name" contenteditable="true">—</div>
+          </div>
+        </div>
+        <div class="period-block">
+          <div class="period-title">Détail du score</div>
+          <div class="period-grid" id="period-grid"></div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-block">
+        <div class="stats-title">Récapitulatif</div>
+        <div class="stat-row">
+          <span class="stat-label">Buts Domicile</span><span class="stat-val" id="stat-goals-home">—</span></div>
+        <div class="stat-row">
+          <span class="stat-label">7m DOM réussi</span><span class="stat-val" id="stat-m7-home">—</span></div>
+        <div class="stat-row">
+          <span class="stat-label">Tirs DOM</span><span class="stat-val" id="stat-tirs-home">—</span></div>
+        <div class="stat-row">
+          <span class="stat-label">Arrêts Gardiens DOM</span><span class="stat-val" id="stat-arrets-home">—</span></div>
+        <div class="stat-row" style="border-top:2px solid var(--border);margin-top:2px;padding-top:2px;"></div>
+        <div class="stat-row">
+          <span class="stat-label">Buts Visiteur</span><span class="stat-val blue-val" id="stat-goals-away">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">7m VIS réussi</span><span class="stat-val blue-val" id="stat-m7-away">—</span></div>
+        <div class="stat-row">
+          <span class="stat-label">Tirs VIS</span><span class="stat-val blue-val" id="stat-tirs-away">—</span></div>
+        <div class="stat-row">
+          <span class="stat-label">Arrêts Gardiens VIS</span><span class="stat-val blue-val" id="stat-arrets-away">—</span>
+        </div>
       </div>
     </div>
-    <div class="off-grid" id="off-away-grid"></div>
-  </div>
 
-</div><!-- /body-grid -->
-
-<!-- BOTTOM SECTION -->
-<div class="bottom-row">
-  <!-- Arbitres + Période -->
-  <div class="arb-block">
-    <div class="arb-grid">
-      <div class="arb-cell">
-        <div class="arb-role">Arbitre 1</div>
-        <div class="arb-name" id="arb1-name" contenteditable="true">—</div>
-        <div class="arb-lic" id="arb1-lic" contenteditable="true">—</div>
+    <!-- FAITS DE MATCH -->
+    <div class="events-section" id="events-section">
+      <div class="events-header">
+        <div class="events-header-title">📋 Faits de match</div>
+        <span class="events-count" id="events-count">0 événements</span>
       </div>
-      <div class="arb-cell">
-        <div class="arb-role">Arbitre 2</div>
-        <div class="arb-name" id="arb2-name" contenteditable="true">—</div>
-        <div class="arb-lic" id="arb2-lic" contenteditable="true">—</div>
-      </div>
-      <div class="arb-cell">
-        <div class="arb-role">Délégué</div>
-        <div class="arb-name" id="del-name" contenteditable="true">—</div>
-        <div class="arb-lic" id="del-lic" contenteditable="true">—</div>
-      </div>
-      <div class="arb-cell">
-        <div class="arb-role">Chronométreur / Secrétaire</div>
-        <div class="arb-name" id="chrono-name" contenteditable="true">—</div>
-        <div class="arb-lic" contenteditable="true">—</div>
-      </div>
+      <div class="events-inner" id="events-inner"></div>
     </div>
-    <div class="period-block">
-      <div class="period-title">Détail du score</div>
-      <div class="period-grid">
-        <div class="pg-header">Équipe</div>
-        <div class="pg-header">Période 1</div>
-        <div class="pg-header">Fin Tps Rég.</div>
-        <div class="pg-header">Prol. 1</div>
-        <div class="pg-header">Prol. 2</div>
-        <div class="pg-header">Tirs au but</div>
-        <div class="pg-row-label" id="pg-home-label">DOM</div>
-        <div class="pg-cell score-val home-score" id="pg-home-ht" contenteditable="true">—</div>
-        <div class="pg-cell score-val home-score" id="pg-home-final" contenteditable="true">—</div>
-        <div class="pg-cell empty-p" contenteditable="true">—</div>
-        <div class="pg-cell empty-p" contenteditable="true">—</div>
-        <div class="pg-cell empty-p" contenteditable="true">—</div>
-        <div class="pg-row-label last" id="pg-away-label">VIS</div>
-        <div class="pg-cell score-val away-score" id="pg-away-ht" contenteditable="true">—</div>
-        <div class="pg-cell score-val away-score" id="pg-away-final" contenteditable="true">—</div>
-        <div class="pg-cell empty-p" contenteditable="true">—</div>
-        <div class="pg-cell empty-p" contenteditable="true">—</div>
-        <div class="pg-cell empty-p" contenteditable="true">—</div>
-      </div>
+
+    <!-- LEGEND -->
+    <div class="legend-bar">
+      <span class="leg-key">Légende</span>
+      <span class="leg-item"><span class="pen-box c-yellow" style="pointer-events:none;cursor:default;">!</span>
+      Avertissement</span>
+      <span class="leg-item"><span class="pen-box c-2min" style="pointer-events:none;cursor:default;">2'</span>
+      <span id="leg-excl">Exclusion 2'</span></span>
+      <span class="leg-item"><span class="pen-box c-red" style="pointer-events:none;cursor:default;">■</span>
+      Disqualification</span>
+      <span class="leg-item"><span class="pen-box c-blue" style="pointer-events:none;cursor:default;">■</span> Rapport
+      écrit</span>
+      <span class="leg-item">⚑ Capitaine</span>
+      <span class="leg-item" style="color:var(--muted);">GK = Gardien de but</span>
     </div>
-    <!-- Signatures -->
-    <div class="sig-row">
-      <div class="obs-block">
-        <div class="obs-label">Observations</div>
-        <div class="obs-content" id="obs-content" contenteditable="true"></div>
-      </div>
-      <div class="sig-block">
-        <div class="sig-label">Signature Arbitre 1</div>
-        <div class="sig-name" id="sig-arb1">—</div>
-        <div class="sig-line"></div>
-      </div>
-      <div class="sig-block">
-        <div class="sig-label">Signature Arbitre 2</div>
-        <div class="sig-name" id="sig-arb2">—</div>
-        <div class="sig-line"></div>
-      </div>
-      <div class="sig-block">
-        <div class="sig-label">Signature Resp. DOM</div>
-        <div class="sig-name" id="sig-home">—</div>
-        <div class="sig-line"></div>
-      </div>
-      <div class="sig-block">
-        <div class="sig-label">Signature Resp. EXT</div>
-        <div class="sig-name" id="sig-away">—</div>
-        <div class="sig-line"></div>
-      </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="footer-left" id="footer-left">Généré par 5138021</div>
+      <div class="footer-center">Feuille de Match</div>
+      <div class="footer-right" id="footer-right">—</div>
     </div>
-  </div>
 
-  <!-- Stats -->
-  <div class="stats-block">
-    <div class="stats-title">Récapitulatif</div>
-    <div class="stat-row"><span class="stat-label">Buts Domicile</span><span class="stat-val" id="stat-goals-home">—</span></div>
-    <div class="stat-row"><span class="stat-label">7m DOM réussi</span><span class="stat-val" id="stat-m7-home">—</span></div>
-    <div class="stat-row"><span class="stat-label">Tirs DOM</span><span class="stat-val" id="stat-tirs-home">—</span></div>
-    <div class="stat-row"><span class="stat-label">Arrêts Gardiens DOM</span><span class="stat-val" id="stat-arrets-home">—</span></div>
-    <div class="stat-row" style="border-top:2px solid var(--border);margin-top:2px;padding-top:2px;"></div>
-    <div class="stat-row"><span class="stat-label">Buts Visiteur</span><span class="stat-val blue-val" id="stat-goals-away">—</span></div>
-    <div class="stat-row"><span class="stat-label">7m VIS réussi</span><span class="stat-val blue-val" id="stat-m7-away">—</span></div>
-    <div class="stat-row"><span class="stat-label">Tirs VIS</span><span class="stat-val blue-val" id="stat-tirs-away">—</span></div>
-    <div class="stat-row"><span class="stat-label">Arrêts Gardiens VIS</span><span class="stat-val blue-val" id="stat-arrets-away">—</span></div>
-    <div class="stat-row" style="border-top:2px solid var(--border);margin-top:2px;padding-top:2px;"></div>
-    <div class="stat-row"><span class="stat-label">Exclusions 2' total</span><span class="stat-val" id="stat-exclu">—</span></div>
-    <div class="stat-row"><span class="stat-label">Cartons rouges</span><span class="stat-val red" id="stat-red">—</span></div>
-    <div class="stat-row"><span class="stat-label">Cartons bleus</span><span class="stat-val" style="color:var(--cyan);" id="stat-blue">—</span></div>
-  </div>
-</div>
+  </div><!-- /page -->
 
-<!-- FAITS DE MATCH -->
-<div class="events-section" id="events-section">
-  <div class="events-header">
-    <div class="events-header-title">📋 Faits de match</div>
-    <span class="events-count" id="events-count">0 événements</span>
-  </div>
-  <div class="events-inner" id="events-inner"></div>
-</div>
+  <script>
+// ═══════════════════════════════════
+// PARAMÈTRES DU MATCH (issus de la page live / préparation)
+// ═══════════════════════════════════
+let CFG = { nbPeriods:2, periodMin:30, pauseMin:10, excluSec:120, tmoTeam:3, tmoPeriod:2, tmoSec:60 };
 
-<!-- LEGEND -->
-<div class="legend-bar">
-  <span class="leg-key">Légende</span>
-  <span class="leg-item"><span class="pen-box c-yellow" style="pointer-events:none;cursor:default;">!</span> Avertissement</span>
-  <span class="leg-item"><span class="pen-box c-2min-used" style="pointer-events:none;cursor:default;">✓</span> Exclusion 2'</span>
-  <span class="leg-item"><span class="pen-box c-red" style="pointer-events:none;cursor:default;">■</span> Disqualification</span>
-  <span class="leg-item"><span class="pen-box c-blue" style="pointer-events:none;cursor:default;">■</span> Rapport écrit</span>
-  <span class="leg-item"><span class="pen-box c-2min-dis" style="pointer-events:none;cursor:default;">D</span> 2' + Disqualif.</span>
-  <span class="leg-item">⚑ Capitaine</span>
-  <span class="leg-item" style="color:var(--muted);">GK = Gardien de but</span>
-</div>
+function exclLbl(){
+  const s = CFG.excluSec;
+  return s % 60 === 0 ? (s/60) + "'" : Math.floor(s/60) + "'" + String(s%60).padStart(2,'0');
+}
 
-<!-- FOOTER -->
-<div class="footer">
-  <div class="footer-left" id="footer-left">Généré par FFHB Match App</div>
-  <div class="footer-center">FFHB — Feuille de Match</div>
-  <div class="footer-right" id="footer-right">—</div>
-</div>
+// ═══════════════════════════════════
+// COULEURS D'ÉQUIPE
+// ═══════════════════════════════════
+function hexToRgb(h){
+  h=(h||'').replace('#','');
+  if(h.length===3)h=h.split('').map(c=>c+c).join('');
+  if(!/^[0-9a-f]{6}$/i.test(h))return null;
+  const n=parseInt(h,16);return [n>>16&255,n>>8&255,n&255];
+}
+function lum(rgb){return 0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2];}
+function mix(rgb,target,t){return rgb.map(v=>Math.round(v+(target-v)*t));}
+function applyTeamColors(homeColor, awayColor){
+  const root=document.documentElement.style;
+  [['home',homeColor,'#E02D37'],['away',awayColor,'#4A9FFF']].forEach(([t,c,def])=>{
+    let rgb=hexToRgb(c); if(!rgb) rgb=hexToRgb(def);
+    // sur fond clair : on fonce les couleurs trop claires ; sur fond sombre : on éclaircit les couleurs trop foncées
+    const onLight = lum(rgb)>150 ? mix(rgb,0,.55) : rgb;
+    const onDark  = lum(rgb)<60  ? mix(rgb,255,.55) : rgb;
+    root.setProperty('--'+t,'rgb('+rgb.join(',')+')');
+    root.setProperty('--'+t+'-rgb',rgb.join(','));
+    root.setProperty('--'+t+'-text','rgb('+onLight.join(',')+')');
+    root.setProperty('--'+t+'-d','rgb('+onDark.join(',')+')');
+  });
+}
 
-</div><!-- /page -->
-
-<script>
 // ═══════════════════════════════════
 // PENALTY STATES
 // ═══════════════════════════════════
@@ -579,15 +589,13 @@ const PEN_STATES = {
   'empty':    {cls:'c-empty',label:'—'},
   'yellow':   {cls:'c-yellow',label:'!'},
   '2min':     {cls:'c-2min',label:"2'"},
-  '2min-used':{cls:'c-2min-used',label:'✓'},
-  '2min-dis': {cls:'c-2min-dis',label:'D'},
+  '2min-used':{cls:'c-2min',label:"2'"},
   'red':      {cls:'c-red',label:'■'},
   'blue':     {cls:'c-blue',label:'■'},
 };
 const PEN_CYCLES = {
   av:['empty','yellow'],
-  p:['empty','2min','2min-used'],
-  p2d:['empty','2min-dis'],
+  p:['empty','2min'],
   dis:['empty','red','blue'],
 };
 
@@ -596,7 +604,7 @@ function cyclePen(el,type){
   const cycle = PEN_CYCLES[type];
   const next = cycle[(cycle.indexOf(cur)+1)%cycle.length];
   setPenState(el,next);
-  const labels={'empty':'Vide','yellow':'Avertissement ⚠️','2min':"2 min",'2min-used':"2 min infligée ✓",'2min-dis':"2'+D",'red':'Disqualif. rouge ■','blue':'Rapport bleu ■'};
+  const labels={'empty':'Vide','yellow':'Avertissement ⚠️','2min':"Exclusion 2'",'2min-used':"Exclusion 2'",'red':'Disqualif. rouge ■','blue':'Rapport bleu ■'};
   showHint('→ ' + labels[next]);
 }
 function setPenState(el,state){
@@ -619,7 +627,7 @@ function cycleOffPen(el){
   }else if(type==='off-2min'){
     if(cur==='empty'){
       const all=document.querySelectorAll(`.off-pen-box[data-type="off-2min"][data-team="${team}"]`);
-      if([...all].some(b=>b!==el&&b.dataset.state!=='empty')){showHint('⛔ 1 seule exclusion 2min max');return;}
+      if([...all].some(b=>b!==el&&b.dataset.state!=='empty')){showHint('⛔ 1 seule exclusion max');return;}
       setOffState(el,'2min');
     }else setOffState(el,'empty');
   }else if(type==='off-dis'){
@@ -665,14 +673,15 @@ function buildRow(p,team){
   const arrets = p.arrets !== undefined && p.arrets !== 0 ? p.arrets : '—';
   // Map sanctions from match data
   const avState = p.av || 'empty';
-  const p1State = (p.p1==='2min'||p.p1==='2min-used') ? '2min-used' : (p.p1||'empty');
-  const p2State = (p.p2==='2min'||p.p2==='2min-used') ? '2min-used' : (p.p2||'empty');
-  const p2dState = p.dis==='red3x2' ? '2min-dis' : 'empty';
-  const disState = p.dis==='red' ? 'red' : p.dis==='blue' ? 'blue' : 'empty';
+  const p1State = (p.p1==='2min'||p.p1==='2min-used') ? '2min' : (p.p1||'empty');
+  const p2State = (p.p2==='2min'||p.p2==='2min-used') ? '2min' : (p.p2||'empty');
+  // 3e exclusion : case 2' cochée ; si elle est disqualifiante (red3x2), le carton rouge est coché aussi
+  const p3State = (p.p3==='2min'||p.p3==='2min-used'||p.dis==='red3x2') ? '2min' : (p.p3||'empty');
+  const disState = (p.dis==='red'||p.dis==='red3x2') ? 'red' : p.dis==='blue' ? 'blue' : 'empty';
   return `<tr class="${rowCls}">
     <td class="td-capt"><input type="checkbox" class="capt-check" data-team="${team}" ${captChecked} onchange="handleCaptainChange(this)"></td>
     <td class="${numCls}" contenteditable="true">${p.num||'—'}</td>
-    <td class="td-name" contenteditable="true"><span class="capt-flag ${flagCls}">⚑ </span>${p.name||''}<span class="lic" contenteditable="true">${p.lic||''}</span></td>
+    <td class="td-name" contenteditable="true"><span class="capt-flag ${flagCls}">⚑ </span>${p.name||''}</td>
     <td><span class="pos-badge ${posCls}" onclick="togglePos(this)">${posLbl}</span></td>
     <td class="${goalsCls}" contenteditable="true">${goals}</td>
     <td class="${m7Cls}" contenteditable="true">${m7}</td>
@@ -681,16 +690,16 @@ function buildRow(p,team){
     <td><div class="pen-row">${buildPenBox(avState,'av')}</div></td>
     <td><div class="pen-row">${buildPenBox(p1State,'p')}</div></td>
     <td><div class="pen-row">${buildPenBox(p2State,'p')}</div></td>
-    <td><div class="pen-row">${buildPenBox(p2dState,'p2d')}</div></td>
+    <td><div class="pen-row">${buildPenBox(p3State,'p')}</div></td>
     <td><div class="pen-row">${buildPenBox(disState,'dis')}</div></td>
-    <td style="width:14px;padding:0;"><span onclick="deleteRow(this)" style="cursor:pointer;color:var(--muted);font-size:8px;padding:2px;" title="Supprimer">✕</span></td>
+    <td class="no-export" style="width:14px;padding:0;"><span onclick="deleteRow(this)" style="cursor:pointer;color:var(--muted);font-size:8px;padding:2px;" title="Supprimer">✕</span></td>
   </tr>`;
 }
 function renderPlayers(tbodyId,players,team){
   document.getElementById(tbodyId).innerHTML=players.map(p=>buildRow(p,team)).join('');
 }
 function addRow(tbodyId,team){
-  const p={num:'—',name:'',lic:'',pos:'J',goals:'—',m7:'—',tirs:'—',arrets:'—',av:'empty',p1:'empty',p2:'empty',p2d:'empty',dis:'empty'};
+  const p={num:'—',name:'',pos:'J',goals:'—',m7:'—',tirs:'—',arrets:'—',av:'empty',p1:'empty',p2:'empty',p3:'empty',dis:'empty'};
   document.getElementById(tbodyId).insertAdjacentHTML('beforeend',buildRow(p,team));
 }
 function deleteRow(el){const tr=el.closest('tr');if(confirm('Supprimer ce joueur ?'))tr.remove();}
@@ -718,29 +727,87 @@ function updateScoreColors(){
 }
 
 // ═══════════════════════════════════
-// OFFICIALS GRID
+// OFFICIALS GRID (4 emplacements minimum, davantage si des officiels ont été ajoutés)
 // ═══════════════════════════════════
 function buildOfficialsGrid(team, officials) {
-  const roles = ['Officiel A','Officiel B','Officiel C','Officiel D'];
-  return roles.map((role, i) => {
+  const count = Math.max(4, (officials||[]).length);
+  let html = '';
+  for (let i = 0; i < count; i++) {
     const off = officials[i] || {};
+    const label = 'Officiel ' + String.fromCharCode(65 + i);
+    const roleTxt = (off.nom && off.role) ? `${label} — ${off.role}` : label;
     const avState = off.av || 'empty';
     const excluState = off.exclu === '2min' ? '2min' : 'empty';
     const disState = off.dis === 'red' ? 'red' : 'empty';
-    const rapState = off.rapport === 'blue' ? 'blue' : 'empty';
-    const name = off.nom ? `${off.nom}${off.lic ? ` <span style="font-size:8px;color:var(--muted);">${off.lic}</span>` : ''}` : `—`;
-    return `<div class="off-cell">
-      <div class="off-role">${role}</div>
+    const rapState = (off.rapport === 'blue' || off.dis === 'blue') ? 'blue' : 'empty';
+    const name = off.nom ? off.nom : '—';
+    html += `<div class="off-cell">
+      <div class="off-role">${roleTxt}</div>
       <div class="off-name" contenteditable="true">${name}</div>
       <div class="off-sanctions">
         <span class="off-san-label">Sanctions :</span>
         <div class="off-pen-box ${PEN_STATES[avState]?.cls||'c-empty'}" data-state="${avState}" data-team="${team}" data-type="off-av" onclick="cycleOffPen(this)" title="Avertissement">${PEN_STATES[avState]?.label||'—'}</div>
-        <div class="off-pen-box ${PEN_STATES[excluState]?.cls||'c-empty'}" data-state="${excluState}" data-team="${team}" data-type="off-2min" onclick="cycleOffPen(this)" title="Exclusion 2min">${PEN_STATES[excluState]?.label||'—'}</div>
-        <div class="off-pen-box ${PEN_STATES[disState]?.cls||'c-empty'}" data-state="${disState}" data-type="off-dis" onclick="cycleOffPen(this)" title="Disqualification">${PEN_STATES[disState]?.label||'—'}</div>
-        <div class="off-pen-box ${PEN_STATES[rapState]?.cls||'c-empty'}" data-state="${rapState}" data-type="off-rapport" onclick="cycleOffPen(this)" title="Rapport écrit">${PEN_STATES[rapState]?.label||'—'}</div>
+        <div class="off-pen-box ${OFF_STATES[excluState]?.cls||'c-empty'}" data-state="${excluState}" data-team="${team}" data-type="off-2min" onclick="cycleOffPen(this)" title="Exclusion">${OFF_STATES[excluState]?.label||'—'}</div>
+        <div class="off-pen-box ${PEN_STATES[disState]?.cls||'c-empty'}" data-state="${disState}" data-team="${team}" data-type="off-dis" onclick="cycleOffPen(this)" title="Disqualification">${PEN_STATES[disState]?.label||'—'}</div>
+        <div class="off-pen-box ${PEN_STATES[rapState]?.cls||'c-empty'}" data-state="${rapState}" data-team="${team}" data-type="off-rapport" onclick="cycleOffPen(this)" title="Rapport écrit">${PEN_STATES[rapState]?.label||'—'}</div>
       </div>
     </div>`;
-  }).join('');
+  }
+  return html;
+}
+
+// ═══════════════════════════════════
+// DÉTAIL DU SCORE (nombre de périodes variable)
+// ═══════════════════════════════════
+function renderPeriodGrid(m, h, a) {
+  const N = Math.max(1, CFG.nbPeriods || 2);
+  const ps = (m && m.periodScores) || [];
+  const htIdx = Math.max(1, Math.floor(N / 2));
+
+  // score cumulé à la fin de la période k
+  function cum(k, side) {
+    const s = ps[k - 1];
+    if (s && s[side] !== undefined) return s[side];
+    // anciennes données : seul le score à la mi-temps est connu
+    if (m && k === htIdx) {
+      const v = side === 'home' ? m.scoreHTHome : m.scoreHTAway;
+      if (v !== undefined) return v;
+    }
+    return '—';
+  }
+
+  const cols = [];
+  for (let k = 1; k <= N - 1; k++) cols.push({ label: 'Période ' + k, home: cum(k, 'home'), away: cum(k, 'away'), main: true });
+  cols.push({ label: 'Fin Tps Rég.', home: m && m.scoreHome !== undefined ? m.scoreHome : '—', away: m && m.scoreAway !== undefined ? m.scoreAway : '—', main: true });
+  cols.push({ label: 'Prol. 1', main: false }, { label: 'Prol. 2', main: false }, { label: 'Tirs au but', main: false });
+
+  const grid = document.getElementById('period-grid');
+  grid.style.gridTemplateColumns = '60px repeat(' + cols.length + ', 1fr)';
+
+  const hLabel = (h && h.abr) || 'DOM', aLabel = (a && a.abr) || 'VIS';
+  const cell = (c, side) => c.main
+    ? `<div class="pg-cell score-val ${side}-score" contenteditable="true">${c[side]}</div>`
+    : `<div class="pg-cell empty-p" contenteditable="true">—</div>`;
+
+  grid.innerHTML =
+    `<div class="pg-header">Équipe</div>` + cols.map(c => `<div class="pg-header">${c.label}</div>`).join('') +
+    `<div class="pg-row-label" id="pg-home-label">${hLabel}</div>` + cols.map(c => cell(c, 'home')).join('') +
+    `<div class="pg-row-label last" id="pg-away-label">${aLabel}</div>` + cols.map(c => cell(c, 'away')).join('');
+}
+
+// Texte sous le score final
+function periodSummaryText(m) {
+  const N = Math.max(1, CFG.nbPeriods || 2);
+  if (N === 1) return '';
+  const ps = (m && m.periodScores) || [];
+  if (N === 2) {
+    const hh = m && m.scoreHTHome !== undefined ? m.scoreHTHome : (ps[0] ? ps[0].home : 0);
+    const aa = m && m.scoreHTAway !== undefined ? m.scoreHTAway : (ps[0] ? ps[0].away : 0);
+    return `Mi-temps : ${hh} – ${aa}`;
+  }
+  const parts = [];
+  for (let k = 1; k <= N - 1; k++) if (ps[k - 1]) parts.push(`P${k} : ${ps[k - 1].home} – ${ps[k - 1].away}`);
+  return parts.join(' · ');
 }
 
 // ═══════════════════════════════════
@@ -760,11 +827,29 @@ const EVENT_CLS = {
   av:'e-av', '2min':'e-2min', dis:'e-dis',
   rapport:'e-rapport', tir:'e-tir', tmo:'e-tmo', blanc:'e-blanc'
 };
-const EVENT_LABELS = {
-  but:'But', but7:'But 7m', save:'Arrêt', av:'Avertissement',
-  '2min':"Exclusion 2'", dis:'Disqualification', rapport:'Rapport',
-  tir:'Tir', tmo:'Temps mort', blanc:'Carton blanc'
-};
+function eventLabel(type){
+  const L = {
+    but:'But', but7:'But 7m', save:'Arrêt', av:'Avertissement',
+    '2min':'Exclusion ' + exclLbl(), dis:'Disqualification', rapport:'Disqualification avec rapport',
+    tir:'Tir', tmo:'Temps mort', blanc:'Carton blanc'
+  };
+  return L[type] || type;
+}
+
+// Titre d'un fait : « Action — Nom Prénom » (« Temps mort » seul pour les temps morts)
+function eventTitle(ev){
+  if(ev.type==='tmo') return 'Temps mort';
+  let desc = ev.desc || '';
+  if(ev.type==='2min') desc = desc.replace(/\s*disqualifiante\s*\(3e\)/i,''); // 3e exclusion = affichée comme un 2' normal
+  // Format du live : « Action — Nom Prénom » → on l'utilise tel quel
+  if(desc && !desc.includes('(')) return desc;
+  // Ancien format : « Équipe — Action … (12 Nom Prénom) » → on reconstruit
+  const label = eventLabel(ev.type);
+  const m = desc.match(/\(([^)]+)\)/);
+  let who = m ? m[1].replace(/^\s*\d+\s+/, '') : (typeof ev.player === 'string' && isNaN(ev.player) ? ev.player : '');
+  return who ? `${label} — ${who}` : label;
+}
+
 function renderEvents(events, homeNom, awayNom) {
   const inner = document.getElementById('events-inner');
   const section = document.getElementById('events-section');
@@ -775,19 +860,14 @@ function renderEvents(events, homeNom, awayNom) {
   countEl.textContent = sorted.length + ' événement' + (sorted.length > 1 ? 's' : '');
   inner.innerHTML = sorted.map(ev => {
     const teamName = ev.team === 'home' ? homeNom : awayNom;
-    const teamColor = ev.team === 'home' ? 'var(--accent)' : 'var(--cyan)';
+    const teamColor = ev.team === 'home' ? 'var(--home-d)' : 'var(--away-d)';
     const icon = EVENT_ICONS[ev.type] || '•';
     const cls = EVENT_CLS[ev.type] || '';
-    const label = EVENT_LABELS[ev.type] || ev.type;
-    const player = [ev.playerNum ? '#'+ev.playerNum : '', ev.playerName || ''].filter(Boolean).join(' ');
-    const title = player ? `${label} - ${player}` : label;
-    const playerMatch = (ev.desc || '').match(/\(([^)]+)\)/);
-const playerStr = playerMatch ? playerMatch[1] : (ev.player || '');
-return `<div class="ev-item ${cls}">
+    return `<div class="ev-item ${cls}">
   <div class="ev-icon">${icon}</div>
   <div class="ev-body">
     <div class="ev-sub" style="color:${teamColor};margin-bottom:2px;">${teamName}</div>
-    <div class="ev-title">${label}${playerStr ? ' — ' + playerStr : ''}</div>
+    <div class="ev-title">${eventTitle(ev)}</div>
   </div>
   <div class="ev-time-badge">${ev.time || '—'}</div>
 </div>`;
@@ -804,13 +884,70 @@ function calcStats(players) {
     m7+=(p.m7||0);
     tirs+=(p.tirs||0);
     arrets+=(p.arrets||0);
-    if(p.p1!=='empty')exclu++;
-    if(p.p2!=='empty')exclu++;
-    if(p.dis==='red')red++;
-    if(p.dis==='red3x2')exclu++; // 3e exclusion = compte comme exclusion, pas rouge direct
+    if(p.p1 && p.p1!=='empty')exclu++;
+    if(p.p2 && p.p2!=='empty')exclu++;
+    if(p.p3 && p.p3!=='empty')exclu++;
+    if(p.dis==='red'||p.dis==='red3x2')red++;
     if(p.dis==='blue')blue++;
   });
   return {goals,m7,tirs,arrets,exclu,red,blue};
+}
+
+// ═══════════════════════════════════
+// EXPORT PDF (fidèle au graphisme, sans passer par Ctrl+P)
+// ═══════════════════════════════════
+function safeFileToken(s){
+  return (s||'').toString().trim().replace(/[^a-z0-9À-ÿ_-]+/gi,'_').replace(/^_+|_+$/g,'') || '—';
+}
+function buildFilename(){
+  const home = document.getElementById('h-home-name')?.textContent || 'Domicile';
+  const away = document.getElementById('h-away-name')?.textContent || 'Visiteur';
+  const date = document.getElementById('h-date')?.textContent || '';
+  const dateToken = (date && date !== '—') ? '_' + safeFileToken(date) : '';
+  return `Feuille-de-match_${safeFileToken(home)}-vs-${safeFileToken(away)}${dateToken}.pdf`;
+}
+
+async function exportPDF(){
+  const btn = document.querySelector('.btn-print');
+  const originalLabel = btn.textContent;
+
+  if (typeof html2pdf === 'undefined') {
+    alert("La librairie d'export PDF n'a pas pu se charger (vérifiez la connexion internet). Réessayez.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Génération...';
+  document.body.classList.add('exporting');
+
+  try {
+    if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(e) {} }
+    await new Promise(r => setTimeout(r, 120));
+
+    const page = document.querySelector('.page');
+    const opt = {
+      margin: 0,
+      filename: buildFilename(),
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      },
+      jsPDF: { unit: 'mm', format: [297, 210], orientation: 'landscape' },
+      pagebreak: { mode: ['avoid-all'] }
+    };
+
+    await html2pdf().set(opt).from(page).save();
+  } catch (err) {
+    console.error('Export PDF error:', err);
+    alert("Une erreur est survenue pendant la génération du PDF. Réessayez.");
+  } finally {
+    document.body.classList.remove('exporting');
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
 }
 
 // ═══════════════════════════════════
@@ -819,11 +956,11 @@ function calcStats(players) {
 function init() {
   const raw = localStorage.getItem('ffhb_match_data');
   if (!raw) {
-    // Show empty sheet
     renderPlayers('tbody-home', [], 'home');
     renderPlayers('tbody-away', [], 'away');
     document.getElementById('off-home-grid').innerHTML = buildOfficialsGrid('home', []);
     document.getElementById('off-away-grid').innerHTML = buildOfficialsGrid('away', []);
+    renderPeriodGrid({}, {}, {});
     document.getElementById('events-section').style.display = 'none';
     return;
   }
@@ -831,6 +968,17 @@ function init() {
   const m = data.match || {};
   const h = data.home || {};
   const a = data.away || {};
+
+  // Paramètres du match
+  CFG = { ...CFG, ...(data.config || {}) };
+  if (!data.config) { // anciennes données
+    if (m.duree) CFG.periodMin = m.duree;
+    if (m.pause != null) CFG.pauseMin = m.pause;
+  }
+  document.getElementById('leg-excl').textContent = 'Exclusion ' + exclLbl();
+
+  // Couleurs d'équipe
+  applyTeamColors(h.color, a.color);
 
   // Header
   document.getElementById('h-teams').textContent = (h.nom || 'Domicile') + ' / ' + (a.nom || 'Extérieur');
@@ -856,44 +1004,24 @@ function init() {
   // Score
   document.getElementById('score-home').textContent = m.scoreHome || 0;
   document.getElementById('score-away').textContent = m.scoreAway || 0;
-  document.getElementById('h-ht-score').textContent = `Mi-temps : ${m.scoreHTHome||0} – ${m.scoreHTAway||0}`;
+  document.getElementById('h-ht-score').textContent = periodSummaryText(m);
   updateScoreColors();
 
-  // Period detail
-  document.getElementById('pg-home-label').textContent = h.abr || 'DOM';
-  document.getElementById('pg-away-label').textContent = a.abr || 'VIS';
-  document.getElementById('pg-home-ht').textContent = m.scoreHTHome !== undefined ? m.scoreHTHome : '—';
-  document.getElementById('pg-away-ht').textContent = m.scoreHTAway !== undefined ? m.scoreHTAway : '—';
-  document.getElementById('pg-home-final').textContent = m.scoreHome !== undefined ? m.scoreHome : '—';
-  document.getElementById('pg-away-final').textContent = m.scoreAway !== undefined ? m.scoreAway : '—';
+  // Détail du score (N périodes)
+  renderPeriodGrid(m, h, a);
 
   // Info band
   const dateStr = m.date ? new Date(m.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'}) : '—';
   document.getElementById('ib-date').textContent = `${dateStr}${m.heure?' à '+m.heure:''}`;
   document.getElementById('ib-salle').textContent = m.salle || '—';
-  document.getElementById('ib-duree').textContent = m.duree ? m.duree + ' min' : '30 min';
+  document.getElementById('ib-duree').textContent = `${CFG.nbPeriods} × ${CFG.periodMin} min`;
   document.getElementById('ib-ville').textContent = m.ville || '—';
 
-  // Arbitres
+  // Arbitres / accompagnateur / secrétaire
   document.getElementById('arb1-name').textContent = m.arb1 || '—';
-  document.getElementById('arb1-lic').textContent = m.arbLic1 || '—';
   document.getElementById('arb2-name').textContent = m.arb2 || '—';
-  document.getElementById('arb2-lic').textContent = m.arbLic2 || '—';
   document.getElementById('del-name').textContent = m.delegue || '—';
-  document.getElementById('del-lic').textContent = m.delegueLic || '—';
   document.getElementById('chrono-name').textContent = m.chrono || '—';
-
-  // Signatures
-  document.getElementById('sig-arb1').textContent = m.arb1 || '—';
-  document.getElementById('sig-arb2').textContent = m.arb2 || '—';
-  // Find capitaines for signatures
-  const homeCapt = (h.players||[]).find(p=>p.isCapt);
-  const awayCapt = (a.players||[]).find(p=>p.isCapt);
-  document.getElementById('sig-home').textContent = homeCapt ? homeCapt.name : (h.nom||'—');
-  document.getElementById('sig-away').textContent = awayCapt ? awayCapt.name : (a.nom||'—');
-
-  // Observations
-  document.getElementById('obs-content').textContent = m.observations || '';
 
   // Players
   renderPlayers('tbody-home', h.players || [], 'home');
@@ -917,13 +1045,10 @@ function init() {
   document.getElementById('stat-m7-away').textContent = sa.m7 || '—';
   document.getElementById('stat-tirs-away').textContent = sa.tirs || '—';
   document.getElementById('stat-arrets-away').textContent = sa.arrets || '—';
-  document.getElementById('stat-exclu').textContent = (sh.exclu + sa.exclu) || '—';
-  document.getElementById('stat-red').textContent = (sh.red + sa.red) || '—';
-  document.getElementById('stat-blue').textContent = (sh.blue + sa.blue) || '—';
 
   // Footer
   document.getElementById('footer-left').textContent = `Exporté le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
-  document.getElementById('footer-right').textContent = m.competition ? m.competition + (m.division ? ' · ' + m.division : '') : 'FFHB Match App';
+  document.getElementById('footer-right').textContent = m.competition ? m.competition + (m.division ? ' · ' + m.division : '') : 'Match App';
 }
 
 function goBack() { window.location.href = '2-match-live.html'; }
@@ -946,6 +1071,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 init();
-</script>
+  </script>
 </body>
+
 </html>
