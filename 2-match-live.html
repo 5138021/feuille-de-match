@@ -50,6 +50,14 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .btn-tmo{background:rgba(155,89,182,.25);color:var(--purple);border:1px solid rgba(155,89,182,.4);}
 .tmo-badge{font-size:8px;display:block;margin-top:1px;opacity:.7;}
 
+/* BOUTON TME PAR ÉQUIPE */
+.tme-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-bottom:8px;padding:9px 6px;border-radius:9px;font-family:var(--font-h);font-size:13px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+.tme-btn:active{transform:scale(.97);}
+.tme-btn.hm{background:rgba(var(--home-rgb),.14);border:1px solid rgba(var(--home-rgb),.5);color:var(--home);}
+.tme-btn.aw{background:rgba(var(--away-rgb),.14);border:1px solid rgba(var(--away-rgb),.5);color:var(--away);}
+.tme-btn .tme-count{font-family:var(--font-mono);font-size:10px;font-weight:700;opacity:.75;letter-spacing:0;}
+.tme-btn.off{opacity:.4;}
+
 /* BANDEAU TEMPS MORT */
 .tmo-banner{display:none;align-items:center;gap:10px;margin:0 -12px;padding:7px 12px;background:rgba(155,89,182,.22);border-top:1px solid rgba(155,89,182,.4);font-family:var(--font-h);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;}
 .tmo-banner .tb-txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -198,7 +206,8 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .event-item.e-tmo{border-color:var(--purple);}
 .event-item.e-tir{border-color:rgba(255,255,255,.15);}
 .event-item.e-blanc{border-color:rgba(255,255,255,.5);}
-.e-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0;margin-top:1px;}
+.e-icon{font-size:13px;min-width:16px;text-align:center;flex-shrink:0;margin-top:1px;}
+.ev-2min{font-family:var(--font-h);font-weight:900;font-size:13px;letter-spacing:.3px;color:#ff5a5f;line-height:1.1;}
 .e-body{flex:1;min-width:0;}
 .e-title{font-family:var(--font-h);font-size:10px;font-weight:800;letter-spacing:.2px;line-height:1.25;}
 .e-sub{font-size:8px;color:var(--muted);margin-top:2px;}
@@ -319,7 +328,6 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
       <div class="chrono-btns">
         <button class="btn-ch btn-play" id="btnPlay" onclick="toggleChrono()">▶ Start</button>
         <button class="btn-ch btn-per" onclick="endPeriod()" id="btnPer">Fin MT1 →</button>
-        <button class="btn-ch btn-tmo" onclick="showTMO()">⏸ T.O.<span class="tmo-badge" id="tmoInfo"></span></button>
       </div>
     </div>
     <div class="sb-team">
@@ -346,6 +354,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
         <span class="tmo-count" id="tmo-home-badge"></span>
         <div class="team-hdr-score" id="ts-home-score" style="color:var(--home)">0</div>
       </div>
+      <button class="tme-btn hm" id="tme-btn-home" title="Temps Mort d'Équipe" onclick="useTMO('home')">⏸ TME <span class="tme-count" id="tme-count-home"></span></button>
       <div class="cards-list" id="grid-home"></div>
       <div class="staff-sep">Staff</div>
       <div class="cards-list" id="grid-staff-home"></div>
@@ -364,6 +373,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
         <span class="tmo-count" id="tmo-away-badge"></span>
         <div class="team-hdr-score" id="ts-away-score" style="color:var(--away)">0</div>
       </div>
+      <button class="tme-btn aw" id="tme-btn-away" title="Temps Mort d'Équipe" onclick="useTMO('away')">⏸ TME <span class="tme-count" id="tme-count-away"></span></button>
       <div class="cards-list" id="grid-away"></div>
       <div class="staff-sep">Staff</div>
       <div class="cards-list" id="grid-staff-away"></div>
@@ -407,29 +417,6 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
       <button class="modal-close" onclick="closeStaffModal()">✕</button>
     </div>
     <div class="menu-list" id="menu-list-staff"></div>
-  </div>
-</div>
-
-<!-- MODAL TMO -->
-<div class="modal-overlay" id="tmoModal">
-  <div class="modal-sheet">
-    <div class="modal-hdr">
-      <div style="font-size:30px;">⏸</div>
-      <div><div class="modal-name">Temps Mort</div><div class="modal-sub" id="tmo-modal-sub">Sélectionner l'équipe</div></div>
-      <button class="modal-close" onclick="document.getElementById('tmoModal').classList.remove('open')">✕</button>
-    </div>
-    <div class="action-grid" style="grid-template-columns:1fr 1fr;">
-      <button class="action-btn" id="tmo-btn-home" style="background:rgba(var(--home-rgb),.14);border:1px solid rgba(var(--home-rgb),.4);color:var(--home);" onclick="useTMO('home')">
-        <span class="ab-icon">⬤</span>
-        <span class="ab-label" id="tmo-btn-home-name">Domicile</span>
-        <span style="font-size:9px;color:var(--muted);" id="tmo-home-left"></span>
-      </button>
-      <button class="action-btn" id="tmo-btn-away" style="background:rgba(var(--away-rgb),.14);border:1px solid rgba(var(--away-rgb),.4);color:var(--away);" onclick="useTMO('away')">
-        <span class="ab-icon">⬤</span>
-        <span class="ab-label" id="tmo-btn-away-name">Extérieur</span>
-        <span style="font-size:9px;color:var(--muted);" id="tmo-away-left"></span>
-      </button>
-    </div>
   </div>
 </div>
 
@@ -610,8 +597,6 @@ function renderScoreboard() {
   document.getElementById('sb-away-name').textContent=a.abr||a.nom;
   document.getElementById('ts-home-name').textContent=h.nom;
   document.getElementById('ts-away-name').textContent=a.nom;
-  document.getElementById('tmo-btn-home-name').textContent=h.abr||h.nom;
-  document.getElementById('tmo-btn-away-name').textContent=a.abr||a.nom;
   updateScore();
 }
 function updateScore() {
@@ -715,32 +700,31 @@ function tmoUsedPeriod(team,period){return (data[team].tmoByPeriod||{})[period]|
 function tmoLeftTeam(team){return Math.max(0,cfg.tmoTeam-data[team].tmo);}
 function tmoLeftPeriod(team){return Math.max(0,cfg.tmoPeriod-tmoUsedPeriod(team,periodIdx));}
 
-function showTMO(){
+function useTMO(team){
   if(phase!=='play'){showToast('⏸ T.O. possible uniquement pendant une période');return;}
   if(tmoCountdown){showToast('Un temps mort est déjà en cours');return;}
-  updateTMOInfo();
-  document.getElementById('tmoModal').classList.add('open');
-}
-function useTMO(team){
   if(tmoLeftTeam(team)<=0){showToast('❌ Plus de temps morts pour cette équipe !');return;}
   if(tmoLeftPeriod(team)<=0){showToast('❌ Max. '+cfg.tmoPeriod+' T.O. atteint sur cette période');return;}
   data[team].tmo++;
   data[team].tmoByPeriod[periodIdx]=tmoUsedPeriod(team,periodIdx)+1;
   addEvent({type:'tmo',team,time:getTime(),period:periodIdx,desc:'Temps mort'});
-  updateTMOInfo();document.getElementById('tmoModal').classList.remove('open');
+  updateTMOInfo();
   showToast('⏸ Temps Mort — '+data[team].nom);
   if(chronoRunning)pauseChrono();
   startTMOCountdown(team);
   saveData();
 }
 function updateTMOInfo(){
-  const ht=data.home.tmo,at=data.away.tmo;
-  document.getElementById('tmoInfo').textContent=`D:${ht}/${cfg.tmoTeam} E:${at}/${cfg.tmoTeam}`;
-  document.getElementById('tmo-home-left').textContent=`Restants : ${tmoLeftTeam('home')} · cette période : ${tmoLeftPeriod('home')}`;
-  document.getElementById('tmo-away-left').textContent=`Restants : ${tmoLeftTeam('away')} · cette période : ${tmoLeftPeriod('away')}`;
-  document.getElementById('tmo-modal-sub').textContent=`${cfg.tmoTeam} par équipe · max ${cfg.tmoPeriod} par période · ${cfg.tmoSec>=60&&cfg.tmoSec%60===0?(cfg.tmoSec/60)+' min':cfg.tmoSec+' s'}`;
-  document.getElementById('tmo-home-badge').textContent=ht>0?`T.O.×${ht}`:'';
-  document.getElementById('tmo-away-badge').textContent=at>0?`T.O.×${at}`:'';
+  ['home','away'].forEach(t=>{
+    const used=data[t].tmo;
+    const btn=document.getElementById('tme-btn-'+t);
+    if(btn){
+      document.getElementById('tme-count-'+t).textContent=used+'/'+cfg.tmoTeam;
+      btn.classList.toggle('off',tmoLeftTeam(t)<=0||(phase==='play'&&tmoLeftPeriod(t)<=0));
+      btn.title="Temps Mort d'Équipe — restants : "+tmoLeftTeam(t)+' · cette période : '+tmoLeftPeriod(t)+' · durée : '+(cfg.tmoSec>=60&&cfg.tmoSec%60===0?(cfg.tmoSec/60)+' min':cfg.tmoSec+' s');
+    }
+    document.getElementById('tmo-'+t+'-badge').textContent=used>0?`T.O.×${used}`:'';
+  });
 }
 
 // Décompte du temps mort
@@ -1114,13 +1098,14 @@ function stopExcluTimer(team,idx,kind){
 const EV_ICONS={but:'⚽',but7:'7️⃣',save:'🧤',av:'<span class="san san-av e-san-icon"></span>','2min':'<span class="san san-2min e-san-icon"></span>',dis:'<span class="san san-dis e-san-icon"></span>',rapport:'<span class="san san-rap e-san-icon"></span>',tir:'🎯',tmo:'⏸',blanc:'<span class="san san-blanc e-san-icon"></span>'};
 const EV_CLS={but:'e-but',but7:'e-but7',save:'e-save',av:'e-av','2min':'e-2min',dis:'e-dis',rapport:'e-dis',tir:'e-tir',tmo:'e-tmo',blanc:'e-blanc'};
 
+function evIcon(t){return t==='2min'?`<span class="ev-2min">${exLbl()}</span>`:(EV_ICONS[t]||'•');}
 function addEvent(ev){ev.id=Date.now()+Math.random();data.events.unshift(ev);renderEvents();}
 function renderEvents(){
   const list=document.getElementById('event-list');
   if(!data.events.length){list.innerHTML=`<div class="ev-empty"><span style="font-size:20px;">📋</span><span>Aucun fait</span></div>`;return;}
   list.innerHTML=data.events.map(ev=>`
     <div class="event-item ${EV_CLS[ev.type]||''}">
-      <div class="e-icon">${EV_ICONS[ev.type]||'•'}</div>
+      <div class="e-icon">${evIcon(ev.type)}</div>
       <div class="e-body">
         <div class="e-title">${ev.desc}</div>
         <div class="e-sub">${ev.team==='home'?data.home.nom:data.away.nom}</div>
