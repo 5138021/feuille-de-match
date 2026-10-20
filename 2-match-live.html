@@ -145,7 +145,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .match-body{padding:10px 12px 80px;}
 
 /* DEUX ÉQUIPES CÔTE À CÔTE */
-.both-teams{display:grid;grid-template-columns:1fr 328px 1fr;gap:6px;align-items:start;}
+.both-teams{display:grid;grid-template-columns:1fr 128px 1fr;gap:6px;align-items:start;}
 .team-col{min-width:0;}
 .events-col{min-width:0;position:sticky;top:96px;}
 .events-col-title{font-family:var(--font-h);font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:center;margin-bottom:8px;}
@@ -286,7 +286,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .menu-list{margin-top:10px;max-height:60vh;overflow-y:auto;}
 .menu-item{display:flex;align-items:center;gap:10px;padding:10px 6px;cursor:pointer;border-radius:8px;transition:background .12s;}
 .menu-item:active{background:rgba(255,255,255,.08);}
-.menu-icon{width:22px;text-align:center;font-size:15px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.menu-icon{min-width:22px;text-align:center;font-size:15px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
 .menu-label{flex:1;font-size:13px;font-weight:600;color:#fff;min-width:0;}
 .menu-key{font-size:9px;color:var(--muted);font-family:var(--font-mono);background:rgba(255,255,255,.06);padding:3px 7px;border-radius:5px;letter-spacing:.5px;flex-shrink:0;}
 .menu-sep{height:1px;background:rgba(255,255,255,.08);margin:6px 2px;}
@@ -878,6 +878,7 @@ function menuItemHTML(icon,label,key,onclick,on,blocked){
   </div>`;
 }
 function sanIcon(cls){return `<span class="san ${cls}"></span>`;}
+function exIcon(){return `<span class="ev-2min">${exLbl()}</span>`;}
 
 // ═══════════ MODAL JOUEUR ═══════════
 function openPlayerModal(team,idx){
@@ -904,7 +905,7 @@ function openPlayerModal(team,idx){
   const rapOn=p.dis==='blue';
   const sancItems=[
     [sanIcon('san-av'),'Avertissement','J','av',p.av==='yellow'],
-    [sanIcon('san-2min'),'Exclusion '+exLbl(),'2','2min',false],
+    [exIcon(),'Exclusion '+exLbl(),'2','2min',false],
     [sanIcon('san-dis'),'Disqualification','D','dis',disOn],
     [sanIcon('san-rap'),'Disqual. rapport','R','rapport',rapOn]
   ];
@@ -1003,7 +1004,7 @@ function openStaffModal(team,idx){
 
   const items=[
     [sanIcon('san-av'),'Avertissement','J','av',hasAv,avBlocked],
-    [sanIcon('san-2min'),'Exclusion '+exLbl(),'2','exclu',hasExclu,excluBlocked],
+    [exIcon(),'Exclusion '+exLbl(),'2','exclu',hasExclu,excluBlocked],
     [sanIcon('san-dis'),'Disqualification','D','dis',hasDis,false],
     [sanIcon('san-rap'),'Rapport écrit','R','rapport',hasRap,false]
   ];
