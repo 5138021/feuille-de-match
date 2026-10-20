@@ -751,10 +751,10 @@ function tmoLeftTeam(team){return Math.max(0,cfg.tmoTeam-data[team].tmo);}
 function tmoLeftPeriod(team){return Math.max(0,cfg.tmoPeriod-tmoUsedPeriod(team,periodIdx));}
 
 function useTMO(team){
-  if(phase!=='play'){showToast('⏸ T.O. possible uniquement pendant une période');return;}
+  if(phase!=='play'){showToast('⏸ Temps Mort possible uniquement pendant une période');return;}
   if(tmoCountdown){showToast('Un temps mort est déjà en cours');return;}
   if(tmoLeftTeam(team)<=0){showToast('❌ Plus de temps morts pour cette équipe !');return;}
-  if(tmoLeftPeriod(team)<=0){showToast('❌ Max. '+cfg.tmoPeriod+' T.O. atteint sur cette période');return;}
+  if(tmoLeftPeriod(team)<=0){showToast('❌ Max. '+cfg.tmoPeriod+' Temps Mort atteint sur cette période');return;}
   data[team].tmo++;
   data[team].tmoByPeriod[periodIdx]=tmoUsedPeriod(team,periodIdx)+1;
   addEvent({type:'tmo',team,time:getTime(),period:periodIdx,desc:'Temps mort'});
@@ -773,7 +773,7 @@ function updateTMOInfo(){
       btn.classList.toggle('off',tmoLeftTeam(t)<=0||(phase==='play'&&tmoLeftPeriod(t)<=0));
       btn.title="Temps Mort d'Équipe — restants : "+tmoLeftTeam(t)+' · cette période : '+tmoLeftPeriod(t)+' · durée : '+(cfg.tmoSec>=60&&cfg.tmoSec%60===0?(cfg.tmoSec/60)+' min':cfg.tmoSec+' s');
     }
-    document.getElementById('tmo-'+t+'-badge').textContent=used>0?`T.O.×${used}`:'';
+    document.getElementById('tmo-'+t+'-badge').textContent=used>0?`Temps Mort×${used}`:'';
   });
 }
 
@@ -783,7 +783,7 @@ function startTMOCountdown(team){
   tmoCountdown={team,rem:Math.round(cfg.tmoSec),interval:null};
   const b=document.getElementById('tmoBanner');
   b.classList.remove('done');b.style.display='flex';
-  document.getElementById('tmoBannerTxt').textContent='⏸ T.O. — '+(data[team].abr||data[team].nom);
+  document.getElementById('tmoBannerTxt').textContent='⏸ Temps Mort — '+(data[team].abr||data[team].nom);
   renderTMOBanner();
   tmoCountdown.interval=setInterval(()=>{
     if(!tmoCountdown)return;
