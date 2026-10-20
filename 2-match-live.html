@@ -50,6 +50,30 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .btn-tmo{background:rgba(155,89,182,.25);color:var(--purple);border:1px solid rgba(155,89,182,.4);}
 .tmo-badge{font-size:8px;display:block;margin-top:1px;opacity:.7;}
 
+
+/* MENU D'UN FAIT DE MATCH */
+.event-item{flex-wrap:wrap;}
+.e-menu{position:absolute;top:1px;right:1px;background:transparent;border:none;color:rgba(255,255,255,.45);font-size:16px;font-weight:900;line-height:1;cursor:pointer;padding:4px 6px;border-radius:6px;letter-spacing:1px;}
+.e-menu:active,.event-item.menu-open .e-menu{background:rgba(255,255,255,.12);color:#fff;}
+.e-actions{flex-basis:100%;display:flex;flex-direction:column;gap:5px;margin-top:5px;}
+.e-act{width:100%;padding:7px 6px;border-radius:7px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;font-family:var(--font-h);font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;text-align:center;}
+.e-act.del{background:rgba(224,45,55,.16);border-color:rgba(224,45,55,.4);color:#ff7a80;}
+.e-act.edit{background:rgba(74,159,255,.14);border-color:rgba(74,159,255,.35);color:var(--cyan);}
+.e-act:active{transform:scale(.97);}
+
+/* MODAL MODIFIER UN FAIT */
+.ee-summary{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border-radius:10px;padding:10px 12px;margin:6px 0 4px;border-left:3px solid var(--purple);}
+.ee-summary .ee-t{font-family:var(--font-h);font-size:14px;font-weight:800;line-height:1.2;}
+.ee-summary .ee-s{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;}
+.mem-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.mem{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;font-size:12px;font-weight:600;min-width:0;}
+.mem:active{transform:scale(.98);}
+.mem .mn{font-family:var(--font-mono);font-weight:700;color:var(--gold);min-width:20px;text-align:center;flex-shrink:0;}
+.mem.gk .mn{color:var(--cyan);}
+.mem .mt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mem.sel{border-color:var(--cyan);background:rgba(74,159,255,.2);}
+.mem.off .mn{color:var(--purple);font-size:13px;}
+
 /* BOUTON TME PAR ÉQUIPE */
 .tme-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-bottom:8px;padding:9px 6px;border-radius:9px;font-family:var(--font-h);font-size:13px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
 .tme-btn:active{transform:scale(.97);}
@@ -417,6 +441,32 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
       <button class="modal-close" onclick="closeStaffModal()">✕</button>
     </div>
     <div class="menu-list" id="menu-list-staff"></div>
+  </div>
+</div>
+
+<!-- MODAL MODIFIER UN FAIT DE MATCH -->
+<div class="modal-overlay" id="evEditModal" onclick="if(event.target===this)closeEventEdit()">
+  <div class="modal-sheet sheet-tall">
+    <div class="modal-hdr" style="margin-bottom:4px;">
+      <div style="font-size:28px;">✏️</div>
+      <div><div class="modal-name">Modifier le fait de match</div><div class="modal-sub">Corriger l'équipe et/ou le joueur</div></div>
+      <button class="modal-close" onclick="closeEventEdit()">✕</button>
+    </div>
+    <div class="ee-summary" id="ee-summary"></div>
+
+    <div class="f-sec">Équipe</div>
+    <div class="team-switch">
+      <button id="ee-home" onclick="setEvEditTeam('home')">Domicile</button>
+      <button id="ee-away" onclick="setEvEditTeam('away')">Extérieur</button>
+    </div>
+
+    <div id="ee-members"></div>
+
+    <div class="f-err" id="ee-err"></div>
+    <div class="f-btns">
+      <button class="f-btn ghost" onclick="closeEventEdit()">Annuler</button>
+      <button class="f-btn go" onclick="saveEventEdit()">✔ Enregistrer</button>
+    </div>
   </div>
 </div>
 
@@ -881,18 +931,18 @@ function doPA(action){
   const t=getTime(),tn=data[team].nom;
   const nm=fullName(p);
   switch(action){
-    case 'goal':p.goals=(p.goals||0)+1;p.tirs=(p.tirs||0)+1;data.match['score'+(team==='home'?'Home':'Away')]++;updateScore();addEvent({type:'but',team,time:t,player:p.num,desc:'But — '+nm});showToast('⚽ But pour '+tn+' !');break;
-    case 'goal7':p.goals=(p.goals||0)+1;p.m7=(p.m7||0)+1;p.tirs=(p.tirs||0)+1;data.match['score'+(team==='home'?'Home':'Away')]++;updateScore();addEvent({type:'but7',team,time:t,player:p.num,desc:'But 7m — '+nm});showToast('7️⃣ But 7m !');break;
-    case 'save':p.arrets=(p.arrets||0)+1;addEvent({type:'save',team,time:t,player:p.num,desc:'Arrêt — '+nm});showToast('🧤 Arrêt de '+p.name);break;
-    case 'tir':p.tirs=(p.tirs||0)+1;addEvent({type:'tir',team,time:t,player:p.num,desc:'Tir — '+nm});showToast('🎯 Tir');break;
+    case 'goal':p.goals=(p.goals||0)+1;p.tirs=(p.tirs||0)+1;data.match['score'+(team==='home'?'Home':'Away')]++;updateScore();addEvent({kind:'p',idx,type:'but',team,time:t,player:p.num,desc:'But — '+nm});showToast('⚽ But pour '+tn+' !');break;
+    case 'goal7':p.goals=(p.goals||0)+1;p.m7=(p.m7||0)+1;p.tirs=(p.tirs||0)+1;data.match['score'+(team==='home'?'Home':'Away')]++;updateScore();addEvent({kind:'p',idx,type:'but7',team,time:t,player:p.num,desc:'But 7m — '+nm});showToast('7️⃣ But 7m !');break;
+    case 'save':p.arrets=(p.arrets||0)+1;addEvent({kind:'p',idx,type:'save',team,time:t,player:p.num,desc:'Arrêt — '+nm});showToast('🧤 Arrêt de '+p.name);break;
+    case 'tir':p.tirs=(p.tirs||0)+1;addEvent({kind:'p',idx,type:'tir',team,time:t,player:p.num,desc:'Tir — '+nm});showToast('🎯 Tir');break;
     case 'tirarret':{
       const oppTeam=team==='home'?'away':'home';
       const gk=data[oppTeam].players.find(pl=>pl.isGK);
       p.tirs=(p.tirs||0)+1;
-      addEvent({type:'tir',team,time:t,player:p.num,desc:'Tir — '+nm});
+      addEvent({kind:'p',idx,type:'tir',team,time:t,player:p.num,desc:'Tir — '+nm});
       if(gk){
         gk.arrets=(gk.arrets||0)+1;
-        addEvent({type:'save',team:oppTeam,time:t,player:gk.num,desc:'Arrêt — '+fullName(gk)});
+        addEvent({kind:'p',idx:data[oppTeam].players.indexOf(gk),type:'save',team:oppTeam,time:t,player:gk.num,desc:'Arrêt — '+fullName(gk)});
       }
       showToast('🧤 Tir arrêté'+(gk?' — '+gk.name:''));
       break;}
@@ -903,7 +953,7 @@ function doPA(action){
       p.isGK=true;
       showToast('🧤 '+p.name+' nommé gardien');
       break;}
-    case 'av':if(p.av==='yellow'){showToast('⚠️ Déjà attribué');return;}p.av='yellow';addEvent({type:'av',team,time:t,player:p.num,desc:'Avertissement — '+nm});showToast('⚠️ Avert. — '+p.name);break;
+    case 'av':if(p.av==='yellow'){showToast('⚠️ Déjà attribué');return;}p.av='yellow';addEvent({kind:'p',idx,type:'av',team,time:t,player:p.num,desc:'Avertissement — '+nm});showToast('⚠️ Avert. — '+p.name);break;
     case '2min':{
       let isDisq=false;
       if(!p.p1||p.p1==='empty'){p.p1='2min';}
@@ -911,11 +961,11 @@ function doPA(action){
       else if(!p.p3||p.p3==='empty'){p.p3='2min';p.dis='red3x2';p.outOfGame=true;isDisq=true;showToast('🟥 3e exclusion — Disqualification !');}
       else{showToast('❌ 3 exclusions déjà atteintes');return;}
       p.excluActive=true;startExcluTimer(team,idx);
-      addEvent({type:'2min',team,time:t,player:p.num,disq3x2:isDisq,desc:'Exclusion '+exLbl()+' — '+nm});
+      addEvent({kind:'p',idx,type:'2min',team,time:t,player:p.num,disq3x2:isDisq,desc:'Exclusion '+exLbl()+' — '+nm});
       if(!isDisq)showToast('⏱️ Exclusion '+exLbl()+' — '+p.name);break;}
-    case 'dis':p.dis='red';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({type:'dis',team,time:t,player:p.num,desc:'Disqualification — '+nm});showToast('🟥 Disqualif. — '+p.name);break;
-    case 'rapport':p.dis='blue';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({type:'rapport',team,time:t,player:p.num,desc:'Disqualification avec rapport — '+nm});showToast('📝 Disqualif. + rapport — '+p.name);break;
-    case 'blanc':p.blanc=true;addEvent({type:'blanc',team,time:t,player:p.num,desc:'Carton blanc — '+nm});showToast('⬜ Carton blanc — '+p.name);break;
+    case 'dis':p.dis='red';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({kind:'p',idx,type:'dis',team,time:t,player:p.num,desc:'Disqualification — '+nm});showToast('🟥 Disqualif. — '+p.name);break;
+    case 'rapport':p.dis='blue';p.outOfGame=true;p.excluActive=true;startExcluTimer(team,idx);addEvent({kind:'p',idx,type:'rapport',team,time:t,player:p.num,desc:'Disqualification avec rapport — '+nm});showToast('📝 Disqualif. + rapport — '+p.name);break;
+    case 'blanc':p.blanc=true;addEvent({kind:'p',idx,type:'blanc',team,time:t,player:p.num,desc:'Carton blanc — '+nm});showToast('⬜ Carton blanc — '+p.name);break;
     case 'undo':undoPlayer(team,p);return;
   }
   renderPlayers('home');renderPlayers('away');closeModal();saveData();
@@ -924,18 +974,8 @@ function doPA(action){
 function undoPlayer(team,p){
   for(let i=data.events.length-1;i>=0;i--){
     const ev=data.events[i];
-    if(ev.team===team&&String(ev.player)===String(p.num)){
-      switch(ev.type){
-        case 'but':case 'but7':p.goals=Math.max(0,(p.goals||1)-1);if(ev.type==='but7')p.m7=Math.max(0,(p.m7||1)-1);p.tirs=Math.max(0,(p.tirs||1)-1);data.match['score'+(team==='home'?'Home':'Away')]=Math.max(0,data.match['score'+(team==='home'?'Home':'Away')]-1);updateScore();break;
-        case 'save':p.arrets=Math.max(0,(p.arrets||1)-1);break;
-        case 'tir':p.tirs=Math.max(0,(p.tirs||1)-1);break;
-        case 'av':p.av='empty';break;
-        case '2min':if(p.p3&&p.p3!=='empty'){p.p3='empty';if(p.dis==='red3x2'){p.dis='empty';p.outOfGame=false;}}else if(p.p2&&p.p2!=='empty')p.p2='empty';else if(p.p1&&p.p1!=='empty')p.p1='empty';p.excluActive=false;stopExcluTimer(team,data[team].players.indexOf(p));break;
-        case 'dis':p.dis='empty';p.excluActive=false;p.outOfGame=false;stopExcluTimer(team,data[team].players.indexOf(p));break;
-        case 'rapport':p.dis='empty';p.excluActive=false;p.outOfGame=false;stopExcluTimer(team,data[team].players.indexOf(p));break;
-        case 'blanc':p.blanc=false;break;
-      }
-      data.events.splice(i,1);showToast('↩️ Annulé');renderPlayers('home');renderPlayers('away');renderEvents();saveData();closeModal();return;
+    if(ev.team===team&&ev.type!=='tmo'&&ev.kind!=='s'&&String(ev.player)===String(p.num)){
+      revertEvent(ev);data.events.splice(i,1);showToast('↩️ Annulé');refreshAll();saveData();closeModal();return;
     }
   }
   showToast('Rien à annuler');closeModal();
@@ -990,29 +1030,25 @@ function doSA(action){
       if(off.av==='yellow'){off.av='empty';showToast('↩️ AV officiel retiré');}
       else{
         if(teamOffs.some((o,i)=>i!==idx&&o.av==='yellow')){showToast('⛔ 1 seul AV autorisé pour l\'équipe !');closeStaffModal();return;}
-        off.av='yellow';addEvent({type:'av',team,time:t,player:off.nom,desc:'Avertissement — '+off.nom});showToast('⚠️ AV Officiel — '+off.nom);
+        off.av='yellow';addEvent({kind:'s',idx,type:'av',team,time:t,player:off.nom,desc:'Avertissement — '+off.nom});showToast('⚠️ AV Officiel — '+off.nom);
       }break;
     case 'exclu':
       if(off.exclu==='2min'){off.exclu='empty';off.excluActive=false;stopExcluTimer(team,idx,'s');showToast('↩️ Exclusion '+exLbl()+' retirée');}
       else{
         if(teamOffs.some((o,i)=>i!==idx&&o.exclu==='2min')){showToast('⛔ 1 seule exclusion '+exLbl()+' autorisée !');closeStaffModal();return;}
-        off.exclu='2min';off.excluActive=true;startExcluTimer(team,idx,'s');addEvent({type:'2min',team,time:t,player:off.nom,desc:'Exclusion '+exLbl()+' — '+off.nom});showToast('⏱️ Exclusion '+exLbl()+' Officiel — '+off.nom);
+        off.exclu='2min';off.excluActive=true;startExcluTimer(team,idx,'s');addEvent({kind:'s',idx,type:'2min',team,time:t,player:off.nom,desc:'Exclusion '+exLbl()+' — '+off.nom});showToast('⏱️ Exclusion '+exLbl()+' Officiel — '+off.nom);
       }break;
     case 'dis':
       if(off.dis==='red'){off.dis='empty';off.excluActive=false;off.outOfGame=false;stopExcluTimer(team,idx,'s');showToast('↩️ Disqualif. retirée');}
-      else{off.dis='red';off.excluActive=true;off.outOfGame=true;startExcluTimer(team,idx,'s');addEvent({type:'dis',team,time:t,player:off.nom,desc:'Disqualification — '+off.nom});showToast('🟥 Disqualif. Officiel — '+off.nom);}break;
+      else{off.dis='red';off.excluActive=true;off.outOfGame=true;startExcluTimer(team,idx,'s');addEvent({kind:'s',idx,type:'dis',team,time:t,player:off.nom,desc:'Disqualification — '+off.nom});showToast('🟥 Disqualif. Officiel — '+off.nom);}break;
     case 'rapport':
       if(off.rapport==='blue'){off.rapport='empty';off.excluActive=false;off.outOfGame=false;stopExcluTimer(team,idx,'s');showToast('↩️ Rapport retiré');}
-      else{off.rapport='blue';off.excluActive=true;off.outOfGame=true;startExcluTimer(team,idx,'s');addEvent({type:'rapport',team,time:t,player:off.nom,desc:'Disqualification avec rapport — '+off.nom});showToast('📝 Disqualif. + rapport Officiel — '+off.nom);}break;
+      else{off.rapport='blue';off.excluActive=true;off.outOfGame=true;startExcluTimer(team,idx,'s');addEvent({kind:'s',idx,type:'rapport',team,time:t,player:off.nom,desc:'Disqualification avec rapport — '+off.nom});showToast('📝 Disqualif. + rapport Officiel — '+off.nom);}break;
     case 'undo':
       for(let i=data.events.length-1;i>=0;i--){
         const ev=data.events[i];
-        if(ev.team===team&&ev.player===off.nom){
-          if(ev.type==='av')off.av='empty';
-          else if(ev.type==='2min'){off.exclu='empty';off.excluActive=false;stopExcluTimer(team,idx,'s');}
-          else if(ev.type==='dis'){off.dis='empty';off.excluActive=false;off.outOfGame=false;stopExcluTimer(team,idx,'s');}
-          else if(ev.type==='rapport'){off.rapport='empty';off.excluActive=false;off.outOfGame=false;stopExcluTimer(team,idx,'s');}
-          data.events.splice(i,1);showToast('↩️ Annulé');renderStaff(team);renderEvents();saveData();closeStaffModal();return;
+        if(ev.team===team&&ev.type!=='tmo'&&ev.player===off.nom){
+          revertEvent(ev);data.events.splice(i,1);showToast('↩️ Annulé');refreshAll();saveData();closeStaffModal();return;
         }
       }
       showToast('Rien à annuler');closeStaffModal();return;
@@ -1098,32 +1134,234 @@ function stopExcluTimer(team,idx,kind){
 const EV_ICONS={but:'⚽',but7:'7️⃣',save:'🧤',av:'<span class="san san-av e-san-icon"></span>','2min':'<span class="san san-2min e-san-icon"></span>',dis:'<span class="san san-dis e-san-icon"></span>',rapport:'<span class="san san-rap e-san-icon"></span>',tir:'🎯',tmo:'⏸',blanc:'<span class="san san-blanc e-san-icon"></span>'};
 const EV_CLS={but:'e-but',but7:'e-but7',save:'e-save',av:'e-av','2min':'e-2min',dis:'e-dis',rapport:'e-dis',tir:'e-tir',tmo:'e-tmo',blanc:'e-blanc'};
 
-function evIcon(t){return t==='2min'?`<span class="ev-2min">${exLbl()}</span>`:(EV_ICONS[t]||'•');}
 function addEvent(ev){ev.id=Date.now()+Math.random();data.events.unshift(ev);renderEvents();}
+
+let openEvId=null; // fait dont le menu (Supprimer / Modifier) est ouvert
 function renderEvents(){
   const list=document.getElementById('event-list');
   if(!data.events.length){list.innerHTML=`<div class="ev-empty"><span style="font-size:20px;">📋</span><span>Aucun fait</span></div>`;return;}
-  list.innerHTML=data.events.map(ev=>`
-    <div class="event-item ${EV_CLS[ev.type]||''}">
+  list.innerHTML=data.events.map(ev=>{
+    const open=openEvId!==null&&openEvId===ev.id;
+    return `
+    <div class="event-item ${EV_CLS[ev.type]||''}${open?' menu-open':''}">
       <div class="e-icon">${evIcon(ev.type)}</div>
       <div class="e-body">
         <div class="e-title">${ev.desc}</div>
         <div class="e-sub">${ev.team==='home'?data.home.nom:data.away.nom}</div>
         <div class="e-time">${ev.time}</div>
       </div>
-      <button class="e-del" onclick="deleteEvent(${ev.id})">✕</button>
-    </div>`).join('');
+      <button class="e-menu" title="Actions" onclick="toggleEvMenu(${ev.id},event)">⋯</button>
+      ${open?`<div class="e-actions">
+        <button class="e-act del" title="Supprimer le fait de match" onclick="deleteEvent(${ev.id})">🗑 Supprimer</button>
+        <button class="e-act edit" title="Modifier le fait de match" onclick="openEventEdit(${ev.id})">✏️ Modifier</button>
+      </div>`:''}
+    </div>`;}).join('');
 }
+function evIcon(t){return t==='2min'?`<span class="ev-2min">${exLbl()}</span>`:(EV_ICONS[t]||'•');}
+function toggleEvMenu(id,e){
+  if(e)e.stopPropagation();
+  openEvId=(openEvId===id)?null:id;
+  renderEvents();
+}
+// un clic ailleurs referme le menu d'un fait
+document.addEventListener('click',function(e){
+  if(openEvId===null)return;
+  if(e.target.closest&&(e.target.closest('.e-actions')||e.target.closest('.e-menu')))return;
+  openEvId=null;renderEvents();
+});
+
+function refreshAll(){
+  renderPlayers('home');renderPlayers('away');renderStaff('home');renderStaff('away');
+  updateScore();updateTMOInfo();renderEvents();
+}
+
+// ═══════════ EFFET D'UN FAIT SUR LES STATISTIQUES ═══════════
+// Retrouve le joueur / officiel visé par un fait (anciens faits : par n° ou par nom)
+function resolveTarget(ev){
+  const t=data[ev.team];if(!t||ev.type==='tmo')return null;
+  if(ev.kind==='p'&&t.players[ev.idx])return{e:t.players[ev.idx],kind:'p',idx:ev.idx};
+  if(ev.kind==='s'&&(t.officials||[])[ev.idx])return{e:t.officials[ev.idx],kind:'s',idx:ev.idx};
+  let i=t.players.findIndex(p=>String(p.num)===String(ev.player));
+  if(i>=0&&ev.kind!=='s'){ev.kind='p';ev.idx=i;return{e:t.players[i],kind:'p',idx:i};}
+  i=(t.officials||[]).findIndex(o=>o.nom&&o.nom===ev.player);
+  if(i>=0){ev.kind='s';ev.idx=i;return{e:t.officials[i],kind:'s',idx:i};}
+  return null;
+}
+const sideKey=t=>t==='home'?'Home':'Away';
+const dec=v=>Math.max(0,(v||0)-1);
+const isSet=v=>v&&v!=='empty';
+
+// Retire de la feuille la statistique liée à un fait
+function revertEvent(ev){
+  const t=data[ev.team];
+  if(ev.type==='tmo'){
+    t.tmo=dec(t.tmo);
+    if(ev.period&&t.tmoByPeriod)t.tmoByPeriod[ev.period]=dec(t.tmoByPeriod[ev.period]);
+    updateTMOInfo();return;
+  }
+  if(ev.type==='but'||ev.type==='but7'){
+    const k='score'+sideKey(ev.team);data.match[k]=dec(data.match[k]);updateScore();
+  }
+  const tg=resolveTarget(ev);if(!tg)return;
+  const e=tg.e;
+  if(tg.kind==='p'){
+    switch(ev.type){
+      case 'but':e.goals=dec(e.goals);e.tirs=dec(e.tirs);break;
+      case 'but7':e.goals=dec(e.goals);e.m7=dec(e.m7);e.tirs=dec(e.tirs);break;
+      case 'save':e.arrets=dec(e.arrets);break;
+      case 'tir':e.tirs=dec(e.tirs);break;
+      case 'av':e.av='empty';break;
+      case '2min':{
+        const hadDisq3=(e.dis==='red3x2');
+        if(isSet(e.p3)){e.p3='empty';if(hadDisq3){e.dis='empty';e.outOfGame=false;}}
+        else if(isSet(e.p2))e.p2='empty';
+        else if(isSet(e.p1))e.p1='empty';
+        e.excluActive=false;stopExcluTimer(ev.team,tg.idx,'p');
+        // la 3e exclusion (disqualifiante) n'existe plus : on retire le marquage des autres faits du joueur
+        if(hadDisq3&&!ev.disq3x2)data.events.forEach(x=>{if(x!==ev&&x.type==='2min'&&x.disq3x2&&x.team===ev.team&&x.idx===tg.idx)x.disq3x2=false;});
+        break;}
+      case 'dis':if(e.dis==='red')e.dis='empty';e.excluActive=false;e.outOfGame=false;stopExcluTimer(ev.team,tg.idx,'p');break;
+      case 'rapport':if(e.dis==='blue')e.dis='empty';e.excluActive=false;e.outOfGame=false;stopExcluTimer(ev.team,tg.idx,'p');break;
+      case 'blanc':e.blanc=false;break;
+    }
+  }else{
+    switch(ev.type){
+      case 'av':e.av='empty';break;
+      case '2min':e.exclu='empty';e.excluActive=false;stopExcluTimer(ev.team,tg.idx,'s');break;
+      case 'dis':e.dis='empty';e.excluActive=false;e.outOfGame=false;stopExcluTimer(ev.team,tg.idx,'s');break;
+      case 'rapport':e.rapport='empty';e.excluActive=false;e.outOfGame=false;stopExcluTimer(ev.team,tg.idx,'s');break;
+    }
+  }
+}
+
+// Applique à la feuille la statistique d'un fait (utilisé pour déplacer un fait vers un autre joueur / une autre équipe)
+function applyEvent(ev){
+  const t=data[ev.team];
+  if(ev.type==='tmo'){
+    t.tmo=(t.tmo||0)+1;t.tmoByPeriod=t.tmoByPeriod||{};
+    if(ev.period)t.tmoByPeriod[ev.period]=(t.tmoByPeriod[ev.period]||0)+1;
+    updateTMOInfo();return{ok:true};
+  }
+  const tg=resolveTarget(ev);if(!tg)return{ok:false,msg:'Joueur introuvable'};
+  const e=tg.e;
+  if(tg.kind==='p'){
+    switch(ev.type){
+      case 'but':e.goals=(e.goals||0)+1;e.tirs=(e.tirs||0)+1;data.match['score'+sideKey(ev.team)]++;updateScore();break;
+      case 'but7':e.goals=(e.goals||0)+1;e.m7=(e.m7||0)+1;e.tirs=(e.tirs||0)+1;data.match['score'+sideKey(ev.team)]++;updateScore();break;
+      case 'save':e.arrets=(e.arrets||0)+1;break;
+      case 'tir':e.tirs=(e.tirs||0)+1;break;
+      case 'av':if(e.av==='yellow')return{ok:false,msg:'Ce joueur a déjà un avertissement'};e.av='yellow';break;
+      case '2min':
+        if(!isSet(e.p1)){e.p1='2min';ev.disq3x2=false;}
+        else if(!isSet(e.p2)){e.p2='2min';ev.disq3x2=false;}
+        else if(!isSet(e.p3)){e.p3='2min';e.dis='red3x2';e.outOfGame=true;ev.disq3x2=true;}
+        else return{ok:false,msg:'Ce joueur a déjà 3 exclusions'};
+        e.excluActive=true;startExcluTimer(ev.team,tg.idx,'p');break;
+      case 'dis':e.dis='red';e.outOfGame=true;e.excluActive=true;startExcluTimer(ev.team,tg.idx,'p');break;
+      case 'rapport':e.dis='blue';e.outOfGame=true;e.excluActive=true;startExcluTimer(ev.team,tg.idx,'p');break;
+      case 'blanc':e.blanc=true;break;
+    }
+  }else{
+    const others=(t.officials||[]).filter((o,i)=>i!==tg.idx);
+    switch(ev.type){
+      case 'av':if(others.some(o=>o.av==='yellow'))return{ok:false,msg:"1 seul avertissement autorisé pour l'équipe"};e.av='yellow';break;
+      case '2min':if(others.some(o=>o.exclu==='2min'))return{ok:false,msg:"1 seule exclusion autorisée pour l'équipe"};e.exclu='2min';e.excluActive=true;startExcluTimer(ev.team,tg.idx,'s');break;
+      case 'dis':e.dis='red';e.excluActive=true;e.outOfGame=true;startExcluTimer(ev.team,tg.idx,'s');break;
+      case 'rapport':e.rapport='blue';e.excluActive=true;e.outOfGame=true;startExcluTimer(ev.team,tg.idx,'s');break;
+      default:return{ok:false,msg:"Action impossible pour un officiel"};
+    }
+  }
+  return{ok:true};
+}
+
+function eventDesc(ev){
+  if(ev.type==='tmo')return 'Temps mort';
+  const tg=resolveTarget(ev);
+  const nm=tg?(tg.kind==='s'?tg.e.nom:fullName(tg.e)):'—';
+  const L={but:'But',but7:'But 7m',save:'Arrêt',tir:'Tir',av:'Avertissement',
+    '2min':'Exclusion '+exLbl(),dis:'Disqualification',rapport:'Disqualification avec rapport',blanc:'Carton blanc'};
+  return (L[ev.type]||ev.type)+' — '+nm;
+}
+
+// ═══════════ SUPPRIMER UN FAIT (et sa statistique) ═══════════
 function deleteEvent(id){
   const ev=data.events.find(e=>e.id===id);
-  // Supprimer un temps mort le rend à l'équipe (total + compteur de la période)
-  if(ev&&ev.type==='tmo'){
-    const t=data[ev.team];
-    t.tmo=Math.max(0,t.tmo-1);
-    if(ev.period&&t.tmoByPeriod)t.tmoByPeriod[ev.period]=Math.max(0,(t.tmoByPeriod[ev.period]||1)-1);
-    updateTMOInfo();
+  openEvId=null;
+  if(!ev){renderEvents();return;}
+  if(!confirm('Supprimer ce fait de match et la statistique associée ?\n\n'+ev.desc)){renderEvents();return;}
+  revertEvent(ev);
+  data.events=data.events.filter(e=>e!==ev);
+  refreshAll();saveData();showToast('🗑 Fait supprimé');
+}
+
+// ═══════════ MODIFIER UN FAIT (équipe / joueur) ═══════════
+let editEv=null; // { ev, team, sel:{kind,idx}|null, origTeam, origSel }
+const SANCTION_TYPES=['av','2min','dis','rapport'];
+
+function openEventEdit(id){
+  const ev=data.events.find(e=>e.id===id);if(!ev)return;
+  openEvId=null;renderEvents();
+  const tg=resolveTarget(ev);
+  const sel=tg?{kind:tg.kind,idx:tg.idx}:null;
+  editEv={ev,team:ev.team,sel,origTeam:ev.team,origSel:sel};
+  document.getElementById('ee-summary').innerHTML=
+    `<div class="e-icon" style="font-size:20px;">${evIcon(ev.type)}</div><div><div class="ee-t">${ev.desc}</div><div class="ee-s">${ev.time} · ${ev.team==='home'?data.home.nom:data.away.nom}</div></div>`;
+  document.getElementById('ee-err').style.display='none';
+  renderEvEdit();
+  document.getElementById('evEditModal').classList.add('open');
+}
+function closeEventEdit(){document.getElementById('evEditModal').classList.remove('open');editEv=null;}
+
+function renderEvEdit(){
+  const ev=editEv.ev,team=editEv.team,t=data[team];
+  const bh=document.getElementById('ee-home'),ba=document.getElementById('ee-away');
+  bh.textContent=data.home.nom||'Domicile';ba.textContent=data.away.nom||'Extérieur';
+  bh.className=team==='home'?'on-home':'';ba.className=team==='away'?'on-away':'';
+  const box=document.getElementById('ee-members');
+  if(ev.type==='tmo'){
+    box.innerHTML='<div class="f-note" style="margin-top:12px;">Un temps mort n\'est lié à aucun joueur : seule l\'équipe peut être modifiée.</div>';
+    return;
   }
-  data.events=data.events.filter(e=>e.id!==id);renderEvents();saveData();
+  const sel=editEv.sel;
+  let html='<div class="f-sec">Joueur</div><div class="mem-grid">'+
+    t.players.map((p,i)=>`<div class="mem${p.isGK?' gk':''}${sel&&sel.kind==='p'&&sel.idx===i?' sel':''}" onclick="pickEvMember('p',${i})"><span class="mn">${p.num||'?'}</span><span class="mt">${p.name||'—'}</span></div>`).join('')+'</div>';
+  if(SANCTION_TYPES.includes(ev.type)){
+    const offs=(t.officials||[]).map((o,i)=>({o,i})).filter(x=>x.o.nom);
+    if(offs.length)html+='<div class="f-sec">Officiel</div><div class="mem-grid">'+
+      offs.map(x=>`<div class="mem off${sel&&sel.kind==='s'&&sel.idx===x.i?' sel':''}" onclick="pickEvMember('s',${x.i})"><span class="mn">👤</span><span class="mt">${x.o.nom}</span></div>`).join('')+'</div>';
+  }
+  box.innerHTML=html;
+}
+function setEvEditTeam(team){
+  editEv.team=team;
+  editEv.sel=(team===editEv.origTeam)?editEv.origSel:null;
+  document.getElementById('ee-err').style.display='none';
+  renderEvEdit();
+}
+function pickEvMember(kind,idx){editEv.sel={kind,idx};document.getElementById('ee-err').style.display='none';renderEvEdit();}
+
+function saveEventEdit(){
+  const ev=editEv.ev,newTeam=editEv.team,sel=editEv.sel;
+  const err=m=>{const e=document.getElementById('ee-err');e.textContent='⚠️ '+m;e.style.display='block';};
+  if(ev.type!=='tmo'&&!sel){err('Choisis un joueur pour cette équipe.');return;}
+  const sameSel=ev.type==='tmo'||(editEv.origSel&&sel.kind===editEv.origSel.kind&&sel.idx===editEv.origSel.idx);
+  if(newTeam===editEv.origTeam&&sameSel){closeEventEdit();return;} // rien n'a changé
+
+  const old={team:ev.team,player:ev.player,kind:ev.kind,idx:ev.idx,desc:ev.desc,disq3x2:ev.disq3x2};
+  revertEvent(ev);
+  ev.team=newTeam;
+  if(ev.type!=='tmo'){
+    const t=data[newTeam];
+    ev.kind=sel.kind;ev.idx=sel.idx;
+    ev.player=sel.kind==='s'?t.officials[sel.idx].nom:t.players[sel.idx].num;
+  }
+  const r=applyEvent(ev);
+  if(!r.ok){ // on remet le fait comme avant
+    Object.assign(ev,old);applyEvent(ev);refreshAll();
+    err(r.msg);return;
+  }
+  ev.desc=eventDesc(ev);
+  refreshAll();saveData();closeEventEdit();showToast('✏️ Fait modifié');
 }
 
 function showEndModal(){
