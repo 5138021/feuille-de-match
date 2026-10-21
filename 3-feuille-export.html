@@ -384,7 +384,6 @@
               <th style="width:16px" title="Capitaine">Cap</th>
               <th style="width:24px">N°</th>
               <th class="th-name">Nom · Prénom</th>
-              <th style="width:26px">Pos</th>
               <th style="width:22px">Buts</th>
               <th style="width:18px">7m</th>
               <th style="width:22px">Tirs</th>
@@ -429,7 +428,6 @@
               <th style="width:16px" title="Capitaine">Cap</th>
               <th style="width:24px">N°</th>
               <th class="th-name">Nom · Prénom</th>
-              <th style="width:26px">Pos</th>
               <th style="width:22px">Buts</th>
               <th style="width:18px">7m</th>
               <th style="width:22px">Tirs</th>
@@ -535,7 +533,6 @@
       <span class="leg-item"><span class="pen-box c-blue" style="pointer-events:none;cursor:default;">■</span> Rapport
       écrit</span>
       <span class="leg-item">⚑ Capitaine</span>
-      <span class="leg-item" style="color:var(--muted);">GK = Gardien de but</span>
     </div>
 
     <!-- FOOTER -->
@@ -658,10 +655,7 @@ function buildPenBox(state,type){
   return `<div class="pen-box ${s.cls}" data-state="${state}" onclick="cyclePen(this,'${type}')">${s.label}</div>`;
 }
 function buildRow(p,team){
-  const isGK=p.isGK||p.pos==='GK';
-  const numCls=isGK?'td-num num-gk':'td-num num-j';
-  const posCls=isGK?'pos-gk':'pos-j';
-  const posLbl=isGK?'GK':'J';
+  const numCls='td-num num-j';
   const goalsCls=(p.goals==='—'||!p.goals)?'td-goals zero':'td-goals';
   const m7Cls=(p.m7==='—'||!p.m7)?'td-7m zero':'td-7m';
   const arsCls=(p.arrets==='—'||!p.arrets)?'td-ars zero':'td-ars';
@@ -683,7 +677,6 @@ function buildRow(p,team){
     <td class="td-capt"><input type="checkbox" class="capt-check" data-team="${team}" ${captChecked} onchange="handleCaptainChange(this)"></td>
     <td class="${numCls}" contenteditable="true">${p.num||'—'}</td>
     <td class="td-name" contenteditable="true"><span class="capt-flag ${flagCls}">⚑ </span>${p.name||''}</td>
-    <td><span class="pos-badge ${posCls}" onclick="togglePos(this)">${posLbl}</span></td>
     <td class="${goalsCls}" contenteditable="true">${goals}</td>
     <td class="${m7Cls}" contenteditable="true">${m7}</td>
     <td class="td-tirs" contenteditable="true">${tirs}</td>
@@ -704,11 +697,6 @@ function addRow(tbodyId,team){
   document.getElementById(tbodyId).insertAdjacentHTML('beforeend',buildRow(p,team));
 }
 function deleteRow(el){const tr=el.closest('tr');if(confirm('Supprimer ce joueur ?'))tr.remove();}
-function togglePos(el){
-  const tr=el.closest('tr');const numTd=tr.querySelector('.td-num');
-  if(el.classList.contains('pos-gk')){el.classList.remove('pos-gk');el.classList.add('pos-j');el.textContent='J';if(numTd){numTd.classList.remove('num-gk');numTd.classList.add('num-j');}}
-  else{el.classList.remove('pos-j');el.classList.add('pos-gk');el.textContent='GK';if(numTd){numTd.classList.remove('num-j');numTd.classList.add('num-gk');}}
-}
 function handleCaptainChange(cb){
   const tbody=cb.closest('tbody');
   tbody.querySelectorAll('.capt-check').forEach(c=>{if(c!==cb){c.checked=false;updateCaptRow(c);}});
