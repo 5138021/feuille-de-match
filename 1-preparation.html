@@ -106,7 +106,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 
 /* PLAYER LIST (sans licence) */
 .players-header{
-  display:grid;grid-template-columns:36px 1fr 36px 36px 30px;
+  display:grid;grid-template-columns:36px 1fr 36px 30px;
   gap:5px;align-items:center;padding:0 2px 6px;
   border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:8px;
 }
@@ -116,7 +116,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 }
 .players-header span:nth-child(2){text-align:left;}
 .player-row{
-  display:grid;grid-template-columns:36px 1fr 36px 36px 30px;
+  display:grid;grid-template-columns:36px 1fr 36px 30px;
   gap:5px;align-items:center;margin-bottom:6px;
 }
 .player-row input{
@@ -206,7 +206,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 
 /* RESPONSIVE */
 @media(max-width:380px){
-  .players-header,.player-row{grid-template-columns:32px 1fr 32px 32px 26px;}
+  .players-header,.player-row{grid-template-columns:32px 1fr 32px 26px;}
 }
 
 /* ── BOUTON CHARGER ÉQUIPE ── */
@@ -358,14 +358,14 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .ei-num.gk{color:var(--cyan);}
 /* ligne joueur dans l'éditeur (sans licence) */
 .ep-row{
-  display:grid;grid-template-columns:38px 1fr 32px 30px 28px;
+  display:grid;grid-template-columns:38px 1fr 30px 28px;
   gap:5px;align-items:center;margin-bottom:6px;
 }
 .ep-row .pos-btn{font-size:9px;padding:6px 2px;}
 .ep-row .capt-btn{font-size:13px;padding:5px 2px;}
 .ep-row .del-btn{font-size:14px;}
 .ep-header{
-  display:grid;grid-template-columns:38px 1fr 32px 30px 28px;
+  display:grid;grid-template-columns:38px 1fr 30px 28px;
   gap:5px;padding:0 2px 6px;border-bottom:1px solid rgba(255,255,255,.06);
   margin-bottom:8px;
 }
@@ -592,7 +592,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 
       <div class="section-title gold" style="margin-top:14px;"><span class="dot"></span>Joueurs — Domicile</div>
       <div class="players-header">
-        <span>N°</span><span>Nom / Prénom</span><span>Pos</span><span>Cap</span><span></span>
+        <span>N°</span><span>Nom / Prénom</span><span>Cap</span><span></span>
       </div>
       <div id="home-players-list"></div>
       <button class="add-player-btn" onclick="addPlayer('home')">＋ Ajouter un joueur</button>
@@ -620,7 +620,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 
       <div class="section-title cyan" style="margin-top:14px;"><span class="dot"></span>Joueurs — Extérieur</div>
       <div class="players-header">
-        <span>N°</span><span>Nom / Prénom</span><span>Pos</span><span>Cap</span><span></span>
+        <span>N°</span><span>Nom / Prénom</span><span>Cap</span><span></span>
       </div>
       <div id="away-players-list"></div>
       <button class="add-player-btn" onclick="addPlayer('away')">＋ Ajouter un joueur</button>
@@ -913,26 +913,14 @@ function addPlayer(team, isGK = false) {
   const div = document.createElement('div');
   div.className = 'player-row';
   div.id = uid;
+  div.dataset.gk = isGK ? '1' : ''; // poste conservé en interne (non affiché) : se définit depuis la page du match
   div.innerHTML = `
-    <input class="num-inp${isGK?' gk-num':''}" type="text" placeholder="${id}" value="${id}" id="${uid}-num">
+    <input class="num-inp" type="text" placeholder="${id}" value="${id}" id="${uid}-num">
     <input type="text" placeholder="Nom Prénom" id="${uid}-name">
-    <button class="pos-btn${isGK?' is-gk':''}" id="${uid}-pos" onclick="togglePos('${uid}')">${isGK?'GK':'J'}</button>
     <button class="capt-btn" id="${uid}-capt" onclick="toggleCapt('${team}','${uid}')" title="Capitaine">⚑</button>
     <button class="del-btn" onclick="delPlayer('${uid}')" title="Supprimer">✕</button>
   `;
   list.appendChild(div);
-}
-
-function togglePos(uid) {
-  const btn = document.getElementById(uid+'-pos');
-  const num = document.getElementById(uid+'-num');
-  if (btn.classList.contains('is-gk')) {
-    btn.classList.remove('is-gk'); btn.textContent = 'J';
-    num.classList.remove('gk-num');
-  } else {
-    btn.classList.add('is-gk'); btn.textContent = 'GK';
-    num.classList.add('gk-num');
-  }
 }
 
 function toggleCapt(team, uid) {
@@ -1077,13 +1065,12 @@ function collectPlayers(team) {
   const rows = list.querySelectorAll('.player-row');
   return [...rows].map(row => {
     const uid = row.id;
-    const posBtn = document.getElementById(uid+'-pos');
     const captBtn = document.getElementById(uid+'-capt');
     return {
       num: document.getElementById(uid+'-num')?.value || '',
       name: document.getElementById(uid+'-name')?.value || '',
       lic: '',
-      isGK: posBtn?.classList.contains('is-gk') || false,
+      isGK: row.dataset.gk === '1',
       isCapt: captBtn?.classList.contains('is-capt') || false,
       goals: 0, m7: 0, tirs: 0, arrets: 0,
       av: 'empty', p1: 'empty', p2: 'empty', p3: 'empty', p2d: 'empty', dis: 'empty',
@@ -1446,12 +1433,11 @@ function collectEditorTab(tab) {
       const i = parseInt(row.dataset.epIdx);
       const numEl  = document.getElementById('ep-num-'+i);
       const nameEl = document.getElementById('ep-name-'+i);
-      const posBtn = document.getElementById('ep-pos-'+i);
       const captBtn= document.getElementById('ep-capt-'+i);
       players.push({
         num:   numEl?.value  || '',
         name:  nameEl?.value || '',
-        isGK:  posBtn?.classList.contains('is-gk')   || false,
+        isGK:  row.dataset.gk === '1',
         isCapt:captBtn?.classList.contains('is-capt')|| false,
       });
     });
@@ -1491,7 +1477,7 @@ function renderEditorTab(tab) {
     let rows = ps.map((p, i) => buildEditorPlayerRow(p, i)).join('');
     body.innerHTML = `
       <div class="ep-header">
-        <span>N°</span><span>Nom / Prénom</span><span>Pos</span><span>Cap</span><span></span>
+        <span>N°</span><span>Nom / Prénom</span><span>Cap</span><span></span>
       </div>
       <div id="ep-list">${rows}</div>
       <button class="add-player-btn" onclick="editorAddPlayer()" style="margin-top:6px;">＋ Ajouter un joueur</button>
@@ -1511,13 +1497,10 @@ function renderEditorTab(tab) {
 }
 
 function buildEditorPlayerRow(p, i) {
-  const gkCls  = p.isGK   ? ' is-gk'   : '';
   const capCls = p.isCapt ? ' is-capt' : '';
-  const numCls = p.isGK   ? ' gk'      : '';
-  return `<div class="ep-row" data-ep-idx="${i}">
-    <input class="ei ei-num${numCls}" id="ep-num-${i}"  value="${esc(p.num)}"  placeholder="#">
-    <input class="ei"                 id="ep-name-${i}" value="${esc(p.name)}" placeholder="Nom Prénom">
-    <button class="pos-btn${gkCls}"   id="ep-pos-${i}"  onclick="editorTogglePos(${i})">${p.isGK?'GK':'J'}</button>
+  return `<div class="ep-row" data-ep-idx="${i}" data-gk="${p.isGK ? '1' : ''}">
+    <input class="ei ei-num" id="ep-num-${i}"  value="${esc(p.num)}"  placeholder="#">
+    <input class="ei"        id="ep-name-${i}" value="${esc(p.name)}" placeholder="Nom Prénom">
     <button class="capt-btn${capCls}" id="ep-capt-${i}" onclick="editorToggleCapt(${i})" title="Capitaine">⚑</button>
     <button class="del-btn"           onclick="editorDelPlayer(${i})" title="Supprimer">✕</button>
   </div>`;
@@ -1547,14 +1530,6 @@ function editorDelPlayer(i) {
   if (_editCaptIdx === i) _editCaptIdx = -1;
   else if (_editCaptIdx > i) _editCaptIdx--;
   renderEditorTab('joueurs');
-}
-
-function editorTogglePos(i) {
-  const btn = document.getElementById('ep-pos-'+i);
-  const num = document.getElementById('ep-num-'+i);
-  const isGK = btn.classList.toggle('is-gk');
-  btn.textContent = isGK ? 'GK' : 'J';
-  num.classList.toggle('gk', isGK);
 }
 
 function editorToggleCapt(i) {
