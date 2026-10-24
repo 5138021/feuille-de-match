@@ -672,6 +672,13 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
         <div class="form-group"><label>Pause (min)</label><input id="cfg-pauseMin" type="number" inputmode="decimal" min="0" max="30" step="1"></div>
       </div>
 
+      <div class="cfg-sec">Type de match</div>
+      <div class="form-row full">
+        <div class="form-group"><label>Égalité en fin de match</label>
+          <select id="cfg-knockout"><option value="0">Match nul accepté</option><option value="1">Match à élimination — tirs au but</option></select>
+        </div>
+      </div>
+
       <div class="cfg-sec">Exclusions</div>
       <div class="form-row">
         <div class="form-group"><label>Durée d'une exclusion (min)</label><input id="cfg-excluMin" type="number" inputmode="decimal" min="0.5" max="10" step="0.5"></div>
@@ -768,7 +775,7 @@ let homeColor = '#E02D37';
 let awayColor = '#4A9FFF';
 
 // Paramètres du match (modal « Démarrer le match »)
-const CFG_DEFAULT = { nbPeriods:2, periodMin:30, pauseMin:10, excluSec:120, tmoTeam:3, tmoPeriod:2, tmoSec:60 };
+const CFG_DEFAULT = { nbPeriods:2, periodMin:30, pauseMin:10, excluSec:120, tmoTeam:3, tmoPeriod:2, tmoSec:60, knockout:false };
 let cfg = { ...CFG_DEFAULT };
 try {
   const saved = JSON.parse(localStorage.getItem('ffhb_match_config') || 'null');
@@ -1170,6 +1177,7 @@ function openConfigModal() {
   renderCfgColors('home');
   renderCfgColors('away');
   document.getElementById('cfg-nbPeriods').value = String(cfg.nbPeriods);
+  document.getElementById('cfg-knockout').value  = cfg.knockout ? '1' : '0';
   document.getElementById('cfg-periodMin').value = cfg.periodMin;
   document.getElementById('cfg-pauseMin').value  = cfg.pauseMin;
   document.getElementById('cfg-excluMin').value  = cfg.excluSec / 60;
@@ -1208,7 +1216,8 @@ function confirmStartMatch() {
     excluSec:  Math.round(num('cfg-excluMin') * 60),
     tmoTeam:   parseInt(document.getElementById('cfg-tmoTeam').value),
     tmoPeriod: parseInt(document.getElementById('cfg-tmoPeriod').value),
-    tmoSec:    parseInt(document.getElementById('cfg-tmoSec').value)
+    tmoSec:    parseInt(document.getElementById('cfg-tmoSec').value),
+    knockout:  document.getElementById('cfg-knockout').value === '1'
   };
   let err = '';
   if (!(n.periodMin >= 1))                         err = 'La durée des périodes doit être d\'au moins 1 minute.';
