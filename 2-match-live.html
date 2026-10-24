@@ -74,6 +74,37 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .mem.sel{border-color:var(--cyan);background:rgba(74,159,255,.2);}
 .mem.off .mn{color:var(--purple);font-size:13px;}
 
+
+/* TIRS AU BUT */
+.btn-tab{background:rgba(245,166,35,.2);color:var(--gold);border:1px solid rgba(245,166,35,.45);}
+.end-btn-tab{background:linear-gradient(135deg,var(--gold),#cc8800);color:var(--blue);}
+.tab-score{display:flex;align-items:center;justify-content:center;gap:14px;background:rgba(255,255,255,.05);border-radius:12px;padding:12px;margin:6px 0 4px;}
+.tab-side{text-align:center;min-width:70px;}
+.tab-nm{font-family:var(--font-h);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;}
+.tab-pts{font-family:var(--font-mono);font-size:44px;font-weight:700;line-height:1.05;}
+.tab-sep{font-family:var(--font-h);font-size:28px;color:var(--muted);}
+.tab-start{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.tab-start button{padding:12px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;font-family:var(--font-h);font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+.tab-start button.on-home{background:rgba(var(--home-rgb),.25);border-color:var(--home);color:var(--home);}
+.tab-start button.on-away{background:rgba(var(--away-rgb),.25);border-color:var(--away);color:var(--away);}
+.tab-next{text-align:center;font-family:var(--font-h);font-size:15px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin:12px 0 2px;}
+.tab-win{text-align:center;font-family:var(--font-h);font-size:17px;font-weight:900;color:var(--green);background:rgba(0,193,122,.12);border:1px solid rgba(0,193,122,.3);border-radius:10px;padding:12px;margin:12px 0 2px;}
+.tab-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.tab-btn{padding:14px 6px;border:none;border-radius:11px;font-family:var(--font-h);font-size:15px;font-weight:900;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+.tab-btn:active{transform:scale(.97);}
+.tab-btn.goal{background:linear-gradient(135deg,var(--green),#00a066);color:var(--blue);}
+.tab-btn.miss{background:rgba(224,45,55,.2);border:1px solid rgba(224,45,55,.5);color:#ff7a80;}
+.tab-btn[disabled]{opacity:.35;pointer-events:none;}
+.tab-seq{display:grid;grid-template-columns:54px 1fr;gap:6px 8px;align-items:center;}
+.tab-seq .sq-nm{font-family:var(--font-h);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;}
+.tab-seq .sq-dots{display:flex;gap:5px;flex-wrap:wrap;}
+.tdot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;border:1px dashed rgba(255,255,255,.25);color:transparent;}
+.tdot.g{background:var(--green);border:none;color:var(--blue);}
+.tdot.m{background:rgba(224,45,55,.85);border:none;color:#fff;}
+.mem.done{opacity:.5;}
+.mem .shotmark{margin-left:auto;font-size:11px;color:var(--green);}
+.tab-small{width:100%;margin-top:10px;padding:10px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:var(--muted);font-family:var(--font-h);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+
 /* BOUTON TME PAR ÉQUIPE */
 .tme-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-bottom:8px;padding:9px 6px;border-radius:9px;font-family:var(--font-h);font-size:13px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
 .tme-btn:active{transform:scale(.97);}
@@ -145,7 +176,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
 .match-body{padding:10px 12px 80px;}
 
 /* DEUX ÉQUIPES CÔTE À CÔTE */
-.both-teams{display:grid;grid-template-columns:1fr 328px 1fr;gap:6px;align-items:start;}
+.both-teams{display:grid;grid-template-columns:1fr 128px 1fr;gap:6px;align-items:start;}
 .team-col{min-width:0;}
 .events-col{min-width:0;position:sticky;top:96px;}
 .events-col-title{font-family:var(--font-h);font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:center;margin-bottom:8px;}
@@ -352,6 +383,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
       <div class="chrono-btns">
         <button class="btn-ch btn-play" id="btnPlay" onclick="toggleChrono()">▶ Start</button>
         <button class="btn-ch btn-per" onclick="endPeriod()" id="btnPer">Fin MT1 →</button>
+        <button class="btn-ch btn-tab" onclick="openTab()" id="btnTab" style="display:none;">🥅 TAB</button>
       </div>
     </div>
     <div class="sb-team">
@@ -361,7 +393,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
   </div>
   <!-- Décompte du temps mort en cours -->
   <div class="tmo-banner" id="tmoBanner">
-    <span class="tb-txt" id="tmoBannerTxt">Temps Mort</span>
+    <span class="tb-txt" id="tmoBannerTxt">T.O.</span>
     <span class="tb-time" id="tmoBannerTime">1:00</span>
     <button onclick="endTMOCountdown()">Terminer</button>
   </div>
@@ -378,7 +410,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
         <span class="tmo-count" id="tmo-home-badge"></span>
         <div class="team-hdr-score" id="ts-home-score" style="color:var(--home)">0</div>
       </div>
-      <button class="tme-btn hm" id="tme-btn-home" title="Temps Mort d'Équipe" onclick="useTMO('home')">⏸ Temps Mort d'Equipe <span class="tme-count" id="tme-count-home"></span></button>
+      <button class="tme-btn hm" id="tme-btn-home" title="Temps Mort d'Équipe" onclick="useTMO('home')">⏸ TME <span class="tme-count" id="tme-count-home"></span></button>
       <div class="cards-list" id="grid-home"></div>
       <div class="staff-sep">Staff</div>
       <div class="cards-list" id="grid-staff-home"></div>
@@ -397,7 +429,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
         <span class="tmo-count" id="tmo-away-badge"></span>
         <div class="team-hdr-score" id="ts-away-score" style="color:var(--away)">0</div>
       </div>
-      <button class="tme-btn aw" id="tme-btn-away" title="Temps Mort d'Équipe" onclick="useTMO('away')">⏸ Temps Mort d'Equipe <span class="tme-count" id="tme-count-away"></span></button>
+      <button class="tme-btn aw" id="tme-btn-away" title="Temps Mort d'Équipe" onclick="useTMO('away')">⏸ TME <span class="tme-count" id="tme-count-away"></span></button>
       <div class="cards-list" id="grid-away"></div>
       <div class="staff-sep">Staff</div>
       <div class="cards-list" id="grid-staff-away"></div>
@@ -470,6 +502,43 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
   </div>
 </div>
 
+<!-- MODAL TIRS AU BUT -->
+<div class="modal-overlay" id="tabModal">
+  <div class="modal-sheet sheet-tall">
+    <div class="modal-hdr" style="margin-bottom:4px;">
+      <div style="font-size:28px;">🥅</div>
+      <div><div class="modal-name">Tirs au but</div><div class="modal-sub">5 tirs par équipe, puis mort subite</div></div>
+      <button class="modal-close" onclick="closeTab()">✕</button>
+    </div>
+    <div class="tab-score" id="tab-score"></div>
+
+    <div id="tab-start-box">
+      <div class="f-sec">Qui tire en premier ?</div>
+      <div class="tab-start" id="tab-start"></div>
+    </div>
+
+    <div id="tab-play" style="display:none;">
+      <div id="tab-next"></div>
+      <div id="tab-pick">
+        <div class="f-sec">Tireur <span style="font-weight:500;letter-spacing:0;text-transform:none;color:var(--muted);">(facultatif)</span></div>
+        <div class="mem-grid" id="tab-members"></div>
+      </div>
+      <div class="tab-btns">
+        <button class="tab-btn goal" id="tab-goal" onclick="tabShot('goal')">⚽ But</button>
+        <button class="tab-btn miss" id="tab-miss" onclick="tabShot('miss')">✖ Raté</button>
+      </div>
+      <div class="f-sec">Séquence</div>
+      <div class="tab-seq" id="tab-seq"></div>
+      <button class="tab-small" onclick="tabUndo()">↩ Annuler le dernier tir</button>
+    </div>
+
+    <div class="f-btns">
+      <button class="f-btn ghost" onclick="tabReset()">↺ Recommencer</button>
+      <button class="f-btn go" onclick="closeTab()">Terminer</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL RÉGLAGES DU MATCH -->
 <div class="modal-overlay" id="settingsModal" onclick="if(event.target===this)closeSettings()">
   <div class="modal-sheet sheet-tall">
@@ -498,6 +567,13 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
       <div class="f-grp"><label>Pause (min)</label><input id="set-pauseMin" type="number" inputmode="decimal" min="0" max="30" step="1"></div>
     </div>
     <div class="f-note" id="set-per-note"></div>
+
+    <div class="f-sec">Type de match</div>
+    <div class="f-row c1">
+      <div class="f-grp"><label>Égalité en fin de match</label>
+        <select id="set-knockout"><option value="0">Match nul accepté</option><option value="1">Match à élimination — tirs au but</option></select>
+      </div>
+    </div>
 
     <div class="f-sec">Exclusions</div>
     <div class="f-row c1">
@@ -565,6 +641,7 @@ body{font-family:var(--font-b);background:var(--blue);color:var(--white);min-hei
     <div class="end-teams" id="end-teams"></div>
     <div class="end-winner" id="end-winner"></div>
     <div class="end-btns">
+      <button class="end-btn end-btn-tab" id="end-btn-tab" onclick="openTab()" style="display:none;">🥅 Tirs au but</button>
       <button class="end-btn end-btn-export" onclick="exportResults()">📋 Exporter la Feuille</button>
       <button class="end-btn end-btn-stay" onclick="document.getElementById('endModal').classList.remove('open')">Continuer à saisir</button>
     </div>
@@ -581,7 +658,7 @@ let currentModalPlayer = null;
 let excluTimers = {}; // uid -> { secsAtStart, totalSecs }
 
 // Paramètres du match (définis dans la page de préparation → modal « Démarrer le match »)
-const CFG_DEFAULT = { nbPeriods:2, periodMin:30, pauseMin:10, excluSec:120, tmoTeam:3, tmoPeriod:2, tmoSec:60 };
+const CFG_DEFAULT = { nbPeriods:2, periodMin:30, pauseMin:10, excluSec:120, tmoTeam:3, tmoPeriod:2, tmoSec:60, knockout:false };
 let cfg = { ...CFG_DEFAULT };
 
 // Déroulement : 'pre' (avant match) · 'play' (période en cours) · 'break' (pause entre périodes) · 'end'
@@ -655,6 +732,7 @@ function updateScore() {
   document.getElementById('sb-away-score').textContent=String(m.scoreAway).padStart(2,'0');
   document.getElementById('ts-home-score').textContent=m.scoreHome;
   document.getElementById('ts-away-score').textContent=m.scoreAway;
+  refreshTabUI();
 }
 
 // ═══════════ CHRONO ═══════════
@@ -723,7 +801,7 @@ function endPeriod(){
     document.getElementById('chronoPeriod').textContent='Match Terminé';
     document.getElementById('btnPer').textContent='✅ Terminé';
     document.getElementById('btnPlay').style.display='none';
-    m.matchEnded=true;showEndModal();
+    m.matchEnded=true;showEndModal();refreshTabUI();
   }
   saveData();
 }
@@ -751,10 +829,10 @@ function tmoLeftTeam(team){return Math.max(0,cfg.tmoTeam-data[team].tmo);}
 function tmoLeftPeriod(team){return Math.max(0,cfg.tmoPeriod-tmoUsedPeriod(team,periodIdx));}
 
 function useTMO(team){
-  if(phase!=='play'){showToast('⏸ Temps Mort possible uniquement pendant une période');return;}
+  if(phase!=='play'){showToast('⏸ T.O. possible uniquement pendant une période');return;}
   if(tmoCountdown){showToast('Un temps mort est déjà en cours');return;}
   if(tmoLeftTeam(team)<=0){showToast('❌ Plus de temps morts pour cette équipe !');return;}
-  if(tmoLeftPeriod(team)<=0){showToast('❌ Max. '+cfg.tmoPeriod+' Temps Mort atteint sur cette période');return;}
+  if(tmoLeftPeriod(team)<=0){showToast('❌ Max. '+cfg.tmoPeriod+' T.O. atteint sur cette période');return;}
   data[team].tmo++;
   data[team].tmoByPeriod[periodIdx]=tmoUsedPeriod(team,periodIdx)+1;
   addEvent({type:'tmo',team,time:getTime(),period:periodIdx,desc:'Temps mort'});
@@ -773,7 +851,7 @@ function updateTMOInfo(){
       btn.classList.toggle('off',tmoLeftTeam(t)<=0||(phase==='play'&&tmoLeftPeriod(t)<=0));
       btn.title="Temps Mort d'Équipe — restants : "+tmoLeftTeam(t)+' · cette période : '+tmoLeftPeriod(t)+' · durée : '+(cfg.tmoSec>=60&&cfg.tmoSec%60===0?(cfg.tmoSec/60)+' min':cfg.tmoSec+' s');
     }
-    document.getElementById('tmo-'+t+'-badge').textContent=used>0?`Temps Mort×${used}`:'';
+    document.getElementById('tmo-'+t+'-badge').textContent=used>0?`T.O.×${used}`:'';
   });
 }
 
@@ -783,7 +861,7 @@ function startTMOCountdown(team){
   tmoCountdown={team,rem:Math.round(cfg.tmoSec),interval:null};
   const b=document.getElementById('tmoBanner');
   b.classList.remove('done');b.style.display='flex';
-  document.getElementById('tmoBannerTxt').textContent='⏸ Temps Mort — '+(data[team].abr||data[team].nom);
+  document.getElementById('tmoBannerTxt').textContent='⏸ T.O. — '+(data[team].abr||data[team].nom);
   renderTMOBanner();
   tmoCountdown.interval=setInterval(()=>{
     if(!tmoCountdown)return;
@@ -1173,7 +1251,7 @@ document.addEventListener('click',function(e){
 
 function refreshAll(){
   renderPlayers('home');renderPlayers('away');renderStaff('home');renderStaff('away');
-  updateScore();updateTMOInfo();renderEvents();
+  updateScore();updateTMOInfo();renderEvents();refreshTabUI();
 }
 
 // ═══════════ EFFET D'UN FAIT SUR LES STATISTIQUES ═══════════
@@ -1369,9 +1447,159 @@ function showEndModal(){
   const m=data.match;
   document.getElementById('end-score').textContent=m.scoreHome+' – '+m.scoreAway;
   document.getElementById('end-teams').textContent=data.home.nom+' · '+data.away.nom;
-  const w=m.scoreHome>m.scoreAway?data.home.nom:m.scoreAway>m.scoreHome?data.away.nom:null;
-  document.getElementById('end-winner').textContent=w?'🏆 '+w+' remporte le match !':'🤝 Match nul';
+  const tie=m.scoreHome===m.scoreAway;
+  const hasTab=!!(m.tab&&m.tab.shots&&m.tab.shots.length);
+  const tabBtn=document.getElementById('end-btn-tab');
+  let txt;
+  if(tie&&(cfg.knockout||hasTab)){
+    const c=tabCompute();
+    if(c.winner)txt='🏆 '+data[c.winner].nom+' remporte aux tirs au but ('+c.home.g+' – '+c.away.g+')';
+    else if(hasTab)txt='🥅 Tirs au but en cours ('+c.home.g+' – '+c.away.g+')';
+    else txt='🤝 Égalité — tirs au but à jouer';
+    tabBtn.style.display='';
+    tabBtn.textContent=hasTab?'🥅 Tirs au but ('+c.home.g+' – '+c.away.g+')':'🥅 Lancer les tirs au but';
+  }else{
+    const w=m.scoreHome>m.scoreAway?data.home.nom:m.scoreAway>m.scoreHome?data.away.nom:null;
+    txt=w?'🏆 '+w+' remporte le match !':'🤝 Match nul';
+    tabBtn.style.display='none';
+  }
+  document.getElementById('end-winner').textContent=txt;
   document.getElementById('endModal').classList.add('open');
+}
+
+// ═══════════ TIRS AU BUT (match à élimination) ═══════════
+let tabSel=null; // joueur sélectionné pour le prochain tir
+function tabData(){const m=data.match;if(!m.tab)m.tab={start:null,shots:[]};return m.tab;}
+
+// Série de 5 tirs par équipe (arrêt anticipé si l'écart ne peut plus être comblé), puis mort subite par paires de tirs
+function tabCompute(){
+  const t=tabData();
+  const r={home:{n:0,g:0},away:{n:0,g:0},next:null,winner:null};
+  t.shots.forEach(x=>{r[x.team].n++;if(x.result==='goal')r[x.team].g++;});
+  if(!t.start)return r;
+  const nH=r.home.n,nA=r.away.n,gH=r.home.g,gA=r.away.g;
+  if(nH<=5&&nA<=5){
+    if(gH>gA+(5-nA))r.winner='home';
+    else if(gA>gH+(5-nH))r.winner='away';
+  }else if(nH===nA&&gH!==gA){
+    r.winner=gH>gA?'home':'away';
+  }
+  if(!r.winner){
+    const other=t.start==='home'?'away':'home';
+    r.next=(t.shots.length%2===0)?t.start:other;
+  }
+  return r;
+}
+
+// Enregistre le résultat dans les données du match (utilisé par la feuille d'export)
+function tabSync(){
+  const m=data.match,t=tabData(),c=tabCompute();
+  if(t.shots.length){m.tabHome=c.home.g;m.tabAway=c.away.g;m.tabWinner=c.winner||null;}
+  else{delete m.tabHome;delete m.tabAway;delete m.tabWinner;}
+  saveData();refreshTabUI();
+}
+
+function refreshTabUI(){
+  const b=document.getElementById('btnTab');if(!b||!data)return;
+  const m=data.match,t=m.tab;
+  const hasTab=!!(t&&t.shots&&t.shots.length);
+  const show=phase==='end'&&(((cfg.knockout)&&m.scoreHome===m.scoreAway)||hasTab);
+  b.style.display=show?'':'none';
+  b.textContent=hasTab?'🥅 TAB '+(m.tabHome||0)+'-'+(m.tabAway||0):'🥅 TAB';
+}
+
+function openTab(){
+  const m=data.match;
+  if(phase!=='end'){showToast('Les tirs au but se jouent à la fin du match');return;}
+  const hasTab=!!(m.tab&&m.tab.shots&&m.tab.shots.length);
+  if(m.scoreHome!==m.scoreAway&&!hasTab){showToast('Le score n\'est pas à égalité');return;}
+  document.getElementById('endModal').classList.remove('open');
+  tabSel=null;renderTab();
+  document.getElementById('tabModal').classList.add('open');
+}
+function closeTab(){
+  document.getElementById('tabModal').classList.remove('open');
+  if(phase==='end')showEndModal();
+}
+
+function renderTab(){
+  const t=tabData(),c=tabCompute(),H=data.home,A=data.away;
+  document.getElementById('tab-score').innerHTML=
+    `<div class="tab-side" style="color:var(--home)"><div class="tab-nm">${H.abr||H.nom}</div><div class="tab-pts">${c.home.g}</div></div>
+     <div class="tab-sep">–</div>
+     <div class="tab-side" style="color:var(--away)"><div class="tab-nm">${A.abr||A.nom}</div><div class="tab-pts">${c.away.g}</div></div>`;
+
+  // choix de l'équipe qui tire en premier (tant qu'aucun tir n'est enregistré)
+  const canPickStart=t.shots.length===0;
+  document.getElementById('tab-start-box').style.display=canPickStart?'':'none';
+  document.getElementById('tab-start').innerHTML=
+    `<button class="${t.start==='home'?'on-home':''}" onclick="tabSetStart('home')">${H.nom}</button>
+     <button class="${t.start==='away'?'on-away':''}" onclick="tabSetStart('away')">${A.nom}</button>`;
+
+  const play=document.getElementById('tab-play');
+  if(!t.start){play.style.display='none';return;}
+  play.style.display='';
+
+  const nextBox=document.getElementById('tab-next');
+  const pick=document.getElementById('tab-pick');
+  if(c.winner){
+    nextBox.innerHTML=`<div class="tab-win">🏆 ${data[c.winner].nom} remporte aux tirs au but (${c.home.g} – ${c.away.g})</div>`;
+    pick.style.display='none';
+  }else{
+    const n=Math.floor(t.shots.length/2)+1;
+    const col=c.next==='home'?'var(--home)':'var(--away)';
+    nextBox.innerHTML=`<div class="tab-next">Tir n°${n} — <span style="color:${col}">${data[c.next].nom}</span></div>`;
+    pick.style.display='';
+    const already=t.shots.filter(x=>x.team===c.next&&x.pi!=null).map(x=>x.pi);
+    document.getElementById('tab-members').innerHTML=data[c.next].players.map((p,i)=>{
+      if(p.outOfGame)return'';
+      const done=already.includes(i);
+      return `<div class="mem${p.isGK?' gk':''}${tabSel===i?' sel':''}${done?' done':''}" onclick="tabPick(${i})"><span class="mn">${p.num||'?'}</span><span class="mt">${p.name||'—'}</span>${done?'<span class="shotmark">✓</span>':''}</div>`;
+    }).join('');
+  }
+  document.getElementById('tab-goal').disabled=!!c.winner;
+  document.getElementById('tab-miss').disabled=!!c.winner;
+
+  // séquence des tirs
+  const rounds=Math.max(5,Math.max(c.home.n,c.away.n)+(c.winner?0:1));
+  const row=(team)=>{
+    const shots=t.shots.filter(x=>x.team===team);
+    let d='';
+    for(let k=0;k<rounds;k++){
+      const x=shots[k];
+      const who=x&&x.pi!=null&&data[team].players[x.pi]?fullName(data[team].players[x.pi]):'';
+      d+=x?`<div class="tdot ${x.result==='goal'?'g':'m'}" title="${who}">${x.result==='goal'?'✓':'✕'}</div>`:'<div class="tdot">·</div>';
+    }
+    return `<div class="sq-nm" style="color:var(--${team})">${data[team].abr||data[team].nom}</div><div class="sq-dots">${d}</div>`;
+  };
+  document.getElementById('tab-seq').innerHTML=row('home')+row('away');
+}
+
+function tabSetStart(team){
+  const t=tabData();if(t.shots.length)return;
+  t.start=team;tabSel=null;tabSync();renderTab();
+}
+function tabPick(i){tabSel=(tabSel===i)?null:i;renderTab();}
+function tabShot(result){
+  const t=tabData(),c=tabCompute();
+  if(!t.start||c.winner||!c.next)return;
+  t.shots.push({team:c.next,pi:tabSel,result});
+  tabSel=null;
+  const c2=tabCompute();
+  tabSync();renderTab();
+  if(c2.winner)showToast('🏆 '+data[c2.winner].nom+' remporte les tirs au but !');
+  else showToast(result==='goal'?'⚽ But !':'✖ Raté');
+}
+function tabUndo(){
+  const t=tabData();
+  if(!t.shots.length){showToast('Rien à annuler');return;}
+  t.shots.pop();tabSel=null;tabSync();renderTab();showToast('↩️ Annulé');
+}
+function tabReset(){
+  const t=tabData();
+  if(!t.start&&!t.shots.length)return;
+  if(!confirm('Recommencer les tirs au but à zéro ?'))return;
+  t.start=null;t.shots=[];tabSel=null;tabSync();renderTab();
 }
 
 // ═══════════ TOAST ═══════════
@@ -1400,6 +1628,7 @@ function openSettings(){
   [...sel.options].forEach(o=>{o.disabled=parseInt(o.value)<periodIdx;});
   sel.disabled=(phase==='end');
   document.getElementById('set-per-note').textContent=phase==='end'?'Match terminé : le nombre de périodes ne peut plus changer.':(periodIdx>1?'Le nombre de périodes ne peut pas être inférieur à la période en cours ('+periodIdx+').':'');
+  document.getElementById('set-knockout').value=cfg.knockout?'1':'0';
   document.getElementById('set-periodMin').value=cfg.periodMin;
   document.getElementById('set-pauseMin').value=cfg.pauseMin;
   document.getElementById('set-excluMin').value=cfg.excluSec/60;
@@ -1435,7 +1664,8 @@ function applySettings(){
     excluSec:Math.round(num('set-excluMin')*60),
     tmoTeam:parseInt(document.getElementById('set-tmoTeam').value),
     tmoPeriod:parseInt(document.getElementById('set-tmoPeriod').value),
-    tmoSec:parseInt(document.getElementById('set-tmoSec').value)
+    tmoSec:parseInt(document.getElementById('set-tmoSec').value),
+    knockout:document.getElementById('set-knockout').value==='1'
   };
   let err='';
   if(!(n.nbPeriods>=periodIdx))err='Le nombre de périodes ne peut pas être inférieur à la période en cours.';
@@ -1459,7 +1689,7 @@ function applySettings(){
     data.match.scoreHTHome=ps?ps.home:0;data.match.scoreHTAway=ps?ps.away:0;
   }
   localStorage.setItem('ffhb_match_config',JSON.stringify(cfg));
-  applyTeamColors();refreshPerButton();updateTMOInfo();
+  applyTeamColors();refreshPerButton();updateTMOInfo();refreshTabUI();
   renderPlayers('home');renderPlayers('away');renderStaff('home');renderStaff('away');
   saveData();closeSettings();showToast('⚙️ Réglages appliqués');
 }
