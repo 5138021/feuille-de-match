@@ -768,7 +768,9 @@ function renderPeriodGrid(m, h, a) {
   const cols = [];
   for (let k = 1; k <= N - 1; k++) cols.push({ label: 'Période ' + k, home: cum(k, 'home'), away: cum(k, 'away'), main: true });
   cols.push({ label: 'Fin Tps Rég.', home: m && m.scoreHome !== undefined ? m.scoreHome : '—', away: m && m.scoreAway !== undefined ? m.scoreAway : '—', main: true });
-  cols.push({ label: 'Prol. 1', main: false }, { label: 'Prol. 2', main: false }, { label: 'Tirs au but', main: false });
+  const hasTab = !!(m && m.tab && m.tab.shots && m.tab.shots.length);
+  cols.push({ label: 'Prol. 1', main: false }, { label: 'Prol. 2', main: false },
+    hasTab ? { label: 'Tirs au but', main: true, home: m.tabHome, away: m.tabAway } : { label: 'Tirs au but', main: false });
 
   const grid = document.getElementById('period-grid');
   grid.style.gridTemplateColumns = '60px repeat(' + cols.length + ', 1fr)';
@@ -786,6 +788,13 @@ function renderPeriodGrid(m, h, a) {
 
 // Texte sous le score final
 function periodSummaryText(m) {
+  const base = periodBaseText(m);
+  const hasTab = !!(m && m.tab && m.tab.shots && m.tab.shots.length);
+  if (!hasTab) return base;
+  const tab = `TAB : ${m.tabHome || 0} – ${m.tabAway || 0}`;
+  return base ? base + ' · ' + tab : tab;
+}
+function periodBaseText(m) {
   const N = Math.max(1, CFG.nbPeriods || 2);
   if (N === 1) return '';
   const ps = (m && m.periodScores) || [];
